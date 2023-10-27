@@ -20,32 +20,39 @@ public class Loader
 
     private void loadData(ArrayList<Object> row, String[] type) throws SQLException
     {
-        for (int i = 0; i < row.size(); i++)
+        for (int i = 0; i < row.size() - 1; i++)
         {
             try
             {
+                String data;
+                if (row.get(i) != null)
+                {
+                    data = row.get(i).toString();
+                }
+                else
+                {
+                    stmt.setString(i + 1, null);
+                    continue;
+                }
                 if (type[i] == "Long")
                 {
-                    stmt.setLong(i, (long) row.get(i));
+                    stmt.setLong(i + 1, Long.parseLong(data));
                 }
                 else if (type[i] == "String")
                 {
-                    stmt.setString(i, row.get(i).toString());
+                    stmt.setString(i + 1, data);
                 }
                 else if (type[i] == "Date")
                 {
-                    String[] tmp = row.get(i).toString().split("月");
-                    Date birthday = new Date(2023 - 1900, Integer.parseInt(row.get(i).toString().split("月")[0]) - 1, Integer.parseInt(row.get(i).toString().split("日")[1]) - 1);
-                    stmt.setDate(i, birthday);
+                    stmt.setDate(i + 1, new Date(2023 - 1900, Integer.parseInt(data.split("月")[0]) - 1, Integer.parseInt(data.split("月")[1].split("日")[0]) - 1));
                 }
                 else if (type[i] == "Int")
                 {
-                    stmt.setInt(i, (int) row.get(i));
+                    stmt.setInt(i + 1, Integer.parseInt(data));
                 }
             }
             catch (Exception e)
             {
-                System.err.println("格式转化错误");
                 System.out.println(e);
             }
         }
@@ -85,41 +92,36 @@ public class Loader
                     }
                     row.add(data);
                 }
-                for (int i = 0; i < row.size(); i++)
-                {
-                    System.out.println(row.get(i));
-                }
                 loadData(row, queue);
-                try
+                if (cnt % BATCH_SIZE != 0)
                 {
-                    if (cnt % BATCH_SIZE != 0)
-                    {
-                        stmt.executeBatch();
-                    }
-                    con.commit();//提交事务，运行后才导入数据库
-                    stmt.close();
-                    database.close(stmt);
-                    long end = System.currentTimeMillis();//结束时间
-                    System.out.println(cnt + " records successfully loaded");
-                    System.out.println("Loading speed : " + (cnt * 1000) / (end - start) + " records/s");
-                }
-                catch (Exception e)
-                {
-                    System.err.println("Fatal error: " + e.getMessage());
-                    try
-                    {
-                        con.rollback();
-                        stmt.close();
-                    }
-                    catch (Exception e2)
-                    {
-                        System.out.println(e2);
-                    }
-                    database.close(stmt);
-                    System.exit(1);
+                    stmt.executeBatch();
                 }
             }
-
+            try
+            {
+                con.commit();//提交事务，运行后才导入数据库
+                stmt.close();
+                database.close(stmt);
+                long end = System.currentTimeMillis();//结束时间
+                System.out.println(cnt + " records successfully loaded");
+                System.out.println("Loading speed : " + (cnt * 1000) / (end - start) + " records/s");
+            }
+            catch (Exception e)
+            {
+                System.err.println("Fatal error: " + e.getMessage());
+                try
+                {
+                    con.rollback();
+                    stmt.close();
+                }
+                catch (Exception e2)
+                {
+                    System.out.println(e2);
+                }
+                database.close(stmt);
+                System.exit(1);
+            }
         }
         catch (SQLException e)
         {
