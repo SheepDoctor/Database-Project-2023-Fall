@@ -1,4 +1,4 @@
 String file_path = "source_file/users.csv";
-        String[] queue = {"Long", "String", "String", "Date", "Int", "String", "Skip","String"};
-        String sql = "insert into users(Mid,Name,Sex,Birthday,Level,Sign,identity) values(?,?,?,?,?,?,?)";
-        Database database = new Database(prop);
+String[] queue = {"Long", "String", "String", "Date", "Int", "String", "Skip","String"};
+String sql = "insert into users(Mid,Name,Sex,Birthday,Level,Sign,identity) values(?,?,?,?,?,?,?)";
+Database database = new Database(prop);
