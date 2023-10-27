@@ -68,7 +68,7 @@ public class Database
             }
             catch (Exception e)
             {
-                // Forget about it
+                System.out.println(e);
             }
         }
     }

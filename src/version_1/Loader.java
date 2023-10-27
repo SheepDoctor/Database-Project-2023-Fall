@@ -8,20 +8,19 @@ import java.sql.*;
 import java.util.ArrayList;
 import java.util.Properties;
 import java.sql.Date;
+import java.util.SimpleTimeZone;
 
 import com.opencsv.CSVReader;
 
 public class Loader
 {
     private final int BATCH_SIZE = 500;//initial 500
-    private URL propertyURL = Loader.class.getResource("/loader.cnf");
     private Connection con = null;
     private PreparedStatement stmt = null;
-    private boolean verbose = false;
 
     private void loadData(ArrayList<Object> row, String[] type) throws SQLException
     {
-        for(int i = 0; i < row.size(); i++)
+        for (int i = 0; i < row.size(); i++)
         {
             try
             {
@@ -54,23 +53,12 @@ public class Loader
     }
 
 
-    public void write_data(String[] queue)
+    public void write_data(String file_path, String[] queue, Database database, String sql)
     {
-
-        Properties def_prop = new Properties();
-        def_prop.put("host", "localhost");
-        def_prop.put("user", "postgres");
-        def_prop.put("password", "123456");
-        def_prop.put("database", "Project");
-        Properties prop = new Properties(def_prop);
-
-        Database database = new Database(prop);
-        // Ignore
-        //System.err.println("No configuration file (loader.cnf) found");
         con = database.open();
         try
         {
-            stmt = con.prepareStatement("insert into users(Mid,Name,Sex,Birthday,Level,Sign,identity)" + " values(?,?,?,?,?,?,?)");
+            stmt = con.prepareStatement(sql);
         }
         catch (SQLException e)
         {
@@ -79,9 +67,6 @@ public class Loader
             database.close(stmt);
             System.exit(1);
         }
-
-        File users = new File("..\\..\\source_file\\users.csv");
-        String file_path = "source_file/users.csv";
         try
         {
             long start = System.currentTimeMillis();//开始时间
@@ -89,18 +74,18 @@ public class Loader
             CSVReader reader = new CSVReader(fr);
             String[] lineData = reader.readNext();
             int cnt = 0;
-            while((lineData = reader.readNext()) != null)
+            while ((lineData = reader.readNext()) != null)
             {
                 ArrayList<Object> row = new ArrayList<>();
-                for(Object data : lineData)
+                for (Object data : lineData)
                 {
-                    if(data == "" || data == null)
+                    if (data == "" || data == null)
                     {
                         data = null;
                     }
                     row.add(data);
                 }
-                for(int i = 0; i < row.size(); i++)
+                for (int i = 0; i < row.size(); i++)
                 {
                     System.out.println(row.get(i));
                 }
@@ -128,6 +113,7 @@ public class Loader
                     }
                     catch (Exception e2)
                     {
+                        System.out.println(e2);
                     }
                     database.close(stmt);
                     System.exit(1);
