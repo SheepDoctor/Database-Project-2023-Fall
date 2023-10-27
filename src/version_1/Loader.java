@@ -8,7 +8,7 @@ import java.sql.*;
 import java.util.ArrayList;
 import java.util.Properties;
 import java.sql.Date;
-import java.util.SimpleTimeZone;
+import java.sql.Timestamp;
 
 import com.opencsv.CSVReader;
 
@@ -26,7 +26,7 @@ public class Loader
             try
             {
                 String data;
-                if(row.get(i) != null)
+                if (row.get(i) != null)
                 {
                     data = row.get(i).toString();
                 }
@@ -63,7 +63,7 @@ public class Loader
                         stmt.setDate(index++, null);
                         continue;
                     }
-                    stmt.setDate(index++, new Date(2023 - 1900, Integer.parseInt(data.split("月")[0]) - 1, Integer.parseInt(data.split("月")[1].split("日")[0]) - 1));
+                    stmt.setDate(index++, new Date(2023 - 1900, Integer.parseInt(data.split("月")[0]) - 1, Integer.parseInt(data.split("月")[1].split("日")[0])));
                 }
                 else if (type[i] == "Int")
                 {
@@ -73,6 +73,21 @@ public class Loader
                         continue;
                     }
                     stmt.setInt(index++, Integer.parseInt(data));
+                }
+                else if (type[i] == "Time")
+                {
+                    if (row.get(i) == null)
+                    {
+                        stmt.setTimestamp(index++, null);
+                        continue;
+                    }
+                    stmt.setTimestamp(index++, new Timestamp(
+                            Integer.parseInt(data.split(" ")[0].split("-")[0]),
+                            Integer.parseInt(data.split(" ")[0].split("-")[1]),
+                            Integer.parseInt(data.split(" ")[0].split("-")[2]),
+                            Integer.parseInt(data.split(" ")[1].split(":")[0]),
+                            Integer.parseInt(data.split(" ")[1].split(":")[1]),
+                            Integer.parseInt(data.split(" ")[1].split(":")[2]),0));
                 }
             }
             catch (Exception e)
@@ -104,7 +119,7 @@ public class Loader
             FileReader fr = new FileReader(file_path);
             CSVReader reader = new CSVReader(fr);
             String[] lineData = reader.readNext();
-            int cnt = 0;
+            int cnt = 1;
             while ((lineData = reader.readNext()) != null)
             {
                 ArrayList<Object> row = new ArrayList<>();
@@ -117,10 +132,11 @@ public class Loader
                     row.add(data);
                 }
                 loadData(row, queue);
-                if (cnt % BATCH_SIZE != 0)
+                if (cnt % BATCH_SIZE == 0)
                 {
                     stmt.executeBatch();
                     stmt.clearBatch();
+                    System.out.println("进度：" + cnt / BATCH_SIZE + "%");
                 }
                 cnt++;
             }
