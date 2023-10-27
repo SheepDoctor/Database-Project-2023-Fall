@@ -20,35 +20,59 @@ public class Loader
 
     private void loadData(ArrayList<Object> row, String[] type) throws SQLException
     {
-        for (int i = 0; i < row.size() - 1; i++)
+        int index = 1;
+        for (int i = 0; i < row.size(); i++)
         {
             try
             {
                 String data;
-                if (row.get(i) != null)
+                if(row.get(i) != null)
                 {
                     data = row.get(i).toString();
                 }
                 else
                 {
-                    stmt.setString(i + 1, null);
+                    data = null;
+                }
+                if (type[i] == "Skip")
+                {
                     continue;
                 }
-                if (type[i] == "Long")
+                else if (type[i] == "Long")
                 {
-                    stmt.setLong(i + 1, Long.parseLong(data));
+                    if (row.get(i) == null)
+                    {
+                        stmt.setLong(index++, -1);
+                        continue;
+                    }
+                    stmt.setLong(index++, Long.parseLong(data));
                 }
                 else if (type[i] == "String")
                 {
-                    stmt.setString(i + 1, data);
+                    if (row.get(i) == null)
+                    {
+                        stmt.setString(index++, null);
+                        continue;
+                    }
+                    stmt.setString(index++, data);
                 }
                 else if (type[i] == "Date")
                 {
-                    stmt.setDate(i + 1, new Date(2023 - 1900, Integer.parseInt(data.split("月")[0]) - 1, Integer.parseInt(data.split("月")[1].split("日")[0]) - 1));
+                    if (row.get(i) == null)
+                    {
+                        stmt.setDate(index++, null);
+                        continue;
+                    }
+                    stmt.setDate(index++, new Date(2023 - 1900, Integer.parseInt(data.split("月")[0]) - 1, Integer.parseInt(data.split("月")[1].split("日")[0]) - 1));
                 }
                 else if (type[i] == "Int")
                 {
-                    stmt.setInt(i + 1, Integer.parseInt(data));
+                    if (row.get(i) == null)
+                    {
+                        stmt.setInt(index++, -1);
+                        continue;
+                    }
+                    stmt.setInt(index++, Integer.parseInt(data));
                 }
             }
             catch (Exception e)

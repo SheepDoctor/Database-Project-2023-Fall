@@ -11,10 +11,10 @@ public class Main
         prop.put("host", "localhost");
         prop.put("user", "postgres");
         prop.put("password", "123456");
-        prop.put("database", "postgres");
+        prop.put("database", "Project");
 
         String file_path = "source_file/users.csv";
-        String[] queue = {"Long", "String", "String", "Date", "Int", "String", "String"};
+        String[] queue = {"Long", "String", "String", "Date", "Int", "String", "Skip","String"};
         String sql = "insert into users(Mid,Name,Sex,Birthday,Level,Sign,identity) values(?,?,?,?,?,?,?)";
         Database database = new Database(prop);
 
