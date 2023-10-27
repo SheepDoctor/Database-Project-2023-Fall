@@ -136,7 +136,6 @@ public class Loader
                 {
                     stmt.executeBatch();
                     stmt.clearBatch();
-                    System.out.println("进度：" + cnt / BATCH_SIZE + "%");
                 }
                 cnt++;
             }

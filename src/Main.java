@@ -13,9 +13,9 @@ public class Main
         prop.put("password", "123456");
         prop.put("database", "Project");
 
-        String file_path = "source_file/videos.csv";
-        String[] queue = {"String", "String", "Long", "Skip", "Time", "Skip", "Time", "Int", "String", "Skip", "Skip", "Skip", "Skip", "Skip"};
-        String sql = "insert into videos(bv, title, owner_id, commit_time, public_time, duration, description) values(?,?,?,?,?,?,?)";
+        String file_path = "source_file/users.csv";
+        String[] queue = {"Long", "String", "String", "Date", "Int", "String", "Skip","String"};
+        String sql = "insert into users(Mid,Name,Sex,Birthday,Level,Sign,identity) values(?,?,?,?,?,?,?)";
         Database database = new Database(prop);
 
         Loader loader = new Loader();
