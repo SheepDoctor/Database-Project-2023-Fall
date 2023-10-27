@@ -80,7 +80,7 @@
       <workItem from="1698383528029" duration="7942000" />
       <workItem from="1698393718987" duration="284000" />
       <workItem from="1698394116300" duration="225000" />
-      <workItem from="1698394608667" duration="9669000" />
+      <workItem from="1698394608667" duration="10331000" />
     </task>
     <task id="LOCAL-00001" summary="Initial project">
       <created>1698383623158</created>
@@ -138,7 +138,14 @@
       <option name="project" value="LOCAL" />
       <updated>1698404927989</updated>
     </task>
-    <option name="localTasksCounter" value="9" />
+    <task id="LOCAL-00009" summary="0.1.2">
+      <created>1698406394732</created>
+      <option name="number" value="00009" />
+      <option name="presentableId" value="LOCAL-00009" />
+      <option name="project" value="LOCAL" />
+      <updated>1698406394732</updated>
+    </task>
+    <option name="localTasksCounter" value="10" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -162,7 +169,8 @@
     <MESSAGE value="0.0.2" />
     <MESSAGE value="0.1.0" />
     <MESSAGE value="0.1.1" />
-    <option name="LAST_COMMIT_MESSAGE" value="0.1.1" />
+    <MESSAGE value="0.1.2" />
+    <option name="LAST_COMMIT_MESSAGE" value="0.1.2" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

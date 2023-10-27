@@ -96,8 +96,11 @@ public class Loader
                 if (cnt % BATCH_SIZE != 0)
                 {
                     stmt.executeBatch();
+                    stmt.clearBatch();
                 }
+                cnt++;
             }
+
             try
             {
                 con.commit();//提交事务，运行后才导入数据库
