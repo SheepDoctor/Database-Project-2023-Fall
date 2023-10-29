@@ -4,7 +4,7 @@ create table users
 (
     mid      bigint primary key,
     name     varchar(63),
-    sex      char(2) default '保密',
+    sex      varchar(2) default '保密',
     birthday date,
     level    int,
     sign     text,
@@ -74,8 +74,6 @@ create table coin
 (
     bv      char(12),
     mid     bigint,
-    time    double precision not null,
-    content text not null,
     primary key (bv, mid),
     foreign key (bv) references videos (bv),
     foreign key (mid) references users (mid),
@@ -86,8 +84,6 @@ create table favorite
 (
     bv      char(12),
     mid     bigint,
-    time    double precision not null,
-    content text not null,
     primary key (bv, mid),
     foreign key (bv) references videos (bv),
     foreign key (mid) references users (mid),
@@ -99,7 +95,6 @@ create table view
     bv      char(12),
     mid     bigint,
     time    double precision not null,
-    content text not null,
     primary key (bv, mid),
     foreign key (bv) references videos (bv),
     foreign key (mid) references users (mid),
