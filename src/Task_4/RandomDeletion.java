@@ -40,6 +40,7 @@ public class RandomDeletion {
 
             connection.commit();
             database.close(null); // 关闭数据库连接
+            connection.close();
             long end = System.currentTimeMillis();
             System.out.println(rowsToDelete + " rows deleted.");
             System.out.println("Speed : " + (rowsToDelete * 1000L) / (end - start) + " records/s");
@@ -83,5 +84,8 @@ public class RandomDeletion {
         }
 
         deleteStatement.executeBatch();
+        deleteStatement.close();
     }
+
+
 }
