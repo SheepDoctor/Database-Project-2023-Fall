@@ -89,6 +89,15 @@ public class Loader
                             Integer.parseInt(data.split(" ")[1].split(":")[1]),
                             Integer.parseInt(data.split(" ")[1].split(":")[2]),0));
                 }
+                else if(type[i] == "Real")
+                {
+                    if (row.get(i) == null)
+                    {
+                        stmt.setDouble(index++, -1);
+                        continue;
+                    }
+                    stmt.setDouble(index++, Double.parseDouble(data));
+                }
             }
             catch (Exception e)
             {
@@ -139,7 +148,8 @@ public class Loader
                 }
                 cnt++;
             }
-
+            stmt.executeBatch();
+            stmt.clearBatch();
             try
             {
                 con.commit();//提交事务，运行后才导入数据库
