@@ -7,12 +7,13 @@ import java.sql.*;
 import java.util.ArrayList;
 import java.sql.Date;
 import java.sql.Timestamp;
+import java.util.concurrent.ExecutorService;
 
 import com.opencsv.CSVReader;
 
-public class Loader
+public class Loader2
 {
-    private final int BATCH_SIZE = 1000;//initial 500
+    private final int BATCH_SIZE = 500;//initial 500
     private Connection con = null;
     private PreparedStatement stmt = null;
 
@@ -50,7 +51,7 @@ public class Loader
                 {
                     if (row.get(i) == null)
                     {
-                        stmt.setString(index++, "\\");
+                        stmt.setString(index++, null);
                         continue;
                     }
                     stmt.setString(index++, data);
@@ -107,7 +108,7 @@ public class Loader
     }
 
 
-    public void write_data(String file_path, String[] queue, Database database, String sql, Boolean adder)
+    public void write_data2(String file_path, String[] queue, Database database, String sql, Boolean adder, ExecutorService executorService)
     {
         con = database.open();
         int cnt = 0;
@@ -146,17 +147,28 @@ public class Loader
                 loadData(row, queue);
                 if (cnt % BATCH_SIZE == 0)
                 {
-                    if(cnt % (BATCH_SIZE * 100) == 0)
-                        System.out.printf("弹幕表导入进度：%.3f%%\n", cnt / 12478996.0 * 100);
+                    //System.out.printf("弹幕表导入进度：%.3f%%\n", cnt / 12478996.0 * 100);
                     //System.out.printf("视频表导入进度：%.3f%%\n", cnt / 7865.0 * 100);
                     //System.out.printf("用户表导入进度：%.3f%%\n", cnt / 37881.0 * 100);
-                    stmt.executeBatch();
-                    stmt.clearBatch();
+                    executorService.submit(()-> {
+                        try {
+                            stmt.executeBatch(); stmt.clearBatch();
+                        } catch (SQLException e) {
+                            throw new RuntimeException(e);
+                        }
+
+                    });
                 }
                 cnt++;
             }
-            stmt.executeBatch();
-            stmt.clearBatch();
+            executorService.submit(()-> {
+                try {
+                    stmt.executeBatch();                stmt.clearBatch();
+
+                } catch (SQLException e) {
+                    throw new RuntimeException(e);
+                }
+            });
             try
             {
                 con.commit();//提交事务，运行后才导入数据库
@@ -207,3 +219,4 @@ public class Loader
         database.close(stmt);
     }
 }
+

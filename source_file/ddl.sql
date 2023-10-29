@@ -4,7 +4,7 @@ create table users
 (
     mid      bigint primary key,
     name     varchar(63),
-    sex      char(1) default '保密',
+    sex      char(2) default '保密',
     birthday date,
     level    int,
     sign     text,
