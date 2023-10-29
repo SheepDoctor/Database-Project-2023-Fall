@@ -12,7 +12,7 @@ import com.opencsv.CSVReader;
 
 public class Loader
 {
-    private final int BATCH_SIZE = 1000;//initial 500
+    private final int BATCH_SIZE = 250;//initial 500
     private Connection con = null;
     private PreparedStatement stmt = null;
 
@@ -50,9 +50,10 @@ public class Loader
                 {
                     if (row.get(i) == null)
                     {
-                        stmt.setString(index++, "\\");
+                        stmt.setString(index++, "");
                         continue;
                     }
+                    data = data.replaceAll("/_reversed", "\\\\");
                     stmt.setString(index++, data);
                 }
                 else if (type[i] == "Date")
@@ -126,15 +127,11 @@ public class Loader
         {
             long start = System.currentTimeMillis();//开始时间
             FileReader fr = new FileReader(file_path);
-            CSVReader reader = new CSVReader(fr);
+            CSVReader reader = new CSVReader(fr, '\7');
             String[] lineData = reader.readNext();
             while ((lineData = reader.readNext()) != null)
             {
                 ArrayList<Object> row = new ArrayList<>();
-                if (cnt == 423818)
-                {
-                    System.out.println("stop");
-                }
                 for (Object data : lineData)
                 {
                     if (data == "" || data == null)
@@ -150,7 +147,7 @@ public class Loader
                 loadData(row, queue);
                 if (cnt % BATCH_SIZE == 0)
                 {
-                    if(cnt % (BATCH_SIZE * 100) == 0)
+                    if(cnt % (BATCH_SIZE * 50) == 0)
                         System.out.printf("弹幕表导入进度：%.3f%%\n", cnt / 12478996.0 * 100);
                     //System.out.printf("视频表导入进度：%.3f%%\n", cnt / 7865.0 * 100);
                     //System.out.printf("用户表导入进度：%.3f%%\n", cnt / 37881.0 * 100);
@@ -168,7 +165,7 @@ public class Loader
                 database.close(stmt);
                 long end = System.currentTimeMillis();//结束时间
                 System.out.println(cnt + " records successfully loaded");
-                System.out.println("Loading speed : " + (cnt * 1000) / (end - start) + " records/s");
+                System.out.println("Loading speed : " + (long)cnt / (end - start) + " records/s");
             }
             catch (Exception e)
             {
