@@ -6,8 +6,7 @@
   <component name="ChangeListManager">
     <list default="true" id="983aa8dd-a81e-4e10-beeb-f458ad86c992" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/command/video_1.txt" beforeDir="false" afterPath="$PROJECT_DIR$/command/video_1.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/source_file/dammu.txt" beforeDir="false" afterPath="$PROJECT_DIR$/command/dammu.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/Main.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/Main.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/version_1/Loader.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/version_1/Loader.java" afterDir="false" />
     </list>
@@ -39,30 +38,30 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent">{
-  &quot;keyToString&quot;: {
-    &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
-    &quot;WebServerToolWindowFactoryState&quot;: &quot;false&quot;,
-    &quot;last_opened_file_path&quot;: &quot;D:/OWEN/本科学习/大二上/数据库原理/Project/DB_script/src/opencsv-3.8.jar&quot;,
-    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
-    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
-    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
-    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
-    &quot;project.structure.last.edited&quot;: &quot;Modules&quot;,
-    &quot;project.structure.proportion&quot;: &quot;0.15&quot;,
-    &quot;project.structure.side.proportion&quot;: &quot;0.27117032&quot;,
-    &quot;settings.editor.selected.configurable&quot;: &quot;MavenSettings&quot;
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "RunOnceActivity.OpenProjectViewOnStart": "true",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "WebServerToolWindowFactoryState": "false",
+    "last_opened_file_path": "D:/OWEN/本科学习/大二上/数据库原理/Project/DB_script/src/commons-lang3-3.1.jar",
+    "node.js.detected.package.eslint": "true",
+    "node.js.detected.package.tslint": "true",
+    "node.js.selected.package.eslint": "(autodetect)",
+    "node.js.selected.package.tslint": "(autodetect)",
+    "project.structure.last.edited": "Modules",
+    "project.structure.proportion": "0.15",
+    "project.structure.side.proportion": "0.27117032",
+    "settings.editor.selected.configurable": "MavenSettings"
   }
-}</component>
+}]]></component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
       <recent name="D:\OWEN\本科学习\大二上\数据库原理\Project\DB_script\src" />
     </key>
     <key name="MoveFile.RECENT_KEYS">
+      <recent name="D:\OWEN\本科学习\大二上\数据库原理\Project\DB_script\src" />
       <recent name="D:\OWEN\本科学习\大二上\数据库原理\Project\DB_script\command" />
       <recent name="D:\OWEN\本科学习\大二上\数据库原理\Project\DB_script\source_file" />
-      <recent name="D:\OWEN\本科学习\大二上\数据库原理\Project\DB_script\src" />
     </key>
   </component>
   <component name="RunManager">
@@ -89,7 +88,7 @@
       <workItem from="1698494017347" duration="435000" />
       <workItem from="1698506989770" duration="216000" />
       <workItem from="1698561501486" duration="711000" />
-      <workItem from="1698581955066" duration="2002000" />
+      <workItem from="1698581955066" duration="3552000" />
     </task>
     <task id="LOCAL-00001" summary="Initial project">
       <created>1698383623158</created>
@@ -203,7 +202,14 @@
       <option name="project" value="LOCAL" />
       <updated>1698583006123</updated>
     </task>
-    <option name="localTasksCounter" value="17" />
+    <task id="LOCAL-00017" summary="0.1.9">
+      <created>1698584253947</created>
+      <option name="number" value="00017" />
+      <option name="presentableId" value="LOCAL-00017" />
+      <option name="project" value="LOCAL" />
+      <updated>1698584253947</updated>
+    </task>
+    <option name="localTasksCounter" value="18" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -234,15 +240,16 @@
     <MESSAGE value="0.1.6" />
     <MESSAGE value="0.1.7" />
     <MESSAGE value="0.1.8" />
-    <option name="LAST_COMMIT_MESSAGE" value="0.1.8" />
+    <MESSAGE value="0.1.9" />
+    <option name="LAST_COMMIT_MESSAGE" value="0.1.9" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
       <breakpoints>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/src/version_1/Loader.java</url>
-          <line>35</line>
-          <option name="timeStamp" value="27" />
+          <line>52</line>
+          <option name="timeStamp" value="28" />
         </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>
