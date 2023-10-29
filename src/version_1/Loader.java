@@ -3,10 +3,8 @@ package version_1;
 import utils.Database;
 
 import java.io.*;
-import java.net.URL;
 import java.sql.*;
 import java.util.ArrayList;
-import java.util.Properties;
 import java.sql.Date;
 import java.sql.Timestamp;
 
@@ -17,6 +15,7 @@ public class Loader
     private final int BATCH_SIZE = 500;//initial 500
     private Connection con = null;
     private PreparedStatement stmt = null;
+
 
     private void loadData(ArrayList<Object> row, String[] type) throws SQLException
     {
@@ -108,9 +107,10 @@ public class Loader
     }
 
 
-    public void write_data(String file_path, String[] queue, Database database, String sql)
+    public void write_data(String file_path, String[] queue, Database database, String sql, Boolean adder)
     {
         con = database.open();
+        int cnt = 0;
         try
         {
             stmt = con.prepareStatement(sql);
@@ -128,7 +128,6 @@ public class Loader
             FileReader fr = new FileReader(file_path);
             CSVReader reader = new CSVReader(fr);
             String[] lineData = reader.readNext();
-            int cnt = 1;
             while ((lineData = reader.readNext()) != null)
             {
                 ArrayList<Object> row = new ArrayList<>();
@@ -140,9 +139,16 @@ public class Loader
                     }
                     row.add(data);
                 }
+                if(adder)
+                {
+                    row.add(cnt);
+                }
                 loadData(row, queue);
                 if (cnt % BATCH_SIZE == 0)
                 {
+                    //System.out.printf("弹幕表导入进度：%.3f%%\n", cnt / 12478996.0 * 100);
+                    //System.out.printf("视频表导入进度：%.3f%%\n", cnt / 7865.0 * 100);
+                    System.out.printf("用户表导入进度：%.3f%%\n", cnt / 37881.0 * 100);
                     stmt.executeBatch();
                     stmt.clearBatch();
                 }
