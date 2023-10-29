@@ -1,4 +1,5 @@
-create database "Project";
+-- drop database "Project";
+-- create database "Project";
 create table users
 (
     mid      bigint primary key,
@@ -47,14 +48,13 @@ create table review
     foreign key (reviewer_mid) references reviewer (reviewer_mid),
     check ( bv like 'BV%')
 );
-
 create table comment
 (
     bv      char(12),
     mid     bigint,
-    time    real not null,
+    time    double precision not null,
     content text not null,
-    id SERIAL PRIMARY KEY
+    id SERIAL PRIMARY KEY,
     foreign key (bv) references videos (bv),
     foreign key (mid) references users (mid),
     check ( bv like 'BV%')
@@ -74,7 +74,7 @@ create table coin
 (
     bv      char(12),
     mid     bigint,
-    time    real not null,
+    time    double precision not null,
     content text not null,
     primary key (bv, mid),
     foreign key (bv) references videos (bv),
@@ -86,7 +86,7 @@ create table favorite
 (
     bv      char(12),
     mid     bigint,
-    time    real not null,
+    time    double precision not null,
     content text not null,
     primary key (bv, mid),
     foreign key (bv) references videos (bv),
@@ -98,7 +98,7 @@ create table view
 (
     bv      char(12),
     mid     bigint,
-    time    real not null,
+    time    double precision not null,
     content text not null,
     primary key (bv, mid),
     foreign key (bv) references videos (bv),
