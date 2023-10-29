@@ -131,6 +131,10 @@ public class Loader
             while ((lineData = reader.readNext()) != null)
             {
                 ArrayList<Object> row = new ArrayList<>();
+                if (cnt == 423818)
+                {
+                    System.out.println("stop");
+                }
                 for (Object data : lineData)
                 {
                     if (data == "" || data == null)
