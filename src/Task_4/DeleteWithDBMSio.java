@@ -11,7 +11,7 @@ import java.util.List;
 import java.util.Properties;
 import java.util.Random;
 
-public class RandomDeletion {
+public class DeleteWithDBMSio {
     public static void main(String[] args) {
         // 数据库连接参数
         Properties prop = new Properties();

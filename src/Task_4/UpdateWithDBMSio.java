@@ -5,7 +5,7 @@ import utils.Database;
 import java.sql.*;
 import java.util.Properties;
 
-public class UpdateNullValuesInTable {
+public class UpdateWithDBMSio {
     public static void main(String[] args) {
         // 数据库连接参数
         Properties prop = new Properties();

@@ -4,11 +4,26 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="983aa8dd-a81e-4e10-beeb-f458ad86c992" name="Changes" comment="" />
+    <list default="true" id="983aa8dd-a81e-4e10-beeb-f458ad86c992" name="Changes" comment="1.0.10">
+      <change afterPath="$PROJECT_DIR$/src/Task_4/DataGenerator.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Task_4/DeleteWithJavaIO.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Task_4/InsertWithJavaIO.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/DB_script.iml" beforeDir="false" afterPath="$PROJECT_DIR$/DB_script.iml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Main.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/Main.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Task_4/PreProcess.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/Task_4/PreProcess.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Task_4/RandomDeletion.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/Task_4/DeleteWithDBMSio.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Task_4/RandomUniqueCSVDataDeletion.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/Task_4/RandomCSVDeletion.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Task_4/UpdateNullValuesInTable.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/Task_4/UpdateWithDBMSio.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/version_1/Loader.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/version_1/Loader.java" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
     <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="CodeInsightWorkspaceSettings">
+    <option name="optimizeImportsOnTheFly" value="true" />
   </component>
   <component name="FileTemplateManagerImpl">
     <option name="RECENT_TEMPLATES">
@@ -21,45 +36,85 @@
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
     <option name="RESET_MODE" value="MIXED" />
   </component>
+  <component name="GitHubPullRequestSearchHistory">{
+  &quot;lastFilter&quot;: {
+    &quot;state&quot;: &quot;OPEN&quot;
+  }
+}</component>
+  <component name="GithubPullRequestsUISettings">
+    <option name="selectedUrlAndAccountId">
+      <UrlAndAccount>
+        <option name="accountId" value="6f779f5b-b268-4d6c-aa5e-043411888625" />
+        <option name="url" value="https://github.com/SheepDoctor/Database-Project-2023-Fall.git" />
+      </UrlAndAccount>
+    </option>
+  </component>
   <component name="MarkdownSettingsMigration">
     <option name="stateVersion" value="1" />
   </component>
   <component name="ProjectId" id="2XKh94pLU8MJyN9aKWcCenrHR8g" />
   <component name="ProjectLevelVcsManager" settingsEditedManually="true">
-    <OptionsSetting value="false" id="Update" />
     <ConfirmationsSetting value="1" id="Add" />
   </component>
   <component name="ProjectViewState">
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "RunOnceActivity.OpenProjectViewOnStart": "true",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "WebServerToolWindowFactoryState": "false",
-    "last_opened_file_path": "D:/OWEN/本科学习/大二上/数据库原理/Project/DB_script/src/commons-lang3-3.1.jar",
-    "node.js.detected.package.eslint": "true",
-    "node.js.detected.package.tslint": "true",
-    "node.js.selected.package.eslint": "(autodetect)",
-    "node.js.selected.package.tslint": "(autodetect)",
-    "project.structure.last.edited": "Modules",
-    "project.structure.proportion": "0.15",
-    "project.structure.side.proportion": "0.27117032",
-    "settings.editor.selected.configurable": "MavenSettings"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;WebServerToolWindowFactoryState&quot;: &quot;false&quot;,
+    &quot;last_opened_file_path&quot;: &quot;D:/qq files/opencsv-3.8.jar&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
+    &quot;project.structure.last.edited&quot;: &quot;库&quot;,
+    &quot;project.structure.proportion&quot;: &quot;0.15&quot;,
+    &quot;project.structure.side.proportion&quot;: &quot;0.27117032&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;database.query.execution&quot;,
+    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   }
-}]]></component>
+}</component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
       <recent name="D:\OWEN\本科学习\大二上\数据库原理\Project\DB_script\src" />
     </key>
     <key name="MoveFile.RECENT_KEYS">
+      <recent name="C:\Users\hlh\Database-Project-2023-Fall\src" />
+      <recent name="C:\Users\hlh\Database-Project-2023-Fall" />
       <recent name="D:\OWEN\本科学习\大二上\数据库原理\Project\DB_script\src" />
-      <recent name="D:\OWEN\本科学习\大二上\数据库原理\Project\DB_script\command" />
       <recent name="D:\OWEN\本科学习\大二上\数据库原理\Project\DB_script\source_file" />
     </key>
   </component>
-  <component name="RunManager">
+  <component name="RunManager" selected="应用程序.DataGenerator">
+    <configuration name="DataGenerator" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
+      <option name="MAIN_CLASS_NAME" value="Task_4.DataGenerator" />
+      <module name="DB_script" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="Task_4.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="DeleteWithJavaIO" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
+      <option name="MAIN_CLASS_NAME" value="Task_4.DeleteWithJavaIO" />
+      <module name="DB_script" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="Task_4.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
     <configuration name="Entrance" type="Application" factoryName="Application">
       <option name="MAIN_CLASS_NAME" value="Main" />
       <module name="DB_script" />
@@ -67,6 +122,54 @@
         <option name="Make" enabled="true" />
       </method>
     </configuration>
+    <configuration name="InsertWithJavaIO" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
+      <option name="MAIN_CLASS_NAME" value="Task_4.InsertWithJavaIO" />
+      <module name="DB_script" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="Task_4.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="PreProcess" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
+      <option name="MAIN_CLASS_NAME" value="Task_4.PreProcess" />
+      <module name="DB_script" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="Task_4.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="RandomCSVDeletion" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
+      <option name="MAIN_CLASS_NAME" value="Task_4.RandomCSVDeletion" />
+      <module name="DB_script" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="Task_4.InsertWithJavaIO" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <recent_temporary>
+      <list>
+        <item itemvalue="应用程序.DataGenerator" />
+        <item itemvalue="应用程序.DeleteWithJavaIO" />
+        <item itemvalue="应用程序.PreProcess" />
+        <item itemvalue="应用程序.InsertWithJavaIO" />
+        <item itemvalue="应用程序.RandomCSVDeletion" />
+      </list>
+    </recent_temporary>
   </component>
   <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
   <component name="TaskManager">
@@ -79,11 +182,11 @@
       <workItem from="1698383528029" duration="7942000" />
       <workItem from="1698393718987" duration="284000" />
       <workItem from="1698394116300" duration="225000" />
-      <workItem from="1698394608667" duration="17595000" />
-      <workItem from="1698494017347" duration="435000" />
-      <workItem from="1698506989770" duration="216000" />
-      <workItem from="1698561501486" duration="711000" />
-      <workItem from="1698581955066" duration="4099000" />
+      <workItem from="1698394608667" duration="12023000" />
+      <workItem from="1698413059786" duration="1252000" />
+      <workItem from="1698552299568" duration="35462000" />
+      <workItem from="1698645660383" duration="1243000" />
+      <workItem from="1698712615242" duration="3377000" />
     </task>
     <task id="LOCAL-00001" summary="Initial project">
       <created>1698383623158</created>
@@ -155,67 +258,43 @@
       <option name="project" value="LOCAL" />
       <updated>1698407062337</updated>
     </task>
-    <task id="LOCAL-00011" summary="0.1.4">
-      <created>1698408774514</created>
+    <task id="LOCAL-00011" summary="1.0.9">
+      <created>1698567579265</created>
       <option name="number" value="00011" />
       <option name="presentableId" value="LOCAL-00011" />
       <option name="project" value="LOCAL" />
-      <updated>1698408774514</updated>
+      <updated>1698567579265</updated>
     </task>
-    <task id="LOCAL-00012" summary="0.1.5">
-      <created>1698413220835</created>
+    <task id="LOCAL-00012" summary="1.0.10">
+      <created>1698579995327</created>
       <option name="number" value="00012" />
       <option name="presentableId" value="LOCAL-00012" />
       <option name="project" value="LOCAL" />
-      <updated>1698413220835</updated>
+      <updated>1698579995327</updated>
     </task>
-    <task id="LOCAL-00013" summary="0.1.6">
-      <created>1698413297862</created>
+    <task id="LOCAL-00013" summary="1.0.10">
+      <created>1698592768002</created>
       <option name="number" value="00013" />
       <option name="presentableId" value="LOCAL-00013" />
       <option name="project" value="LOCAL" />
-      <updated>1698413297862</updated>
+      <updated>1698592768002</updated>
     </task>
-    <task id="LOCAL-00014" summary="0.1.6">
-      <created>1698415402624</created>
-      <option name="number" value="00014" />
-      <option name="presentableId" value="LOCAL-00014" />
-      <option name="project" value="LOCAL" />
-      <updated>1698415402624</updated>
-    </task>
-    <task id="LOCAL-00015" summary="0.1.7">
-      <created>1698561595920</created>
-      <option name="number" value="00015" />
-      <option name="presentableId" value="LOCAL-00015" />
-      <option name="project" value="LOCAL" />
-      <updated>1698561595920</updated>
-    </task>
-    <task id="LOCAL-00016" summary="0.1.8">
-      <created>1698583006123</created>
-      <option name="number" value="00016" />
-      <option name="presentableId" value="LOCAL-00016" />
-      <option name="project" value="LOCAL" />
-      <updated>1698583006123</updated>
-    </task>
-    <task id="LOCAL-00017" summary="0.1.9">
-      <created>1698584253947</created>
-      <option name="number" value="00017" />
-      <option name="presentableId" value="LOCAL-00017" />
-      <option name="project" value="LOCAL" />
-      <updated>1698584253947</updated>
-    </task>
-    <task id="LOCAL-00018" summary="0.2.0">
-      <created>1698585590385</created>
-      <option name="number" value="00018" />
-      <option name="presentableId" value="LOCAL-00018" />
-      <option name="project" value="LOCAL" />
-      <updated>1698585590385</updated>
-    </task>
-    <option name="localTasksCounter" value="19" />
+    <option name="localTasksCounter" value="14" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
     <option name="version" value="3" />
+  </component>
+  <component name="Vcs.Log.History.Properties">
+    <option name="COLUMN_ID_ORDER">
+      <list>
+        <option value="Default.Root" />
+        <option value="Default.Author" />
+        <option value="Default.Date" />
+        <option value="Default.Subject" />
+        <option value="Space.CommitStatus" />
+      </list>
+    </option>
   </component>
   <component name="Vcs.Log.Tabs.Properties">
     <option name="TAB_STATES">
@@ -237,14 +316,10 @@
     <MESSAGE value="0.1.1" />
     <MESSAGE value="0.1.2" />
     <MESSAGE value="0.1.3" />
-    <MESSAGE value="0.1.4" />
-    <MESSAGE value="0.1.5" />
-    <MESSAGE value="0.1.6" />
-    <MESSAGE value="0.1.7" />
-    <MESSAGE value="0.1.8" />
-    <MESSAGE value="0.1.9" />
-    <MESSAGE value="0.2.0" />
-    <option name="LAST_COMMIT_MESSAGE" value="0.2.0" />
+    <MESSAGE value="Changes" />
+    <MESSAGE value="1.0.9" />
+    <MESSAGE value="1.0.10" />
+    <option name="LAST_COMMIT_MESSAGE" value="1.0.10" />
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
     <SUITE FILE_PATH="coverage/DB_script$Entrance.ic" NAME="Entrance Coverage Results" MODIFIED="1698407418442" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="idea" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" />
