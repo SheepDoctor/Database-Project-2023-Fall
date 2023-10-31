@@ -70,7 +70,7 @@ create table likes
     check ( bv like 'BV%')
 );
 
-create table coin
+create table coins
 (
     bv  char(12),
     mid bigint,
@@ -80,7 +80,7 @@ create table coin
     check ( bv like 'BV%')
 );
 
-create table favorite
+create table favorites
 (
     bv  char(12),
     mid bigint,
@@ -90,7 +90,7 @@ create table favorite
     check ( bv like 'BV%')
 );
 
-create table view
+create table views
 (
     bv   char(12),
     mid  bigint,
