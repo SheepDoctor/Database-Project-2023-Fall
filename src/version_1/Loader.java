@@ -127,7 +127,8 @@ public class Loader
         {
             long start = System.currentTimeMillis();//开始时间
             FileReader fr = new FileReader(file_path);
-            CSVReader reader = new CSVReader(fr, '\7');
+            //CSVReader reader = new CSVReader(fr, '\7');//用于数据处理过的数据
+            CSVReader reader = new CSVReader(fr);
             String[] lineData = reader.readNext();
             while ((lineData = reader.readNext()) != null)
             {
@@ -148,9 +149,9 @@ public class Loader
                 if (cnt % BATCH_SIZE == 0)
                 {
                     if(cnt % (BATCH_SIZE * 50) == 0)
-                        System.out.printf("弹幕表导入进度：%.3f%%\n", cnt / 12478996.0 * 100);
-                    //System.out.printf("视频表导入进度：%.3f%%\n", cnt / 7865.0 * 100);
-                    //System.out.printf("用户表导入进度：%.3f%%\n", cnt / 37881.0 * 100);
+                        //System.out.printf("(弹幕)表导入进度：%.3f%%\n", cnt / 12478996.0 * 100);
+                    //System.out.printf("(视频)表导入进度：%.3f%%\n", cnt / 7865.0 * 100);
+                    //System.out.printf("(用户)表导入进度：%.3f%%\n", cnt / 37881.0 * 100);
                     stmt.executeBatch();
                     stmt.clearBatch();
                 }

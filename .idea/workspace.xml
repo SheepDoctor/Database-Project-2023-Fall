@@ -6,8 +6,6 @@
   <component name="ChangeListManager">
     <list default="true" id="983aa8dd-a81e-4e10-beeb-f458ad86c992" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/Main.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/Main.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/version_1/Loader.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/version_1/Loader.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -37,22 +35,22 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "RunOnceActivity.OpenProjectViewOnStart": "true",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "WebServerToolWindowFactoryState": "false",
-    "last_opened_file_path": "D:/OWEN/本科学习/大二上/数据库原理/Project/DB_script/src/commons-lang3-3.1.jar",
-    "node.js.detected.package.eslint": "true",
-    "node.js.detected.package.tslint": "true",
-    "node.js.selected.package.eslint": "(autodetect)",
-    "node.js.selected.package.tslint": "(autodetect)",
-    "project.structure.last.edited": "Modules",
-    "project.structure.proportion": "0.15",
-    "project.structure.side.proportion": "0.27117032",
-    "settings.editor.selected.configurable": "MavenSettings"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;WebServerToolWindowFactoryState&quot;: &quot;false&quot;,
+    &quot;last_opened_file_path&quot;: &quot;D:/OWEN/本科学习/大二上/数据库原理/Project/DB_script/src/commons-lang3-3.1.jar&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
+    &quot;project.structure.last.edited&quot;: &quot;Modules&quot;,
+    &quot;project.structure.proportion&quot;: &quot;0.15&quot;,
+    &quot;project.structure.side.proportion&quot;: &quot;0.27117032&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;MavenSettings&quot;
   }
-}]]></component>
+}</component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
       <recent name="D:\OWEN\本科学习\大二上\数据库原理\Project\DB_script\src" />
@@ -98,7 +96,8 @@
       <workItem from="1698494017347" duration="435000" />
       <workItem from="1698506989770" duration="216000" />
       <workItem from="1698561501486" duration="711000" />
-      <workItem from="1698581955066" duration="16615000" />
+      <workItem from="1698581955066" duration="16810000" />
+      <workItem from="1698631515070" duration="885000" />
     </task>
     <task id="LOCAL-00001" summary="Initial project">
       <created>1698383623158</created>
@@ -240,7 +239,14 @@
       <option name="project" value="LOCAL" />
       <updated>1698587747371</updated>
     </task>
-    <option name="localTasksCounter" value="21" />
+    <task id="LOCAL-00021" summary="0.2.2 Loader for danmu">
+      <created>1698598894084</created>
+      <option name="number" value="00021" />
+      <option name="presentableId" value="LOCAL-00021" />
+      <option name="project" value="LOCAL" />
+      <updated>1698598894084</updated>
+    </task>
+    <option name="localTasksCounter" value="22" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -274,23 +280,8 @@
     <MESSAGE value="0.1.9" />
     <MESSAGE value="0.2.0" />
     <MESSAGE value="0.2.1" />
-    <option name="LAST_COMMIT_MESSAGE" value="0.2.1" />
-  </component>
-  <component name="XDebuggerManager">
-    <breakpoint-manager>
-      <breakpoints>
-        <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/src/utils/Pretreatment_data.java</url>
-          <line>22</line>
-          <option name="timeStamp" value="50" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/src/version_1/Loader.java</url>
-          <line>137</line>
-          <option name="timeStamp" value="62" />
-        </line-breakpoint>
-      </breakpoints>
-    </breakpoint-manager>
+    <MESSAGE value="0.2.2 Loader for danmu" />
+    <option name="LAST_COMMIT_MESSAGE" value="0.2.2 Loader for danmu" />
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
     <SUITE FILE_PATH="coverage/DB_script$Entrance.ic" NAME="Entrance Coverage Results" MODIFIED="1698407418442" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="idea" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" />
