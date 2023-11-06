@@ -1,9 +1,11 @@
+package version_1;
+
 import utils.Database;
 import version_1.Loader;
 
 import java.util.Properties;
 
-public class version_1.Danmu
+public class Videos
 {
     public static void main(String[] args)
     {
@@ -19,6 +21,6 @@ public class version_1.Danmu
         Database database = new Database(prop);
 
         Loader loader = new Loader();
-        loader.write_data(file_path, queue, database, sql, false);
+        loader.write_data(file_path, queue, database, sql, false, false);
     }
 }

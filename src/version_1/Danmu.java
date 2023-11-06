@@ -1,9 +1,10 @@
+package version_1;
+
 import utils.Database;
-import version_1.Loader;
 
 import java.util.Properties;
 
-public class Main
+public class Danmu
 {
     public static void main(String[] args)
     {

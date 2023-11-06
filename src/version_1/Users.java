@@ -1,9 +1,11 @@
+package version_1;
+
 import utils.Database;
 import version_1.Loader;
 
 import java.util.Properties;
 
-public class Main
+public class Users
 {
     public static void main(String[] args)
     {
@@ -13,12 +15,12 @@ public class Main
         prop.put("password", "123456");
         prop.put("database", "Project");
 
-        String file_path = "source_file/danmu_p.csv";
-        String[] queue = {"String", "Long", "Real", "String", "Int"};
-        String sql = "insert into comment(BV,Mid,Time,content,id) values(?,?,?,?,?)";
+        String file_path = "source_file/users.csv";
+        String[] queue = {"Long", "String", "String", "Date", "Int", "String", "Skip", "String"};
+        String sql = "insert into users(Mid,Name,Sex,Birthday,Level,Sign,identity) values(?,?,?,?,?,?,?)";
         Database database = new Database(prop);
 
         Loader loader = new Loader();
-        loader.write_data(file_path, queue, database, sql, true, true);
+        loader.write_data(file_path, queue, database, sql, false, false);
     }
 }

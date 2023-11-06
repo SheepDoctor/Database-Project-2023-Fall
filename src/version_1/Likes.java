@@ -1,9 +1,9 @@
-import utils.Database;
-import version_1.Loader;
+package version_1;
 
+import utils.Database;
 import java.util.Properties;
 
-public class version_1.Danmu
+public class Likes
 {
     public static void main(String[] args)
     {
@@ -14,11 +14,11 @@ public class version_1.Danmu
         prop.put("database", "Project");
 
         String file_path = "source_file/videos.csv";
-        String[] queue = {"String", "String", "Long", "Skip", "Time", "Skip", "Time", "Int", "String", "Skip", "Skip", "Skip", "Skip", "Skip"};
-        String sql = "insert into videos(bv, title, owner_id, commit_time, public_time, duration, description) values(?,?,?,?,?,?,?)";
+        String[] queue = {"String", "Skip", "Skip", "Skip", "Skip", "Skip", "Skip", "Skip", "Skip", "Skip", "List", "Skip", "Skip", "Skip"};
+        String sql = "insert into videos(bv,mid) values(?,?)";
         Database database = new Database(prop);
 
         Loader loader = new Loader();
-        loader.write_data(file_path, queue, database, sql, false);
+        loader.write_data(file_path, queue, database, sql, false, false);
     }
 }
