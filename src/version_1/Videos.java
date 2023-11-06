@@ -21,6 +21,6 @@ public class Videos
         Database database = new Database(prop);
 
         Loader loader = new Loader();
-        loader.write_data(file_path, queue, database, sql, false);
+        loader.write_data(file_path, queue, database, sql, false, false);
     }
 }

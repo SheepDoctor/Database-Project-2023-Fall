@@ -1,8 +1,6 @@
 package version_1;
 
 import utils.Database;
-import version_1.Loader;
-
 import java.util.Properties;
 
 public class Likes
@@ -21,6 +19,6 @@ public class Likes
         Database database = new Database(prop);
 
         Loader loader = new Loader();
-        loader.write_data(file_path, queue, database, sql, false);
+        loader.write_data(file_path, queue, database, sql, false, false);
     }
 }

@@ -5,12 +5,10 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="983aa8dd-a81e-4e10-beeb-f458ad86c992" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/command/like_1.txt" beforeDir="false" afterPath="$PROJECT_DIR$/command/like_1.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/command/user_1.txt" beforeDir="false" afterPath="$PROJECT_DIR$/command/user_1.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/command/video_1.txt" beforeDir="false" afterPath="$PROJECT_DIR$/command/video_1.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/version_1/Main.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/version_1/Danmu.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/version_1/Danmu.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/version_1/Danmu.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/version_1/Likes.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/version_1/Likes.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/version_1/Loader.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/version_1/Loader.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/version_1/Users.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/version_1/Users.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/version_1/Videos.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/version_1/Videos.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -67,6 +65,9 @@
       <recent name="D:\OWEN\本科学习\大二上\数据库原理\Project\DB_script\command" />
       <recent name="D:\OWEN\本科学习\大二上\数据库原理\Project\DB_script\source_file" />
     </key>
+    <key name="CopyClassDialog.RECENTS_KEY">
+      <recent name="" />
+    </key>
   </component>
   <component name="RunManager">
     <configuration name="Entrance" type="Application" factoryName="Application">
@@ -112,7 +113,7 @@
       <workItem from="1699018746416" duration="1287000" />
       <workItem from="1699020285196" duration="2613000" />
       <workItem from="1699258016544" duration="200000" />
-      <workItem from="1699258475221" duration="811000" />
+      <workItem from="1699258475221" duration="1268000" />
     </task>
     <task id="LOCAL-00001" summary="Initial project">
       <created>1698383623158</created>
@@ -275,7 +276,21 @@
       <option name="project" value="LOCAL" />
       <updated>1699259074190</updated>
     </task>
-    <option name="localTasksCounter" value="24" />
+    <task id="LOCAL-00024" summary="0.2.4 Runnable version to load danmu">
+      <created>1699259393274</created>
+      <option name="number" value="00024" />
+      <option name="presentableId" value="LOCAL-00024" />
+      <option name="project" value="LOCAL" />
+      <updated>1699259393274</updated>
+    </task>
+    <task id="LOCAL-00025" summary="0.2.4 Runnable version to load danmu">
+      <created>1699259405993</created>
+      <option name="number" value="00025" />
+      <option name="presentableId" value="LOCAL-00025" />
+      <option name="project" value="LOCAL" />
+      <updated>1699259405993</updated>
+    </task>
+    <option name="localTasksCounter" value="26" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -321,11 +336,6 @@
           <url>file://$PROJECT_DIR$/src/version_1/Loader.java</url>
           <line>28</line>
           <option name="timeStamp" value="5" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/src/version_1/Loader.java</url>
-          <line>162</line>
-          <option name="timeStamp" value="9" />
         </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>

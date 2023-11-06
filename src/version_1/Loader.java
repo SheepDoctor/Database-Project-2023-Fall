@@ -99,7 +99,7 @@ public class Loader
                     }
                     stmt.setDouble(index++, Double.parseDouble(data));
                 }
-                else if(Objects.equals(type[i], "List"))
+                else if (Objects.equals(type[i], "List"))
                 {
                     ResultSet resultSet = stmt.executeQuery();
                     data = data.replace("[", "");
@@ -119,7 +119,7 @@ public class Loader
         stmt.addBatch();
     }
 
-    public void write_data(String file_path, String[] queue, Database database, String sql, Boolean adder)
+    public void write_data(String file_path, String[] queue, Database database, String sql, Boolean adder, Boolean pretreat)
     {
         con = database.open();
         int cnt = 0;
@@ -138,8 +138,15 @@ public class Loader
         {
             long start = System.currentTimeMillis();//开始时间
             FileReader fr = new FileReader(file_path);
-            CSVReader reader = new CSVReader(fr, '\7');//用于数据处理过的数据
-            //CSVReader reader = new CSVReader(fr);
+            CSVReader reader;
+            if (pretreat)
+            {
+                reader = new CSVReader(fr, '\7');//用于数据处理过的数据
+            }
+            else
+            {
+                reader = new CSVReader(fr);
+            }
             String[] lineData = reader.readNext();
             while ((lineData = reader.readNext()) != null)
             {
@@ -160,10 +167,13 @@ public class Loader
                 if (cnt % BATCH_SIZE == 0)
                 {
                     if (cnt % (BATCH_SIZE * 50) == 0)
-                        System.out.printf("(弹幕)表导入进度：%.3f%%\n", cnt / 12478996.0 * 100);
+                    {
+                        System.out.println("当前进度：" + cnt + " 条");
+                        //System.out.printf("(弹幕)表导入进度：%.3f%%\n", cnt / 12478996.0 * 100);
                         //System.out.printf("(视频)表导入进度：%.3f%%\n", cnt / 7865.0 * 100);
                         //System.out.printf("(用户)表导入进度：%.3f%%\n", cnt / 37881.0 * 100);
-                        stmt.executeBatch();
+                    }
+                    stmt.executeBatch();
                     stmt.clearBatch();
                 }
                 cnt++;

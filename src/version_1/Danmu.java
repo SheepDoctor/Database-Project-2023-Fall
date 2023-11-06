@@ -20,6 +20,6 @@ public class Danmu
         Database database = new Database(prop);
 
         Loader loader = new Loader();
-        loader.write_data(file_path, queue, database, sql, true);
+        loader.write_data(file_path, queue, database, sql, true, true);
     }
 }
