@@ -6,12 +6,12 @@
   <component name="ChangeListManager">
     <list default="true" id="983aa8dd-a81e-4e10-beeb-f458ad86c992" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/command/dammu.txt" beforeDir="false" afterPath="$PROJECT_DIR$/command/dammu_1.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/command/like_1.txt" beforeDir="false" afterPath="$PROJECT_DIR$/command/like_1.txt" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/command/user_1.txt" beforeDir="false" afterPath="$PROJECT_DIR$/command/user_1.txt" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/command/video_1.txt" beforeDir="false" afterPath="$PROJECT_DIR$/command/video_1.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/Main.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/version_1/Main.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/utils/Pretreatment_data.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/utils/Pretreatment_data.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/version_1/Loader.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/version_1/Loader.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/version_1/Main.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/version_1/Danmu.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/version_1/Videos.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/version_1/Videos.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -68,9 +68,9 @@
       <recent name="D:\OWEN\本科学习\大二上\数据库原理\Project\DB_script\source_file" />
     </key>
   </component>
-  <component name="RunManager" selected="Application.Entrance">
+  <component name="RunManager">
     <configuration name="Entrance" type="Application" factoryName="Application">
-      <option name="MAIN_CLASS_NAME" value="version_1.Main" />
+      <option name="MAIN_CLASS_NAME" value="version_1.Danmu" />
       <module name="DB_script" />
       <method v="2">
         <option name="Make" enabled="true" />
@@ -112,7 +112,7 @@
       <workItem from="1699018746416" duration="1287000" />
       <workItem from="1699020285196" duration="2613000" />
       <workItem from="1699258016544" duration="200000" />
-      <workItem from="1699258475221" duration="504000" />
+      <workItem from="1699258475221" duration="811000" />
     </task>
     <task id="LOCAL-00001" summary="Initial project">
       <created>1698383623158</created>
@@ -268,7 +268,14 @@
       <option name="project" value="LOCAL" />
       <updated>1698712852645</updated>
     </task>
-    <option name="localTasksCounter" value="23" />
+    <task id="LOCAL-00023" summary="0.2.4 Runnable version to load danmu">
+      <created>1699259074190</created>
+      <option name="number" value="00023" />
+      <option name="presentableId" value="LOCAL-00023" />
+      <option name="project" value="LOCAL" />
+      <updated>1699259074190</updated>
+    </task>
+    <option name="localTasksCounter" value="24" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -304,7 +311,8 @@
     <MESSAGE value="0.2.1" />
     <MESSAGE value="0.2.2 Loader for danmu" />
     <MESSAGE value="0.2.3" />
-    <option name="LAST_COMMIT_MESSAGE" value="0.2.3" />
+    <MESSAGE value="0.2.4 Runnable version to load danmu" />
+    <option name="LAST_COMMIT_MESSAGE" value="0.2.4 Runnable version to load danmu" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

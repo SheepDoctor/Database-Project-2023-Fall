@@ -8,3 +8,6 @@ opencsv-3.8.jar
 postgresql-42.2.5.jar
 commons-lang3-3.1.jar
 并且手动在Project Structure中导入依赖
+## import danmu
+首先运行Pretreatment程序，进行数据预处理
+再运行main函数
