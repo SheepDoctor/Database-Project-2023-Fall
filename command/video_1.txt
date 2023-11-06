@@ -3,7 +3,7 @@ import version_1.Loader;
 
 import java.util.Properties;
 
-public class Main
+public class version_1.Main
 {
     public static void main(String[] args)
     {
