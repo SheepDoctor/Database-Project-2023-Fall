@@ -13,10 +13,12 @@ import com.opencsv.CSVReader;
 
 public class RelationLoader
 {
-    private final int BATCH_SIZE = 250;//initial 500
+    private final int BATCH_SIZE = 500;//initial 500
     private Connection con = null;
     private PreparedStatement stmt = null;
     private int cnt = 0;
+    private long start;
+    private long end;
 
     private void loadData(ArrayList<Object> row, String[] type) throws SQLException
     {
@@ -176,12 +178,12 @@ public class RelationLoader
                         }
                         stmt.setLong(index++, Long.parseLong(sub_data));
                         cnt++;
-
                         if (cnt % BATCH_SIZE == 0)
                         {
-                            if (cnt % (BATCH_SIZE * 500) == 0)
+                            if (cnt % (BATCH_SIZE * 75) == 0)
                             {
-                                System.out.println("当前进度：" + cnt + " 条");
+                                end = System.currentTimeMillis();
+                                System.out.println("当前进度：" + cnt + " 条，TIME：" + (long) (end - start) / 1000 + "s");
                             }
                             stmt.executeBatch();
                             stmt.clearBatch();
@@ -214,7 +216,7 @@ public class RelationLoader
         }
         try
         {
-            long start = System.currentTimeMillis();//开始时间
+            start = System.currentTimeMillis();//开始时间
             FileReader fr = new FileReader(file_path);
             CSVReader reader;
             if (pretreat)
@@ -241,7 +243,7 @@ public class RelationLoader
                 {
                     row.add(cnt);
                 }
-                //loadData(row, queue);
+                loadData(row, queue);
                 //if (cnt % BATCH_SIZE == 0)
                 //{
                 //    if (cnt % (BATCH_SIZE * 50) == 0)
@@ -259,7 +261,7 @@ public class RelationLoader
                 con.commit();//提交事务，运行后才导入数据库
                 stmt.close();
                 database.close(stmt);
-                long end = System.currentTimeMillis();//结束时间
+                end = System.currentTimeMillis();//结束时间
                 System.out.println(cnt + " records successfully loaded");
                 System.out.println("TIME : " + (long) (end - start) / 1000 + "s");
                 System.out.println("Loading speed : " + (long) cnt / (end - start) + " records/s");

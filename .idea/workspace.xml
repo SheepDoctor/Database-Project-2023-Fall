@@ -5,9 +5,9 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="983aa8dd-a81e-4e10-beeb-f458ad86c992" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/version_1/Loader.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/version_1/Loader.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/version_1/Likes.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/version_1/Likes.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/version_1/RelationLoader.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/version_1/RelationLoader.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/version_2/Main2.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/version_2/Main2.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -346,8 +346,13 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/src/version_1/RelationLoader.java</url>
-          <line>176</line>
-          <option name="timeStamp" value="21" />
+          <line>177</line>
+          <option name="timeStamp" value="24" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/src/version_1/Likes.java</url>
+          <line>21</line>
+          <option name="timeStamp" value="25" />
         </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>
