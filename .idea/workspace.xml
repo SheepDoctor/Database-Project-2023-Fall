@@ -6,7 +6,7 @@
   <component name="ChangeListManager">
     <list default="true" id="983aa8dd-a81e-4e10-beeb-f458ad86c992" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/version_1/Likes.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/version_1/Likes.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/version_1/Loader.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/version_1/Loader.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/version_1/RelationLoader.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/version_1/RelationLoader.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -96,7 +96,7 @@
       <workItem from="1699275250384" duration="661000" />
       <workItem from="1699314734205" duration="1461000" />
       <workItem from="1699316216937" duration="37000" />
-      <workItem from="1699316404990" duration="2039000" />
+      <workItem from="1699316404990" duration="2880000" />
     </task>
     <task id="LOCAL-00001" summary="Initial project">
       <created>1698383623158</created>
@@ -287,7 +287,14 @@
       <option name="project" value="LOCAL" />
       <updated>1699316243829</updated>
     </task>
-    <option name="localTasksCounter" value="28" />
+    <task id="LOCAL-00028" summary="0.2.6 tested version for partial relationships">
+      <created>1699318586132</created>
+      <option name="number" value="00028" />
+      <option name="presentableId" value="LOCAL-00028" />
+      <option name="project" value="LOCAL" />
+      <updated>1699318586132</updated>
+    </task>
+    <option name="localTasksCounter" value="29" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -326,7 +333,8 @@
     <MESSAGE value="0.2.4 Runnable version to load danmu" />
     <MESSAGE value="0.2.5 Module Version_1 updated&#10;Executable files are extended" />
     <MESSAGE value="0.2. untested" />
-    <option name="LAST_COMMIT_MESSAGE" value="0.2. untested" />
+    <MESSAGE value="0.2.6 tested version for partial relationships" />
+    <option name="LAST_COMMIT_MESSAGE" value="0.2.6 tested version for partial relationships" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

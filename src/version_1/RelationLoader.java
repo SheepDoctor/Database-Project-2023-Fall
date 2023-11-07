@@ -176,9 +176,15 @@ public class RelationLoader
                         }
                         stmt.setLong(index++, Long.parseLong(sub_data));
                         cnt++;
-                        if (cnt % (BATCH_SIZE * 50) == 0)
+
+                        if (cnt % BATCH_SIZE == 0)
                         {
-                            System.out.println("当前进度：" + cnt + " 条");
+                            if (cnt % (BATCH_SIZE * 500) == 0)
+                            {
+                                System.out.println("当前进度：" + cnt + " 条");
+                            }
+                            stmt.executeBatch();
+                            stmt.clearBatch();
                         }
                     }
                     break;
@@ -235,16 +241,16 @@ public class RelationLoader
                 {
                     row.add(cnt);
                 }
-                loadData(row, queue);
-                if (cnt % BATCH_SIZE == 0)
-                {
-                    if (cnt % (BATCH_SIZE * 50) == 0)
-                    {
-                        System.out.println("当前进度：" + cnt + " 条");
-                    }
-                    stmt.executeBatch();
-                    stmt.clearBatch();
-                }
+                //loadData(row, queue);
+                //if (cnt % BATCH_SIZE == 0)
+                //{
+                //    if (cnt % (BATCH_SIZE * 50) == 0)
+                //    {
+                //        System.out.println("当前进度：" + cnt + " 条");
+                //    }
+                //    stmt.executeBatch();
+                //    stmt.clearBatch();
+                //}
             }
             stmt.executeBatch();
             stmt.clearBatch();
@@ -255,6 +261,7 @@ public class RelationLoader
                 database.close(stmt);
                 long end = System.currentTimeMillis();//结束时间
                 System.out.println(cnt + " records successfully loaded");
+                System.out.println("TIME : " + (long) (end - start) / 1000 + "s");
                 System.out.println("Loading speed : " + (long) cnt / (end - start) + " records/s");
             }
             catch (Exception e)

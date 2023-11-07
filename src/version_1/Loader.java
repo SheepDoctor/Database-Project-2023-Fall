@@ -176,6 +176,7 @@ public class Loader
                 database.close(stmt);
                 long end = System.currentTimeMillis();//结束时间
                 System.out.println(cnt + " records successfully loaded");
+                System.out.println("TIME : " + (long) (end - start) / 1000 + "s");
                 System.out.println("Loading speed : " + (long) cnt / (end - start) + " records/s");
             }
             catch (Exception e)
