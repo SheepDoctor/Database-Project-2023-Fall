@@ -10,10 +10,10 @@ public class Main
         Properties prop = new Properties();
         prop.put("host", "localhost");
         prop.put("user", "postgres");
-        prop.put("password", "123456");
-        prop.put("database", "Project");
+        prop.put("password", "123abc");
+        prop.put("database", "postgres");
 
-        String file_path = "source_file/danmu_p.csv";
+        String file_path = "C:\\Users\\Dell\\Desktop\\学习\\Third Semester\\Database\\data.project1\\danmu.csv";
         String[] queue = {"String", "Long", "Real", "String", "Int"};
         String sql = "insert into comment(BV,Mid,Time,content,id) values(?,?,?,?,?)";
         Database database = new Database(prop);
