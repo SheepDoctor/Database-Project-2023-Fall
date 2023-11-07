@@ -15,7 +15,21 @@ public class Coins
         prop.put("database", "Project");
 
         String file_path = "source_file/videos.csv";
-        String[] queue = {"String", "Skip", "Skip", "Skip", "Skip", "Skip", "Skip", "Skip", "Skip", "Skip", "List", "Skip", "Skip"};
+        String[] queue = {
+                "String",
+                "Skip",
+                "Skip",
+                "Skip",
+                "Skip",
+                "Skip",
+                "Skip",
+                "Skip",
+                "Skip",
+                "Skip",
+                "Skip",
+                "List",
+                "Skip",
+                "Skip"};
         String sql = "insert into likes(bv,mid) values(?,?)";
         Database database = new Database(prop);
 
