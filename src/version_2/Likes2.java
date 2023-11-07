@@ -2,11 +2,16 @@ package version_1;
 
 import utils.Database;
 import java.util.Properties;
+import java.util.concurrent.Executor;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
-public class Likes
+public class Likes2
 {
     public static void main(String[] args)
     {
+        ExecutorService executorService= Executors.newCachedThreadPool();
+
         Properties prop = new Properties();
         prop.put("host", "localhost");
         prop.put("user", "postgres");
