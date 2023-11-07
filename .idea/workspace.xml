@@ -6,8 +6,11 @@
   <component name="ChangeListManager">
     <list default="true" id="983aa8dd-a81e-4e10-beeb-f458ad86c992" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/DB_script.iml" beforeDir="false" afterPath="$PROJECT_DIR$/DB_script.iml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Main.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/Main.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/version_1/Likes.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/version_1/Likes.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/version_1/RelationLoader.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/version_1/RelationLoader.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/version_2/Loader2.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/version_2/Loader2.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/version_2/Main2.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/version_2/Main2.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -64,8 +67,72 @@
       <recent name="D:\OWEN\本科学习\大二上\数据库原理\Project\DB_script\source_file" />
     </key>
     <key name="CopyClassDialog.RECENTS_KEY">
+      <recent name="version_2" />
       <recent name="" />
     </key>
+  </component>
+  <component name="RunManager" selected="应用程序.Main2">
+    <configuration name="Entrance" type="Application" factoryName="Application">
+      <option name="MAIN_CLASS_NAME" value="version_1.Danmu" />
+      <module name="DB_script" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="Likes" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
+      <option name="MAIN_CLASS_NAME" value="version_1.Likes" />
+      <module name="DB_script" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="version_1.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="Likes2" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
+      <option name="MAIN_CLASS_NAME" value="version_1.Likes2" />
+      <module name="DB_script" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="version_1.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="Main2" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
+      <option name="MAIN_CLASS_NAME" value="Main2" />
+      <module name="DB_script" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="Pretreatment" type="Application" factoryName="Application">
+      <option name="MAIN_CLASS_NAME" value="utils.Pretreatment_data" />
+      <module name="DB_script" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <list>
+      <item itemvalue="应用程序.Entrance" />
+      <item itemvalue="应用程序.Pretreatment" />
+      <item itemvalue="应用程序.Likes" />
+      <item itemvalue="应用程序.Likes2" />
+      <item itemvalue="应用程序.Main2" />
+    </list>
+    <recent_temporary>
+      <list>
+        <item itemvalue="应用程序.Main2" />
+        <item itemvalue="应用程序.Likes2" />
+        <item itemvalue="应用程序.Likes" />
+      </list>
+    </recent_temporary>
   </component>
   <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
   <component name="TaskManager">
@@ -95,8 +162,6 @@
       <workItem from="1699264447130" duration="985000" />
       <workItem from="1699275250384" duration="661000" />
       <workItem from="1699314734205" duration="1461000" />
-      <workItem from="1699316216937" duration="37000" />
-      <workItem from="1699316404990" duration="2039000" />
     </task>
     <task id="LOCAL-00001" summary="Initial project">
       <created>1698383623158</created>
@@ -280,14 +345,7 @@
       <option name="project" value="LOCAL" />
       <updated>1699260080963</updated>
     </task>
-    <task id="LOCAL-00027" summary="0.2. untested">
-      <created>1699316243829</created>
-      <option name="number" value="00027" />
-      <option name="presentableId" value="LOCAL-00027" />
-      <option name="project" value="LOCAL" />
-      <updated>1699316243829</updated>
-    </task>
-    <option name="localTasksCounter" value="28" />
+    <option name="localTasksCounter" value="27" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -325,8 +383,7 @@
     <MESSAGE value="0.2.3" />
     <MESSAGE value="0.2.4 Runnable version to load danmu" />
     <MESSAGE value="0.2.5 Module Version_1 updated&#10;Executable files are extended" />
-    <MESSAGE value="0.2. untested" />
-    <option name="LAST_COMMIT_MESSAGE" value="0.2. untested" />
+    <option name="LAST_COMMIT_MESSAGE" value="0.2.5 Module Version_1 updated&#10;Executable files are extended" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -337,9 +394,9 @@
           <option name="timeStamp" value="5" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/src/version_1/RelationLoader.java</url>
-          <line>176</line>
-          <option name="timeStamp" value="21" />
+          <url>file://$PROJECT_DIR$/src/version_1/Likes.java</url>
+          <line>21</line>
+          <option name="timeStamp" value="10" />
         </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>
