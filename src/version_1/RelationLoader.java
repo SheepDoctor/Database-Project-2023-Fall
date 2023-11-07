@@ -184,7 +184,7 @@ public class RelationLoader
                             if (cnt % (BATCH_SIZE * 75) == 0)
                             {
                                 end = System.currentTimeMillis();
-                                Duration duration = Duration.ofSeconds((long) (end - start) / 1000);
+                                Duration duration = Duration.ofSeconds((end - start) / 1000);
                                 long hours = duration.toHours(); // 获取小时数
                                 long minutes = duration.toMinutesPart(); // 获取分钟数
                                 long seconds = duration.toSecondsPart(); // 获取秒数
