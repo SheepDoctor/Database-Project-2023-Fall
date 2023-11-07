@@ -96,9 +96,6 @@ public class RelationLoader
                 }
             }
         }
-
-
-        int index = 1;
         for (int i = 0; i < row.size(); i++)
         {
             try
@@ -106,80 +103,83 @@ public class RelationLoader
                 if (Objects.equals(type[i], "List"))
                 {
                     String data = row.get(i) != null ? row.get(i).toString() : null;
-                    ResultSet resultSet = stmt.executeQuery();
-                    data = data.replace("[", "");
-                    data = data.replace("]", "");
-                    String[] list = data.split("\", \"");
-                    for(int k = 0; k < list.length; k++)
+                    data = data.replace("['", "");
+                    data = data.replace("']", "");
+                    String[] list = data.split("\', \'");
+                    for (int k = 0; k < list.length; k++)
                     {
-                        for (String sub_data : list)
+                        int index = 1;
+                        String sub_data = list[k];
+                        for (int j = 0; j < new_row.size(); j++)
                         {
-                            for (int j = 0; j < new_row.size(); j++)
+                            if (Objects.equals(new_type.get(j), "Long"))
                             {
-                                if (Objects.equals(new_type.get(j), "Long"))
+                                if (new_row.get(j) == null)
                                 {
-                                    if (new_row.get(i) == null)
-                                    {
-                                        stmt.setLong(index++, -1);
-                                        continue;
-                                    }
-                                    stmt.setLong(index++, Long.parseLong(sub_data));
+                                    stmt.setLong(index++, -1);
+                                    continue;
                                 }
-                                else if (Objects.equals(new_type.get(j), "String"))
+                                stmt.setLong(index++, Long.parseLong(new_row.get(j)));
+                            }
+                            else if (Objects.equals(new_type.get(j), "String"))
+                            {
+                                if (new_row.get(j) == null)
                                 {
-                                    if (new_row.get(i) == null)
-                                    {
-                                        stmt.setString(index++, "");
-                                        continue;
-                                    }
-                                    data = data.replaceAll("/_reversed", "\\\\");
-                                    stmt.setString(index++, sub_data);
+                                    stmt.setString(index++, "");
+                                    continue;
                                 }
-                                else if (Objects.equals(new_type.get(j), "Date"))
+                                data = data.replaceAll("/_reversed", "\\\\");
+                                stmt.setString(index++, new_row.get(j));
+                            }
+                            else if (Objects.equals(new_type.get(j), "Date"))
+                            {
+                                if (new_row.get(j) == null)
                                 {
-                                    if (new_row.get(i) == null)
-                                    {
-                                        stmt.setDate(index++, null);
-                                        continue;
-                                    }
-                                    stmt.setDate(index++, new Date(2023 - 1900, Integer.parseInt(sub_data.split("月")[0]) - 1, Integer.parseInt(sub_data.split("月")[1].split("日")[0])));
+                                    stmt.setDate(index++, null);
+                                    continue;
                                 }
-                                else if (Objects.equals(new_type.get(j), "Int"))
+                                stmt.setDate(index++, new Date(2023 - 1900, Integer.parseInt(sub_data.split("月")[0]) - 1, Integer.parseInt(new_row.get(j).split("月")[1].split("日")[0])));
+                            }
+                            else if (Objects.equals(new_type.get(j), "Int"))
+                            {
+                                if (new_row.get(j) == null)
                                 {
-                                    if (new_row.get(i) == null)
-                                    {
-                                        stmt.setInt(index++, -1);
-                                        continue;
-                                    }
-                                    stmt.setInt(index++, Integer.parseInt(sub_data));
+                                    stmt.setInt(index++, -1);
+                                    continue;
                                 }
-                                else if (Objects.equals(new_type.get(j), "Time"))
+                                stmt.setInt(index++, Integer.parseInt(new_row.get(j)));
+                            }
+                            else if (Objects.equals(new_type.get(j), "Time"))
+                            {
+                                if (new_row.get(j) == null)
                                 {
-                                    if (new_row.get(i) == null)
-                                    {
-                                        stmt.setTimestamp(index++, null);
-                                        continue;
-                                    }
-                                    stmt.setTimestamp(index++, new Timestamp(
-                                            Integer.parseInt(sub_data.split(" ")[0].split("-")[0]),
-                                            Integer.parseInt(sub_data.split(" ")[0].split("-")[1]),
-                                            Integer.parseInt(sub_data.split(" ")[0].split("-")[2]),
-                                            Integer.parseInt(sub_data.split(" ")[1].split(":")[0]),
-                                            Integer.parseInt(sub_data.split(" ")[1].split(":")[1]),
-                                            Integer.parseInt(sub_data.split(" ")[1].split(":")[2]), 0));
+                                    stmt.setTimestamp(index++, null);
+                                    continue;
                                 }
-                                else if (Objects.equals(new_type.get(j), "Real"))
+                                stmt.setTimestamp(index++, new Timestamp(
+                                        Integer.parseInt(new_row.get(j).split(" ")[0].split("-")[0]),
+                                        Integer.parseInt(new_row.get(j).split(" ")[0].split("-")[1]),
+                                        Integer.parseInt(new_row.get(j).split(" ")[0].split("-")[2]),
+                                        Integer.parseInt(new_row.get(j).split(" ")[1].split(":")[0]),
+                                        Integer.parseInt(new_row.get(j).split(" ")[1].split(":")[1]),
+                                        Integer.parseInt(new_row.get(j).split(" ")[1].split(":")[2]), 0));
+                            }
+                            else if (Objects.equals(new_type.get(j), "Real"))
+                            {
+                                if (new_row.get(j) == null)
                                 {
-                                    if (new_row.get(i) == null)
-                                    {
-                                        stmt.setDouble(index++, -1);
-                                        continue;
-                                    }
-                                    stmt.setDouble(index++, Double.parseDouble(sub_data));
+                                    stmt.setDouble(index++, -1);
+                                    continue;
                                 }
+                                stmt.setDouble(index++, Double.parseDouble(new_row.get(j)));
                             }
                         }
-                        stmt.setLong(index++, Long.parseLong(list[k]));
+                        stmt.setLong(index++, Long.parseLong(sub_data));
+                        cnt++;
+                        if (cnt % (BATCH_SIZE * 50) == 0)
+                        {
+                            System.out.println("当前进度：" + cnt + " 条");
+                        }
                     }
                     break;
                 }
@@ -241,9 +241,6 @@ public class RelationLoader
                     if (cnt % (BATCH_SIZE * 50) == 0)
                     {
                         System.out.println("当前进度：" + cnt + " 条");
-                        //System.out.printf("(弹幕)表导入进度：%.3f%%\n", cnt / 12478996.0 * 100);
-                        //System.out.printf("(视频)表导入进度：%.3f%%\n", cnt / 7865.0 * 100);
-                        //System.out.printf("(用户)表导入进度：%.3f%%\n", cnt / 37881.0 * 100);
                     }
                     stmt.executeBatch();
                     stmt.clearBatch();

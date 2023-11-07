@@ -7,7 +7,7 @@
     <list default="true" id="983aa8dd-a81e-4e10-beeb-f458ad86c992" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/version_1/Likes.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/version_1/Likes.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/version_1/Loader.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/version_1/Loader.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/version_1/RelationLoader.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/version_1/RelationLoader.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -67,26 +67,6 @@
       <recent name="" />
     </key>
   </component>
-  <component name="RunManager" selected="Application.Entrance">
-    <configuration name="Entrance" type="Application" factoryName="Application">
-      <option name="MAIN_CLASS_NAME" value="version_1.Danmu" />
-      <module name="DB_script" />
-      <method v="2">
-        <option name="Make" enabled="true" />
-      </method>
-    </configuration>
-    <configuration name="Pretreatment" type="Application" factoryName="Application">
-      <option name="MAIN_CLASS_NAME" value="utils.Pretreatment_data" />
-      <module name="DB_script" />
-      <method v="2">
-        <option name="Make" enabled="true" />
-      </method>
-    </configuration>
-    <list>
-      <item itemvalue="Application.Entrance" />
-      <item itemvalue="Application.Pretreatment" />
-    </list>
-  </component>
   <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
   <component name="TaskManager">
     <task active="true" id="Default" summary="Default task">
@@ -115,6 +95,8 @@
       <workItem from="1699264447130" duration="985000" />
       <workItem from="1699275250384" duration="661000" />
       <workItem from="1699314734205" duration="1461000" />
+      <workItem from="1699316216937" duration="37000" />
+      <workItem from="1699316404990" duration="2039000" />
     </task>
     <task id="LOCAL-00001" summary="Initial project">
       <created>1698383623158</created>
@@ -298,7 +280,14 @@
       <option name="project" value="LOCAL" />
       <updated>1699260080963</updated>
     </task>
-    <option name="localTasksCounter" value="27" />
+    <task id="LOCAL-00027" summary="0.2. untested">
+      <created>1699316243829</created>
+      <option name="number" value="00027" />
+      <option name="presentableId" value="LOCAL-00027" />
+      <option name="project" value="LOCAL" />
+      <updated>1699316243829</updated>
+    </task>
+    <option name="localTasksCounter" value="28" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -336,7 +325,8 @@
     <MESSAGE value="0.2.3" />
     <MESSAGE value="0.2.4 Runnable version to load danmu" />
     <MESSAGE value="0.2.5 Module Version_1 updated&#10;Executable files are extended" />
-    <option name="LAST_COMMIT_MESSAGE" value="0.2.5 Module Version_1 updated&#10;Executable files are extended" />
+    <MESSAGE value="0.2. untested" />
+    <option name="LAST_COMMIT_MESSAGE" value="0.2. untested" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -347,9 +337,9 @@
           <option name="timeStamp" value="5" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/src/version_1/Likes.java</url>
-          <line>21</line>
-          <option name="timeStamp" value="10" />
+          <url>file://$PROJECT_DIR$/src/version_1/RelationLoader.java</url>
+          <line>176</line>
+          <option name="timeStamp" value="21" />
         </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>
