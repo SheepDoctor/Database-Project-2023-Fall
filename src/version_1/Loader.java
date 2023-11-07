@@ -90,7 +90,7 @@ public class Loader
                             Integer.parseInt(data.split(" ")[1].split(":")[1]),
                             Integer.parseInt(data.split(" ")[1].split(":")[2]), 0));
                 }
-                else if (type[i] == "Real")
+                else if (Objects.equals(type[i], "Real"))
                 {
                     if (row.get(i) == null)
                     {
@@ -98,17 +98,6 @@ public class Loader
                         continue;
                     }
                     stmt.setDouble(index++, Double.parseDouble(data));
-                }
-                else if (Objects.equals(type[i], "List"))
-                {
-                    ResultSet resultSet = stmt.executeQuery();
-                    data = data.replace("[", "");
-                    data = data.replace("]", "");
-                    String[] list = data.split("\", \"");
-                    for (String info : list)
-                    {
-
-                    }
                 }
             }
             catch (Exception e)

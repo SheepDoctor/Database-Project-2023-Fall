@@ -18,7 +18,7 @@ public class Likes
         String sql = "insert into videos(bv,mid) values(?,?)";
         Database database = new Database(prop);
 
-        Loader loader = new Loader();
+        RelationLoader loader = new RelationLoader();
         loader.write_data(file_path, queue, database, sql, false, false);
     }
 }
