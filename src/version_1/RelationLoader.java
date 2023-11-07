@@ -4,6 +4,7 @@ import utils.Database;
 
 import java.io.*;
 import java.sql.*;
+import java.time.Duration;
 import java.util.ArrayList;
 import java.sql.Date;
 import java.sql.Timestamp;
@@ -183,7 +184,12 @@ public class RelationLoader
                             if (cnt % (BATCH_SIZE * 75) == 0)
                             {
                                 end = System.currentTimeMillis();
-                                System.out.println("当前进度：" + cnt + " 条，TIME：" + (long) (end - start) / 1000 + "s");
+                                Duration duration = Duration.ofSeconds((long) (end - start) / 1000);
+                                long hours = duration.toHours(); // 获取小时数
+                                long minutes = duration.toMinutesPart(); // 获取分钟数
+                                long seconds = duration.toSecondsPart(); // 获取秒数
+                                System.out.println("当前进度：" + cnt + " 条，TIME：" +
+                                        hours + "h " + minutes + "m " + seconds + "s");
                             }
                             stmt.executeBatch();
                             stmt.clearBatch();
