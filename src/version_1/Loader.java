@@ -83,8 +83,8 @@ public class Loader
                         continue;
                     }
                     stmt.setTimestamp(index++, new Timestamp(
-                            Integer.parseInt(data.split(" ")[0].split("-")[0]),
-                            Integer.parseInt(data.split(" ")[0].split("-")[1]),
+                            Integer.parseInt(data.split(" ")[0].split("-")[0]) - 1900,
+                            Integer.parseInt(data.split(" ")[0].split("-")[1]) - 1,
                             Integer.parseInt(data.split(" ")[0].split("-")[2]),
                             Integer.parseInt(data.split(" ")[1].split(":")[0]),
                             Integer.parseInt(data.split(" ")[1].split(":")[1]),
@@ -102,13 +102,12 @@ public class Loader
             }
             catch (Exception e)
             {
-                System.out.println(e);
             }
         }
         stmt.addBatch();
     }
 
-    public void write_data(String file_path, String[] queue, Database database, String sql, Boolean adder, Boolean pretreat)
+    public void write_data(String file_path, String[] queue, Database database, String sql, Boolean adder, Boolean pretreat, double num)
     {
         con = database.open();
         int cnt = 0;
@@ -155,10 +154,14 @@ public class Loader
                 loadData(row, queue);
                 if (cnt % BATCH_SIZE == 0)
                 {
-                    System.out.println("当前进度：" + cnt + " 条");
-                    //System.out.printf("(弹幕)表导入进度：%.3f%%\n", cnt / 12478996.0 * 100);
-                    //System.out.printf("(用户)表导入进度：%.3f%%\n", cnt / 37881.0 * 100);
-                    //System.out.printf("(视频)表导入进度：%.3f%%\n", cnt / 7865.0 * 100);
+                    if(num == 0)
+                    {
+                        System.out.println("当前进度：" + cnt + " 条");
+                    }
+                    else
+                    {
+                        System.out.printf("导入进度：%.3f%%\n", cnt / num * 100);
+                    }
                     stmt.executeBatch();
                     stmt.clearBatch();
                 }
@@ -174,7 +177,7 @@ public class Loader
                 long end = System.currentTimeMillis();//结束时间
                 System.out.println(cnt + " records successfully loaded");
                 System.out.println("TIME : " + (long) (end - start) / 1000 + "s");
-                System.out.println("Loading speed : " + (long) cnt / (end - start) + " records/s");
+                System.out.println("Loading speed : " + (long) cnt / ((end - start) / 1000) + " records/s");
             }
             catch (Exception e)
             {

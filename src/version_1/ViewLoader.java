@@ -28,7 +28,6 @@ public class ViewLoader
     private void loadData(ArrayList<Object> row, String[] type) throws SQLException
     {
         ArrayList<String> new_row = new ArrayList<>();
-        ArrayList<String> new_type = new ArrayList<>();
         for (int i = 0; i < row.size(); i++)
         {
             if (!(Objects.equals(type[i], "Skip") && Objects.equals(type[i], "List")))
@@ -39,67 +38,55 @@ public class ViewLoader
                     if (row.get(i) == null)
                     {
                         new_row.add(null);
-                        new_type.add("Long");
                         continue;
                     }
                     new_row.add(data);
-                    new_type.add("Long");
                 }
                 else if (Objects.equals(type[i], "String"))
                 {
                     if (row.get(i) == null)
                     {
                         new_row.add("");
-                        new_type.add("String");
                         continue;
                     }
                     data = data.replaceAll("/_reversed", "\\\\");
                     new_row.add(data);
-                    new_type.add("String");
                 }
                 else if (Objects.equals(type[i], "Date"))
                 {
                     if (row.get(i) == null)
                     {
                         new_row.add(null);
-                        new_type.add("Date");
                         continue;
                     }
                     new_row.add(data);
-                    new_type.add("Date");
                 }
                 else if (Objects.equals(type[i], "Int"))
                 {
                     if (row.get(i) == null)
                     {
                         new_row.add("-1");
-                        new_type.add("Int");
                         continue;
                     }
                     new_row.add(data);
-                    new_type.add("Int");
                 }
                 else if (Objects.equals(type[i], "Time"))
                 {
                     if (row.get(i) == null)
                     {
                         new_row.add(null);
-                        new_type.add("Time");
                         continue;
                     }
                     new_row.add(data);
-                    new_type.add("Time");
                 }
                 else if (Objects.equals(type[i], "Real"))
                 {
                     if (row.get(i) == null)
                     {
                         new_row.add(null);
-                        new_type.add("Time");
                         continue;
                     }
                     new_row.add(data);
-                    new_type.add("Time");
                 }
             }
         }
@@ -132,72 +119,9 @@ public class ViewLoader
                         int index = 1;
                         String sub_data1 = list.get(k);
                         String sub_data2 = list.get(k + 1);
-                        for (int j = 0; j < new_row.size(); j++)
-                        {
-                            if (Objects.equals(new_type.get(j), "Long"))
-                            {
-                                if (new_row.get(j) == null)
-                                {
-                                    stmt.setLong(index++, -1);
-                                    continue;
-                                }
-                                stmt.setLong(index++, Long.parseLong(new_row.get(j)));
-                            }
-                            else if (Objects.equals(new_type.get(j), "String"))
-                            {
-                                if (new_row.get(j) == null)
-                                {
-                                    stmt.setString(index++, "");
-                                    continue;
-                                }
-                                data = data.replaceAll("/_reversed", "\\\\");
-                                stmt.setString(index++, new_row.get(j));
-                            }
-                            else if (Objects.equals(new_type.get(j), "Date"))
-                            {
-                                if (new_row.get(j) == null)
-                                {
-                                    stmt.setDate(index++, null);
-                                    continue;
-                                }
-                                stmt.setDate(index++, new Date(2023 - 1900, Integer.parseInt(sub_data1.split("月")[0]) - 1, Integer.parseInt(new_row.get(j).split("月")[1].split("日")[0])));
-                            }
-                            else if (Objects.equals(new_type.get(j), "Int"))
-                            {
-                                if (new_row.get(j) == null)
-                                {
-                                    stmt.setInt(index++, -1);
-                                    continue;
-                                }
-                                stmt.setInt(index++, Integer.parseInt(new_row.get(j)));
-                            }
-                            else if (Objects.equals(new_type.get(j), "Time"))
-                            {
-                                if (new_row.get(j) == null)
-                                {
-                                    stmt.setTimestamp(index++, null);
-                                    continue;
-                                }
-                                stmt.setTimestamp(index++, new Timestamp(
-                                        Integer.parseInt(new_row.get(j).split(" ")[0].split("-")[0]),
-                                        Integer.parseInt(new_row.get(j).split(" ")[0].split("-")[1]),
-                                        Integer.parseInt(new_row.get(j).split(" ")[0].split("-")[2]),
-                                        Integer.parseInt(new_row.get(j).split(" ")[1].split(":")[0]),
-                                        Integer.parseInt(new_row.get(j).split(" ")[1].split(":")[1]),
-                                        Integer.parseInt(new_row.get(j).split(" ")[1].split(":")[2]), 0));
-                            }
-                            else if (Objects.equals(new_type.get(j), "Real"))
-                            {
-                                if (new_row.get(j) == null)
-                                {
-                                    stmt.setDouble(index++, -1);
-                                    continue;
-                                }
-                                stmt.setDouble(index++, Double.parseDouble(new_row.get(j)));
-                            }
-                        }
+                        stmt.setString(index++, new_row.get(0));
                         stmt.setLong(index++, Long.parseLong(sub_data1));
-                        //stmt.setLong(index++, Long.parseLong(sub_data1));
+                        stmt.setLong(index, Long.parseLong(sub_data2));
                         stmt.addBatch();
                         cnt++;
                         if (cnt % BATCH_SIZE == 0)
@@ -269,7 +193,6 @@ public class ViewLoader
                 }
                 loadData(row, queue);
                 counter++;
-                System.out.println(counter);
             }
             stmt.executeBatch();
             stmt.clearBatch();
@@ -281,7 +204,7 @@ public class ViewLoader
                 end = System.currentTimeMillis();//结束时间
                 System.out.println(cnt + " records successfully loaded");
                 System.out.println("TIME : " + (end - start) / 1000 + "s");
-                System.out.println("Loading speed : " + (long) cnt / (end - start) + " records/s");
+                System.out.println("Loading speed : " + (long) cnt / ((end - start) / 1000) + " records/s");
             }
             catch (Exception e)
             {
@@ -293,7 +216,6 @@ public class ViewLoader
                 }
                 catch (Exception e2)
                 {
-                    System.out.println(e2);
                 }
                 database.close(stmt);
                 System.exit(1);
@@ -309,7 +231,6 @@ public class ViewLoader
             }
             catch (Exception e2)
             {
-                System.out.println(e2);
             }
             database.close(stmt);
             System.exit(1);
@@ -320,7 +241,6 @@ public class ViewLoader
         }
         catch (IOException e)
         {
-            System.err.println(e);
             throw new RuntimeException(e);
         }
         database.close(stmt);

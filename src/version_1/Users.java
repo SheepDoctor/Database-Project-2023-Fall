@@ -5,6 +5,8 @@ import version_1.Loader;
 
 import java.util.Properties;
 
+import static version_1.Reviewer.reviewer;
+
 public class Users
 {
     public static void main(String[] args)
@@ -21,6 +23,9 @@ public class Users
         Database database = new Database(prop);
 
         Loader loader = new Loader();
-        loader.write_data(file_path, queue, database, sql, false, false);
+        System.out.println("USER导入......");
+        loader.write_data(file_path, queue, database, sql, false, false, 37881.0);
+
+        reviewer();
     }
 }

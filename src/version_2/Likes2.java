@@ -1,6 +1,8 @@
-package version_1;
+package version_2;
 
 import utils.Database;
+import version_1.RelationLoader;
+
 import java.util.Properties;
 import java.util.concurrent.Executor;
 import java.util.concurrent.ExecutorService;
@@ -24,6 +26,6 @@ public class Likes2
         Database database = new Database(prop);
 
         RelationLoader loader = new RelationLoader();
-        loader.write_data(file_path, queue, database, sql, false, false);
+        loader.write_data(file_path, queue, database, sql, false, false, 7865.0);
     }
 }

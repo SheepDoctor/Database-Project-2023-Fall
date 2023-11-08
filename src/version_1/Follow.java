@@ -4,7 +4,7 @@ import utils.Database;
 
 import java.util.Properties;
 
-public class View
+public class Follow
 {
     public static void main(String[] args)
     {
@@ -14,8 +14,7 @@ public class View
         prop.put("password", "123456");
         prop.put("database", "Project");
 
-        //String file_path = "source_file/videos.csv";
-        String file_path = "source_file/draft.csv";
+        String file_path = "source_file/users.csv";
         String[] queue = {
                 "Long",
                 "Skip",
@@ -23,18 +22,12 @@ public class View
                 "Skip",
                 "Skip",
                 "Skip",
-                "Skip",
-                "Skip",
-                "Skip",
-                "Skip",
-                "Skip",
-                "Skip",
-                "Skip",
-                "List"};
-        String sql = "insert into view(bv,mid,time) values(?,?,?)";
+                "List",
+                "Skip"
+                };
+        String sql = "insert into follow(follow_mid,follow_by_mid) values(?,?)";
         Database database = new Database(prop);
-
-        ViewLoader loader = new ViewLoader();
-        loader.write_data(file_path, queue, database, sql, false, false);
+        RelationLoader loader = new RelationLoader();
+        loader.write_data(file_path, queue, database, sql, false, false, 37881.0);
     }
 }

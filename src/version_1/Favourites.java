@@ -34,6 +34,6 @@ public class Favourites
         Database database = new Database(prop);
 
         RelationLoader loader = new RelationLoader();
-        loader.write_data(file_path, queue, database, sql, false, false);
+        loader.write_data(file_path, queue, database, sql, false, false, 7865.0);
     }
 }

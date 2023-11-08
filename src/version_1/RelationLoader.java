@@ -22,7 +22,7 @@ public class RelationLoader
     private long end;
     private int counter = 1;
 
-    private void loadData(ArrayList<Object> row, String[] type) throws SQLException
+    private void loadData(ArrayList<Object> row, String[] type, double num) throws SQLException
     {
         ArrayList<String> new_row = new ArrayList<>();
         ArrayList<String> new_type = new ArrayList<>();
@@ -107,6 +107,10 @@ public class RelationLoader
                 if (Objects.equals(type[i], "List"))
                 {
                     String data = row.get(i) != null ? row.get(i).toString() : null;
+                    if(data == null || data.equals("[]"))
+                    {
+                        continue;
+                    }
                     data = data.replace("['", "");
                     data = data.replace("']", "");
                     String[] list = data.split("\', \'");
@@ -191,7 +195,7 @@ public class RelationLoader
                                 Duration duration = Duration.ofSeconds((end - start) / 1000);
                                 System.out.printf("已处理数：" + cnt / 10000 + " 万条，TIME：" +
                                         duration.toHours() + "h " + duration.toMinutesPart() + "m " + duration.toSecondsPart() + "s，");
-                                System.out.printf("导入进度：%.4f%%\n", counter / 7865.0 * 100);
+                                System.out.printf("导入进度：%.4f%%\n", counter / num * 100);
                             }
                         }
                     }
@@ -205,7 +209,7 @@ public class RelationLoader
         }
     }
 
-    public void write_data(String file_path, String[] queue, Database database, String sql, Boolean adder, Boolean pretreat)
+    public void write_data(String file_path, String[] queue, Database database, String sql, Boolean adder, Boolean pretreat, double num)
     {
         con = database.open();
         try
@@ -248,7 +252,7 @@ public class RelationLoader
                 {
                     row.add(cnt);
                 }
-                loadData(row, queue);
+                loadData(row, queue, num);
                 counter++;
             }
             stmt.executeBatch();
@@ -261,7 +265,7 @@ public class RelationLoader
                 end = System.currentTimeMillis();//结束时间
                 System.out.println(cnt + " records successfully loaded");
                 System.out.println("TIME : " + (end - start) / 1000 + "s");
-                System.out.println("Loading speed : " + (long) cnt / (end - start) + " records/s");
+                System.out.println("Loading speed : " + (long) cnt / ((end - start) / 1000) + " records/s");
             }
             catch (Exception e)
             {
