@@ -8,11 +8,14 @@ import java.time.Duration;
 import java.util.ArrayList;
 import java.sql.Date;
 import java.sql.Timestamp;
+import java.util.List;
 import java.util.Objects;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import com.opencsv.CSVReader;
 
-public class RelationLoader
+public class ViewLoader
 {
     private final int BATCH_SIZE = 500;//initial 500
     private Connection con = null;
@@ -107,13 +110,28 @@ public class RelationLoader
                 if (Objects.equals(type[i], "List"))
                 {
                     String data = row.get(i) != null ? row.get(i).toString() : null;
-                    data = data.replace("['", "");
-                    data = data.replace("']", "");
-                    String[] list = data.split("\', \'");
-                    for (int k = 0; k < list.length; k++)
+                    String regex = "'(\\d+)'|(\\d+)";
+                    Pattern pattern = Pattern.compile(regex);
+                    Matcher matcher = pattern.matcher(data);
+                    List<String> list = new ArrayList<>();
+                    while (matcher.find())
+                    {
+                        String match = matcher.group(1);
+                        if (match != null)
+                        {
+                            list.add(match);
+                        }
+                        else
+                        {
+                            list.add(matcher.group(2));
+                        }
+                    }
+                    int len = list.size();
+                    for (int k = 0; k < len; k += 2)
                     {
                         int index = 1;
-                        String sub_data = list[k];
+                        String sub_data1 = list.get(k);
+                        String sub_data2 = list.get(k + 1);
                         for (int j = 0; j < new_row.size(); j++)
                         {
                             if (Objects.equals(new_type.get(j), "Long"))
@@ -142,7 +160,7 @@ public class RelationLoader
                                     stmt.setDate(index++, null);
                                     continue;
                                 }
-                                stmt.setDate(index++, new Date(2023 - 1900, Integer.parseInt(sub_data.split("月")[0]) - 1, Integer.parseInt(new_row.get(j).split("月")[1].split("日")[0])));
+                                stmt.setDate(index++, new Date(2023 - 1900, Integer.parseInt(sub_data1.split("月")[0]) - 1, Integer.parseInt(new_row.get(j).split("月")[1].split("日")[0])));
                             }
                             else if (Objects.equals(new_type.get(j), "Int"))
                             {
@@ -178,7 +196,8 @@ public class RelationLoader
                                 stmt.setDouble(index++, Double.parseDouble(new_row.get(j)));
                             }
                         }
-                        stmt.setLong(index++, Long.parseLong(sub_data));
+                        stmt.setLong(index++, Long.parseLong(sub_data1));
+                        //stmt.setLong(index++, Long.parseLong(sub_data1));
                         stmt.addBatch();
                         cnt++;
                         if (cnt % BATCH_SIZE == 0)
@@ -250,6 +269,7 @@ public class RelationLoader
                 }
                 loadData(row, queue);
                 counter++;
+                System.out.println(counter);
             }
             stmt.executeBatch();
             stmt.clearBatch();
@@ -289,6 +309,7 @@ public class RelationLoader
             }
             catch (Exception e2)
             {
+                System.out.println(e2);
             }
             database.close(stmt);
             System.exit(1);
@@ -299,6 +320,7 @@ public class RelationLoader
         }
         catch (IOException e)
         {
+            System.err.println(e);
             throw new RuntimeException(e);
         }
         database.close(stmt);

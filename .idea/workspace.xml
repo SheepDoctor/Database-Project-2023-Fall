@@ -5,6 +5,11 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="983aa8dd-a81e-4e10-beeb-f458ad86c992" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/source_file/ddl.sql" beforeDir="false" afterPath="$PROJECT_DIR$/source_file/ddl.sql" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/version_1/Coins.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/version_1/Coins.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/version_1/Favourites.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/version_1/Favourites.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/version_1/Loader.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/version_1/Loader.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/version_1/RelationLoader.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/version_1/RelationLoader.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -95,6 +100,10 @@
       <workItem from="1699314734205" duration="1461000" />
       <workItem from="1699316216937" duration="37000" />
       <workItem from="1699316404990" duration="2880000" />
+      <workItem from="1699343861301" duration="13730000" />
+      <workItem from="1699370637609" duration="145000" />
+      <workItem from="1699370876633" duration="3873000" />
+      <workItem from="1699417695907" duration="10384000" />
     </task>
     <task id="LOCAL-00001" summary="Initial project">
       <created>1698383623158</created>
@@ -306,7 +315,21 @@
       <option name="project" value="LOCAL" />
       <updated>1699320597079</updated>
     </task>
-    <option name="localTasksCounter" value="31" />
+    <task id="LOCAL-00031" summary="0.2.9 fine-tuned version for relationships">
+      <created>1699320755486</created>
+      <option name="number" value="00031" />
+      <option name="presentableId" value="LOCAL-00031" />
+      <option name="project" value="LOCAL" />
+      <updated>1699320755486</updated>
+    </task>
+    <task id="LOCAL-00032" summary="0.3.0 fine-tuned version for relationships">
+      <created>1699321043784</created>
+      <option name="number" value="00032" />
+      <option name="presentableId" value="LOCAL-00032" />
+      <option name="project" value="LOCAL" />
+      <updated>1699321043784</updated>
+    </task>
+    <option name="localTasksCounter" value="33" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -348,20 +371,31 @@
     <MESSAGE value="0.2.6 tested version for partial relationships" />
     <MESSAGE value="0.2.8 fine-tuned version for relationships" />
     <MESSAGE value="0.2.9 fine-tuned version for relationships" />
-    <option name="LAST_COMMIT_MESSAGE" value="0.2.9 fine-tuned version for relationships" />
+    <MESSAGE value="0.3.0 fine-tuned version for relationships" />
+    <option name="LAST_COMMIT_MESSAGE" value="0.3.0 fine-tuned version for relationships" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
       <breakpoints>
         <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/src/version_1/Loader.java</url>
-          <line>28</line>
-          <option name="timeStamp" value="5" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/src/version_1/RelationLoader.java</url>
           <line>251</line>
           <option name="timeStamp" value="27" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/src/version_1/Favourites.java</url>
+          <line>36</line>
+          <option name="timeStamp" value="28" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/src/version_1/ViewLoader.java</url>
+          <line>128</line>
+          <option name="timeStamp" value="32" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/src/version_1/Loader.java</url>
+          <line>164</line>
+          <option name="timeStamp" value="33" />
         </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>

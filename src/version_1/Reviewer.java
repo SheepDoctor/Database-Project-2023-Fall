@@ -4,7 +4,7 @@ import utils.Database;
 
 import java.util.Properties;
 
-public class Favourites
+public class Reviewer
 {
     public static void main(String[] args)
     {
@@ -16,7 +16,6 @@ public class Favourites
 
         String file_path = "source_file/videos.csv";
         String[] queue = {
-                "String",
                 "Skip",
                 "Skip",
                 "Skip",
@@ -26,14 +25,15 @@ public class Favourites
                 "Skip",
                 "Skip",
                 "Skip",
+                "Long",
                 "Skip",
                 "Skip",
-                "List",
+                "Skip",
                 "Skip"};
-        String sql = "insert into favourites(bv,mid) values(?,?)";
+        String sql = "insert into reviewer(reviewer_mid) values(?) ON CONFLICT (reviewer_mid) DO NOTHING;";
         Database database = new Database(prop);
 
-        RelationLoader loader = new RelationLoader();
+        Loader loader = new Loader();
         loader.write_data(file_path, queue, database, sql, false, false);
     }
 }

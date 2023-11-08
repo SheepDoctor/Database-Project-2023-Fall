@@ -13,7 +13,7 @@ import com.opencsv.CSVReader;
 
 public class Loader
 {
-    private final int BATCH_SIZE = 250;//initial 500
+    private final int BATCH_SIZE = 500;//initial 500
     private Connection con = null;
     private PreparedStatement stmt = null;
 
@@ -155,13 +155,10 @@ public class Loader
                 loadData(row, queue);
                 if (cnt % BATCH_SIZE == 0)
                 {
-                    if (cnt % (BATCH_SIZE * 50) == 0)
-                    {
-                        System.out.println("当前进度：" + cnt + " 条");
-                        //System.out.printf("(弹幕)表导入进度：%.3f%%\n", cnt / 12478996.0 * 100);
-                        //System.out.printf("(视频)表导入进度：%.3f%%\n", cnt / 7865.0 * 100);
-                        //System.out.printf("(用户)表导入进度：%.3f%%\n", cnt / 37881.0 * 100);
-                    }
+                    //System.out.println("当前进度：" + cnt + " 条");
+                    //System.out.printf("(弹幕)表导入进度：%.3f%%\n", cnt / 12478996.0 * 100);
+                    //System.out.printf("(用户)表导入进度：%.3f%%\n", cnt / 37881.0 * 100);
+                    System.out.printf("(视频)表导入进度：%.3f%%\n", cnt / 7865.0 * 100);
                     stmt.executeBatch();
                     stmt.clearBatch();
                 }

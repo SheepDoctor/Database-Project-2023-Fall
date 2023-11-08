@@ -30,7 +30,8 @@ public class Coins
                 "List",
                 "Skip",
                 "Skip"};
-        String sql = "insert into likes(bv,mid) values(?,?)";
+        //String sql = "insert into coin(bv,mid) values(?,?)";
+        String sql = "insert into coins(bv,mid) values(?,?)";
         Database database = new Database(prop);
 
         RelationLoader loader = new RelationLoader();

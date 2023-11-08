@@ -70,24 +70,20 @@ create table likes
     check ( bv like 'BV%')
 );
 
-create table coin
+create table coins
 (
     bv      char(12),
     mid     bigint,
-    time    double precision not null,
-    content text not null,
     primary key (bv, mid),
     foreign key (bv) references videos (bv),
     foreign key (mid) references users (mid),
     check ( bv like 'BV%')
 );
 
-create table favorite
+create table favourites
 (
     bv      char(12),
     mid     bigint,
-    time    double precision not null,
-    content text not null,
     primary key (bv, mid),
     foreign key (bv) references videos (bv),
     foreign key (mid) references users (mid),
@@ -99,7 +95,6 @@ create table view
     bv      char(12),
     mid     bigint,
     time    double precision not null,
-    content text not null,
     primary key (bv, mid),
     foreign key (bv) references videos (bv),
     foreign key (mid) references users (mid),
