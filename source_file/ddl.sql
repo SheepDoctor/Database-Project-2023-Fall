@@ -40,7 +40,7 @@ create table review
     review_time  timestamp not null,
     primary key (bv, reviewer_mid),
     foreign key (bv) references videos (bv),
-    foreign key (reviewer_mid) references reviewer (reviewer_mid),
+    foreign key (reviewer_mid) references users (mid),
     check ( bv like 'BV%')
 );
 create table comment

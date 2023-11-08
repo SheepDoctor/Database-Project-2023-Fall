@@ -16,6 +16,7 @@ public class Pretreatment_data
         {
             String line;
             line = reader.readLine();
+            writer.write(line.replaceAll(",", "\7"));
             while ((line = reader.readLine()) != null)
             {
                 line  = line.replace("\\", "/_reversed");
@@ -25,7 +26,11 @@ public class Pretreatment_data
                 String modifiedLine = line;
                 if (m.find())
                 {
-                    modifiedLine = modifyLine(m.group(0)) + line.substring(m.group(0).length()) + '\n';  // 修改行内容的方法
+                    modifiedLine = '\n' + modifyLine(m.group(0)) + line.substring(m.group(0).length());  // 修改行内容的方法
+                }
+                else
+                {
+                    modifiedLine = line + "/_reversedn";
                 }
                 writer.write(modifiedLine);
             }
