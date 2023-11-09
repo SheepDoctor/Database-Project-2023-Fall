@@ -10,6 +10,7 @@ import java.sql.Date;
 import java.sql.Timestamp;
 import java.util.List;
 import java.util.Objects;
+import java.util.concurrent.ExecutorService;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -25,7 +26,7 @@ public class ViewLoader2
     private long end;
     private int counter = 1;
 
-    private void loadData(ArrayList<Object> row, String[] type) throws SQLException
+    private void loadData(ArrayList<Object> row, String[] type,ExecutorService executorService) throws SQLException
     {
         ArrayList<String> new_row = new ArrayList<>();
         for (int i = 0; i < row.size(); i++)
@@ -126,8 +127,23 @@ public class ViewLoader2
                         cnt++;
                         if (cnt % BATCH_SIZE == 0)
                         {
-                            stmt.executeBatch();
-                            stmt.clearBatch();
+                            executorService.submit(()-> {
+                                try {
+                                    stmt.executeBatch();stmt.clearBatch();
+                                } catch (SQLException e) {
+                                    throw new RuntimeException(e);
+                                }
+
+                            });
+                        if (cnt % (BATCH_SIZE * 100) == 0)
+                        {
+                            end = System.currentTimeMillis();
+                            Duration duration = Duration.ofSeconds((end - start) / 1000);
+                            System.out.printf("已处理数：" + cnt / 10000 + " 万条，TIME：" +
+                                    duration.toHours() + "h " + duration.toMinutesPart() + "m " + duration.toSecondsPart() + "s，");
+                            System.out.printf("导入进度：%.4f%%\n", counter / 7865.0 * 100);
+                        }
+
                         }
                     }
                     break;
@@ -140,7 +156,7 @@ public class ViewLoader2
         }
     }
 
-    public void write_data(String file_path, String[] queue, Database database, String sql, Boolean adder, Boolean pretreat)
+    public void write_data(String file_path, String[] queue, Database database, String sql, Boolean adder, Boolean pretreat, ExecutorService executorService)
     {
         con = database.open();
         try
@@ -183,11 +199,18 @@ public class ViewLoader2
                 {
                     row.add(cnt);
                 }
-                loadData(row, queue);
+                loadData(row, queue,executorService);
                 counter++;
+
             }
-            stmt.executeBatch();
-            stmt.clearBatch();
+            executorService.submit(()-> {
+                try {
+                    stmt.executeBatch();                stmt.clearBatch();
+
+                } catch (SQLException e) {
+                    throw new RuntimeException(e);
+                }
+            });
             try
             {
                 con.commit();//提交事务，运行后才导入数据库

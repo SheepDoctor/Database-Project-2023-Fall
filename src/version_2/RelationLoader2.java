@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.sql.Date;
 import java.sql.Timestamp;
 import java.util.Objects;
+import java.util.concurrent.ExecutorService;
 
 import com.opencsv.CSVReader;
 
@@ -22,7 +23,7 @@ public class RelationLoader2
     private long end;
     private int counter = 1;
 
-    private void loadData(ArrayList<Object> row, String[] type, double num) throws SQLException
+    private void loadData(ArrayList<Object> row, String[] type, double num,ExecutorService executorService) throws SQLException
     {
         ArrayList<String> new_row = new ArrayList<>();
         ArrayList<String> new_type = new ArrayList<>();
@@ -185,10 +186,16 @@ public class RelationLoader2
                         stmt.setLong(index++, Long.parseLong(sub_data));
                         stmt.addBatch();
                         cnt++;
-                        if (cnt % BATCH_SIZE == 0)
+                        if (cnt % (BATCH_SIZE*100) == 0)
                         {
-                            stmt.executeBatch();
-                            stmt.clearBatch();
+                            executorService.submit(()-> {
+                                try {
+                                    stmt.executeBatch();stmt.clearBatch();
+                                } catch (SQLException e) {
+                                    throw new RuntimeException(e);
+                                }
+
+                            });
                             if (cnt % (BATCH_SIZE * 100) == 0)
                             {
                                 end = System.currentTimeMillis();
@@ -209,7 +216,7 @@ public class RelationLoader2
         }
     }
 
-    public void write_data(String file_path, String[] queue, Database database, String sql, Boolean adder, Boolean pretreat, double num)
+    public void write_data(String file_path, String[] queue, Database database, String sql, Boolean adder, Boolean pretreat, double num, ExecutorService executorService)
     {
         con = database.open();
         try
@@ -252,11 +259,17 @@ public class RelationLoader2
                 {
                     row.add(cnt);
                 }
-                loadData(row, queue, num);
+                loadData(row, queue, num,executorService);
                 counter++;
             }
-            stmt.executeBatch();
-            stmt.clearBatch();
+            executorService.submit(()-> {
+                try {
+                    stmt.executeBatch();stmt.clearBatch();
+                } catch (SQLException e) {
+                    throw new RuntimeException(e);
+                }
+
+            });
             try
             {
                 con.commit();//提交事务，运行后才导入数据库
