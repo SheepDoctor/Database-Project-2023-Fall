@@ -66,6 +66,8 @@ public class Reviewer2
                 }
                 cnt++;
             }
+            stmt.executeBatch();
+            stmt.clearBatch();
             try
             {
                 con.commit();//提交事务，运行后才导入数据库

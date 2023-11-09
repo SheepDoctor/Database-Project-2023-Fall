@@ -4,9 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="983aa8dd-a81e-4e10-beeb-f458ad86c992" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-    </list>
+    <list default="true" id="983aa8dd-a81e-4e10-beeb-f458ad86c992" name="Changes" comment="" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -353,7 +351,14 @@
       <option name="project" value="LOCAL" />
       <updated>1699465056695</updated>
     </task>
-    <option name="localTasksCounter" value="37" />
+    <task id="LOCAL-00037" summary="0.3.6">
+      <created>1699535921827</created>
+      <option name="number" value="00037" />
+      <option name="presentableId" value="LOCAL-00037" />
+      <option name="project" value="LOCAL" />
+      <updated>1699535921829</updated>
+    </task>
+    <option name="localTasksCounter" value="38" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -371,7 +376,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="0.0.2" />
     <MESSAGE value="0.1.0" />
     <MESSAGE value="0.1.1" />
     <MESSAGE value="0.1.2" />
@@ -396,7 +400,8 @@
     <MESSAGE value="0.3.1 more! more!" />
     <MESSAGE value="0.3.2 untested final version" />
     <MESSAGE value="0.3.3 tested final version" />
-    <option name="LAST_COMMIT_MESSAGE" value="0.3.3 tested final version" />
+    <MESSAGE value="0.3.6" />
+    <option name="LAST_COMMIT_MESSAGE" value="0.3.6" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
