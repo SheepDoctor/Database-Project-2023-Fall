@@ -1,6 +1,10 @@
+package version_2;
+
 import utils.Database;
 import version_1.Loader;
 import version_1.Loader2;
+import version_1.RelationLoader;
+import version_1.RelationLoader2;
 
 import java.util.Properties;
 import java.util.concurrent.ExecutorService;
@@ -17,12 +21,14 @@ public class Main2
         prop.put("password", "123abc");
         prop.put("database", "postgres");
 
-        String file_path = "source_file/users.csv";
-        String[] queue = {"Long", "String", "String", "Date", "Int", "String", "Skip","String"};
-        String sql = "insert into users(Mid,Name,Sex,Birthday,Level,Sign,identity) values(?,?,?,?,?,?,?)";
+        String file_path = "C:\\Users\\Dell\\Desktop\\学习\\Third Semester\\Database\\data.project1\\danmu.csv";
+     //   String[] queue = {"Long", "String", "String", "Date", "Int", "String", "Skip","String"};
+     //   String sql = "insert into users(Mid,Name,Sex,Birthday,Level,Sign,identity) values(?,?,?,?,?,?,?)";
+        String[] queue = {"String", "Long", "Real", "String", "Int"};
+        String sql = "insert into comment(BV,Mid,Time,content,id) values(?,?,?,?,?)";
         Database database = new Database(prop);
 
-        Loader2 loader2 = new Loader2();
-        loader2.write_data2(file_path, queue, database, sql, false, executorService);
+        RelationLoader2 loader2 = new RelationLoader2();
+        loader2.write_data_2(file_path, queue, database, sql, false,false, executorService );
     }
 }

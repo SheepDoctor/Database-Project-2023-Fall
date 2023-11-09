@@ -13,7 +13,7 @@ import com.opencsv.CSVReader;
 
 public class Loader2
 {
-    private final int BATCH_SIZE = 500;//initial 500
+    private final int BATCH_SIZE = 5000;//initial 500
     private Connection con = null;
     private PreparedStatement stmt = null;
 

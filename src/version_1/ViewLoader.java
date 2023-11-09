@@ -4,114 +4,145 @@ import utils.Database;
 
 import java.io.*;
 import java.sql.*;
+import java.time.Duration;
 import java.util.ArrayList;
 import java.sql.Date;
 import java.sql.Timestamp;
+import java.util.List;
 import java.util.Objects;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import com.opencsv.CSVReader;
 
-public class Loader
+public class ViewLoader
 {
     private final int BATCH_SIZE = 500;//initial 500
     private Connection con = null;
     private PreparedStatement stmt = null;
-
+    private int cnt = 0;
+    private long start;
+    private long end;
+    private int counter = 1;
 
     private void loadData(ArrayList<Object> row, String[] type) throws SQLException
     {
-        int index = 1;
+        ArrayList<String> new_row = new ArrayList<>();
         for (int i = 0; i < row.size(); i++)
         {
-            try
+            if (!(Objects.equals(type[i], "Skip") && Objects.equals(type[i], "List")))
             {
-                String data;
-                if (row.get(i) != null)
-                {
-                    data = row.get(i).toString();
-                }
-                else
-                {
-                    data = null;
-                }
-
-                if (Objects.equals(type[i], "Skip"))
-                {
-                    continue;
-                }
-                else if (Objects.equals(type[i], "Long"))
+                String data = row.get(i) != null ? row.get(i).toString() : null;
+                if (Objects.equals(type[i], "Long"))
                 {
                     if (row.get(i) == null)
                     {
-                        stmt.setLong(index++, -1);
+                        new_row.add(null);
                         continue;
                     }
-                    stmt.setLong(index++, Long.parseLong(data));
+                    new_row.add(data);
                 }
                 else if (Objects.equals(type[i], "String"))
                 {
                     if (row.get(i) == null)
                     {
-                        stmt.setString(index++, "");
+                        new_row.add("");
                         continue;
                     }
                     data = data.replaceAll("/_reversed", "\\\\");
-                    stmt.setString(index++, data);
+                    new_row.add(data);
                 }
                 else if (Objects.equals(type[i], "Date"))
                 {
                     if (row.get(i) == null)
                     {
-                        stmt.setDate(index++, null);
+                        new_row.add(null);
                         continue;
                     }
-                    stmt.setDate(index++, new Date(2023 - 1900, Integer.parseInt(data.split("月")[0]) - 1, Integer.parseInt(data.split("月")[1].split("日")[0])));
+                    new_row.add(data);
                 }
                 else if (Objects.equals(type[i], "Int"))
                 {
                     if (row.get(i) == null)
                     {
-                        stmt.setInt(index++, -1);
+                        new_row.add("-1");
                         continue;
                     }
-                    stmt.setInt(index++, Integer.parseInt(data));
+                    new_row.add(data);
                 }
                 else if (Objects.equals(type[i], "Time"))
                 {
                     if (row.get(i) == null)
                     {
-                        stmt.setTimestamp(index++, null);
+                        new_row.add(null);
                         continue;
                     }
-                    stmt.setTimestamp(index++, new Timestamp(
-                            Integer.parseInt(data.split(" ")[0].split("-")[0]) - 1900,
-                            Integer.parseInt(data.split(" ")[0].split("-")[1]) - 1,
-                            Integer.parseInt(data.split(" ")[0].split("-")[2]),
-                            Integer.parseInt(data.split(" ")[1].split(":")[0]),
-                            Integer.parseInt(data.split(" ")[1].split(":")[1]),
-                            Integer.parseInt(data.split(" ")[1].split(":")[2]), 0));
+                    new_row.add(data);
                 }
                 else if (Objects.equals(type[i], "Real"))
                 {
                     if (row.get(i) == null)
                     {
-                        stmt.setDouble(index++, -1);
+                        new_row.add(null);
                         continue;
                     }
-                    stmt.setDouble(index++, Double.parseDouble(data));
+                    new_row.add(data);
+                }
+            }
+        }
+        for (int i = 0; i < row.size(); i++)
+        {
+            try
+            {
+                if (Objects.equals(type[i], "List"))
+                {
+                    String data = row.get(i) != null ? row.get(i).toString() : null;
+                    String regex = "'(\\d+)'|(\\d+)";
+                    Pattern pattern = Pattern.compile(regex);
+                    Matcher matcher = pattern.matcher(data);
+                    List<String> list = new ArrayList<>();
+                    while (matcher.find())
+                    {
+                        String match = matcher.group(1);
+                        if (match != null)
+                        {
+                            list.add(match);
+                        }
+                        else
+                        {
+                            list.add(matcher.group(2));
+                        }
+                    }
+                    int len = list.size();
+                    for (int k = 0; k < len; k += 2)
+                    {
+                        int index = 1;
+                        String sub_data1 = list.get(k);
+                        String sub_data2 = list.get(k + 1);
+                        stmt.setString(index++, new_row.get(0));
+                        stmt.setLong(index++, Long.parseLong(sub_data1));
+                        stmt.setLong(index, Long.parseLong(sub_data2));
+                        stmt.addBatch();
+                        cnt++;
+                        if (cnt % BATCH_SIZE == 0)
+                        {
+                            stmt.executeBatch();
+                            stmt.clearBatch();
+                        }
+                    }
+                    break;
                 }
             }
             catch (Exception e)
             {
+                System.out.println(e);
             }
         }
-        stmt.addBatch();
     }
 
-    public void write_data(String file_path, String[] queue, Database database, String sql, Boolean adder, Boolean pretreat, double num)
+    public void write_data(String file_path, String[] queue, Database database, String sql, Boolean adder, Boolean pretreat)
     {
         con = database.open();
-        int cnt = 0;
         try
         {
             stmt = con.prepareStatement(sql);
@@ -125,7 +156,7 @@ public class Loader
         }
         try
         {
-            long start = System.currentTimeMillis();//开始时间
+            start = System.currentTimeMillis();//开始时间
             FileReader fr = new FileReader(file_path);
             CSVReader reader;
             if (pretreat)
@@ -153,20 +184,7 @@ public class Loader
                     row.add(cnt);
                 }
                 loadData(row, queue);
-                if (cnt % BATCH_SIZE == 0)
-                {
-                    if(num == 0)
-                    {
-                        System.out.println("当前进度：" + cnt + " 条");
-                    }
-                    else
-                    {
-                        System.out.printf("导入进度：%.3f%%\n", cnt / num * 100);
-                    }
-                    stmt.executeBatch();
-                    stmt.clearBatch();
-                }
-                cnt++;
+                counter++;
             }
             stmt.executeBatch();
             stmt.clearBatch();
@@ -175,10 +193,9 @@ public class Loader
                 con.commit();//提交事务，运行后才导入数据库
                 stmt.close();
                 database.close(stmt);
-                long end = System.currentTimeMillis();//结束时间
+                end = System.currentTimeMillis();//结束时间
                 System.out.println(cnt + " records successfully loaded");
                 System.out.println("TIME : " + (end - start) / 1000 + "s");
-                System.out.println("Loading speed : " + (long) cnt / ((end - start) / 1000) + " records/s");
             }
             catch (Exception e)
             {
@@ -190,7 +207,6 @@ public class Loader
                 }
                 catch (Exception e2)
                 {
-                    System.out.println(e2);
                 }
                 database.close(stmt);
                 System.exit(1);

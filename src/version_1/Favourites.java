@@ -1,11 +1,10 @@
 package version_1;
 
 import utils.Database;
-import version_1.Loader;
 
 import java.util.Properties;
 
-public class Videos
+public class Favourites
 {
     public static void main(String[] args)
     {
@@ -16,11 +15,25 @@ public class Videos
         prop.put("database", "Project");
 
         String file_path = "source_file/videos.csv";
-        String[] queue = {"String", "String", "Long", "Skip", "Time", "Skip", "Time", "Int", "String", "Skip", "Skip", "Skip", "Skip", "Skip"};
-        String sql = "insert into videos(bv, title, owner_id, commit_time, public_time, duration, description) values(?,?,?,?,?,?,?)";
+        String[] queue = {
+                "String",
+                "Skip",
+                "Skip",
+                "Skip",
+                "Skip",
+                "Skip",
+                "Skip",
+                "Skip",
+                "Skip",
+                "Skip",
+                "Skip",
+                "Skip",
+                "List",
+                "Skip"};
+        String sql = "insert into favourites(bv,mid) values(?,?)";
         Database database = new Database(prop);
 
-        Loader loader = new Loader();
+        RelationLoader loader = new RelationLoader();
         loader.write_data(file_path, queue, database, sql, false, false, 7865.0);
     }
 }

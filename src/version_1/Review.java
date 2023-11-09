@@ -1,11 +1,10 @@
 package version_1;
 
 import utils.Database;
-import version_1.Loader;
 
 import java.util.Properties;
 
-public class Videos
+public class Review
 {
     public static void main(String[] args)
     {
@@ -16,8 +15,23 @@ public class Videos
         prop.put("database", "Project");
 
         String file_path = "source_file/videos.csv";
-        String[] queue = {"String", "String", "Long", "Skip", "Time", "Skip", "Time", "Int", "String", "Skip", "Skip", "Skip", "Skip", "Skip"};
-        String sql = "insert into videos(bv, title, owner_id, commit_time, public_time, duration, description) values(?,?,?,?,?,?,?)";
+        //String file_path = "source_file/draft.csv";
+        String[] queue = {
+                "String",
+                "Skip",
+                "Skip",
+                "Skip",
+                "Time",
+                "Skip",
+                "Skip",
+                "Skip",
+                "Skip",
+                "Long",
+                "Skip",
+                "Skip",
+                "Skip",
+                "Skip"};
+        String sql = "insert into review(bv,review_time,reviewer_mid) values(?,?,?)";
         Database database = new Database(prop);
 
         Loader loader = new Loader();
