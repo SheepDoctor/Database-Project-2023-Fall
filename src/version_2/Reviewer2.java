@@ -10,11 +10,15 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.Properties;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 public class Reviewer2
 {
     public static void reviewer()
     {
+        ExecutorService executorService= Executors.newCachedThreadPool();
+
         Properties prop = new Properties();
         prop.put("host", "localhost");
         prop.put("user", "postgres");
@@ -28,7 +32,7 @@ public class Reviewer2
                 "Skip", "Long", "Skip", "Skip", "Skip", "Skip"};
         String sql = "insert into users(Mid,identity) values(?,'Reviewer') on conflict (Mid) do nothing";
         System.out.println("REVIEWER导入......");
-        loader.write_data(file_path, queue, database, sql, false, false, 7865.0);
+        loader.write_data(file_path, queue, database, sql, false, false, 7865.0,executorService);
     }
     public static void check_data(Database database)
     {
@@ -65,8 +69,6 @@ public class Reviewer2
                 }
                 cnt++;
             }
-            stmt.executeBatch();
-            stmt.clearBatch();
             try
             {
                 con.commit();//提交事务，运行后才导入数据库
