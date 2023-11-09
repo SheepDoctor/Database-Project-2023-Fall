@@ -1,4 +1,4 @@
-package version_1;
+package version_2;
 
 import utils.Database;
 
@@ -7,13 +7,13 @@ import java.sql.*;
 import java.util.ArrayList;
 import java.sql.Date;
 import java.sql.Timestamp;
-import java.util.concurrent.ExecutorService;
+import java.util.Objects;
 
 import com.opencsv.CSVReader;
 
 public class Loader2
 {
-    private final int BATCH_SIZE = 5000;//initial 500
+    private final int BATCH_SIZE = 500;//initial 500
     private Connection con = null;
     private PreparedStatement stmt = null;
 
@@ -34,11 +34,12 @@ public class Loader2
                 {
                     data = null;
                 }
-                if (type[i] == "Skip")
+
+                if (Objects.equals(type[i], "Skip"))
                 {
                     continue;
                 }
-                else if (type[i] == "Long")
+                else if (Objects.equals(type[i], "Long"))
                 {
                     if (row.get(i) == null)
                     {
@@ -47,16 +48,17 @@ public class Loader2
                     }
                     stmt.setLong(index++, Long.parseLong(data));
                 }
-                else if (type[i] == "String")
+                else if (Objects.equals(type[i], "String"))
                 {
                     if (row.get(i) == null)
                     {
-                        stmt.setString(index++, null);
+                        stmt.setString(index++, "");
                         continue;
                     }
+                    data = data.replaceAll("/_reversed", "\\\\");
                     stmt.setString(index++, data);
                 }
-                else if (type[i] == "Date")
+                else if (Objects.equals(type[i], "Date"))
                 {
                     if (row.get(i) == null)
                     {
@@ -65,7 +67,7 @@ public class Loader2
                     }
                     stmt.setDate(index++, new Date(2023 - 1900, Integer.parseInt(data.split("月")[0]) - 1, Integer.parseInt(data.split("月")[1].split("日")[0])));
                 }
-                else if (type[i] == "Int")
+                else if (Objects.equals(type[i], "Int"))
                 {
                     if (row.get(i) == null)
                     {
@@ -74,7 +76,7 @@ public class Loader2
                     }
                     stmt.setInt(index++, Integer.parseInt(data));
                 }
-                else if (type[i] == "Time")
+                else if (Objects.equals(type[i], "Time"))
                 {
                     if (row.get(i) == null)
                     {
@@ -82,14 +84,14 @@ public class Loader2
                         continue;
                     }
                     stmt.setTimestamp(index++, new Timestamp(
-                            Integer.parseInt(data.split(" ")[0].split("-")[0]),
-                            Integer.parseInt(data.split(" ")[0].split("-")[1]),
+                            Integer.parseInt(data.split(" ")[0].split("-")[0]) - 1900,
+                            Integer.parseInt(data.split(" ")[0].split("-")[1]) - 1,
                             Integer.parseInt(data.split(" ")[0].split("-")[2]),
                             Integer.parseInt(data.split(" ")[1].split(":")[0]),
                             Integer.parseInt(data.split(" ")[1].split(":")[1]),
-                            Integer.parseInt(data.split(" ")[1].split(":")[2]),0));
+                            Integer.parseInt(data.split(" ")[1].split(":")[2]), 0));
                 }
-                else if(type[i] == "Real")
+                else if (Objects.equals(type[i], "Real"))
                 {
                     if (row.get(i) == null)
                     {
@@ -101,14 +103,12 @@ public class Loader2
             }
             catch (Exception e)
             {
-                System.out.println(e);
             }
         }
         stmt.addBatch();
     }
 
-
-    public void write_data2(String file_path, String[] queue, Database database, String sql, Boolean adder, ExecutorService executorService)
+    public void write_data(String file_path, String[] queue, Database database, String sql, Boolean adder, Boolean pretreat, double num)
     {
         con = database.open();
         int cnt = 0;
@@ -127,7 +127,15 @@ public class Loader2
         {
             long start = System.currentTimeMillis();//开始时间
             FileReader fr = new FileReader(file_path);
-            CSVReader reader = new CSVReader(fr);
+            CSVReader reader;
+            if (pretreat)
+            {
+                reader = new CSVReader(fr, '\7');//用于数据处理过的数据
+            }
+            else
+            {
+                reader = new CSVReader(fr);
+            }
             String[] lineData = reader.readNext();
             while ((lineData = reader.readNext()) != null)
             {
@@ -140,35 +148,28 @@ public class Loader2
                     }
                     row.add(data);
                 }
-                if(adder)
+                if (adder)
                 {
                     row.add(cnt);
                 }
                 loadData(row, queue);
                 if (cnt % BATCH_SIZE == 0)
                 {
-                    //System.out.printf("弹幕表导入进度：%.3f%%\n", cnt / 12478996.0 * 100);
-                    //System.out.printf("视频表导入进度：%.3f%%\n", cnt / 7865.0 * 100);
-                    //System.out.printf("用户表导入进度：%.3f%%\n", cnt / 37881.0 * 100);
-                    executorService.submit(()-> {
-                        try {
-                            stmt.executeBatch(); stmt.clearBatch();
-                        } catch (SQLException e) {
-                            throw new RuntimeException(e);
-                        }
-
-                    });
+                    if(num == 0)
+                    {
+                        System.out.println("当前进度：" + cnt + " 条");
+                    }
+                    else
+                    {
+                        System.out.printf("导入进度：%.3f%%\n", cnt / num * 100);
+                    }
+                    stmt.executeBatch();
+                    stmt.clearBatch();
                 }
                 cnt++;
             }
-            executorService.submit(()-> {
-                try {
-                    stmt.executeBatch();                stmt.clearBatch();
-
-                } catch (SQLException e) {
-                    throw new RuntimeException(e);
-                }
-            });
+            stmt.executeBatch();
+            stmt.clearBatch();
             try
             {
                 con.commit();//提交事务，运行后才导入数据库
@@ -176,7 +177,8 @@ public class Loader2
                 database.close(stmt);
                 long end = System.currentTimeMillis();//结束时间
                 System.out.println(cnt + " records successfully loaded");
-                System.out.println("Loading speed : " + (cnt * 1000) / (end - start) + " records/s");
+                System.out.println("TIME : " + (end - start) / 1000 + "s");
+                System.out.println("Loading speed : " + (long) cnt / ((end - start) / 1000) + " records/s");
             }
             catch (Exception e)
             {
@@ -219,4 +221,3 @@ public class Loader2
         database.close(stmt);
     }
 }
-

@@ -1,4 +1,4 @@
-package version_1;
+package version_2;
 
 import com.opencsv.CSVReader;
 import utils.Database;
@@ -11,18 +11,17 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.Properties;
 
-public class Reviewer
+public class Reviewer2
 {
     public static void reviewer()
     {
         Properties prop = new Properties();
         prop.put("host", "localhost");
         prop.put("user", "postgres");
-//        prop.put("password", "123456");
         prop.put("password", "123abc");
         prop.put("database", "Project");
         Database database = new Database(prop);
-        Loader loader = new Loader();
+        Loader2 loader = new Loader2();
         check_data(database);
         String file_path = "source_file/videos.csv";
         String[] queue = {"Skip", "Skip", "Skip", "Skip", "Skip", "Skip", "Skip", "Skip",

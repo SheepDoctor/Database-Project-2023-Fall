@@ -1,21 +1,36 @@
 package version_2;
 
 import utils.Database;
+
 import java.util.Properties;
 
-public class Likes2
+public class Favourites2
 {
     public static void main(String[] args)
     {
         Properties prop = new Properties();
         prop.put("host", "localhost");
         prop.put("user", "postgres");
-        prop.put("password", "123abc");
+        prop.put("password", "123abc");;
         prop.put("database", "Project");
 
         String file_path = "source_file/videos.csv";
-        String[] queue = {"String", "Skip", "Skip", "Skip", "Skip", "Skip", "Skip", "Skip", "Skip", "Skip", "List", "Skip", "Skip", "Skip"};
-        String sql = "insert into likes(bv,mid) values(?,?)";
+        String[] queue = {
+                "String",
+                "Skip",
+                "Skip",
+                "Skip",
+                "Skip",
+                "Skip",
+                "Skip",
+                "Skip",
+                "Skip",
+                "Skip",
+                "Skip",
+                "Skip",
+                "List",
+                "Skip"};
+        String sql = "insert into favourites(bv,mid) values(?,?)";
         Database database = new Database(prop);
 
         RelationLoader2 loader = new RelationLoader2();

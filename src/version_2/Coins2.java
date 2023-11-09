@@ -1,9 +1,10 @@
 package version_2;
 
 import utils.Database;
+
 import java.util.Properties;
 
-public class Likes2
+public class Coins2
 {
     public static void main(String[] args)
     {
@@ -14,8 +15,23 @@ public class Likes2
         prop.put("database", "Project");
 
         String file_path = "source_file/videos.csv";
-        String[] queue = {"String", "Skip", "Skip", "Skip", "Skip", "Skip", "Skip", "Skip", "Skip", "Skip", "List", "Skip", "Skip", "Skip"};
-        String sql = "insert into likes(bv,mid) values(?,?)";
+        String[] queue = {
+                "String",
+                "Skip",
+                "Skip",
+                "Skip",
+                "Skip",
+                "Skip",
+                "Skip",
+                "Skip",
+                "Skip",
+                "Skip",
+                "Skip",
+                "List",
+                "Skip",
+                "Skip"};
+        //String sql = "insert into coin(bv,mid) values(?,?)";
+        String sql = "insert into coins(bv,mid) values(?,?)";
         Database database = new Database(prop);
 
         RelationLoader2 loader = new RelationLoader2();

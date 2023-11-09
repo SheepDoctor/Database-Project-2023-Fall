@@ -6,6 +6,14 @@
   <component name="ChangeListManager">
     <list default="true" id="983aa8dd-a81e-4e10-beeb-f458ad86c992" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/version_1/Likes.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/version_1/Likes.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/version_1/Reviewer.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/version_1/Reviewer.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/version_1/Users.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/version_1/Users.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/version_1/Videos.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/version_1/Videos.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/version_2/Likes2.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/version_2/Likes2.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/version_2/Loader2.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/version_2/Loader2.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/version_2/Main2.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/version_2/RelationLoader2.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/version_2/RelationLoader2.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -35,25 +43,26 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent">{
-  &quot;keyToString&quot;: {
-    &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
-    &quot;WebServerToolWindowFactoryState&quot;: &quot;false&quot;,
-    &quot;last_opened_file_path&quot;: &quot;D:/OWEN/本科学习/大二上/数据库原理/Project/DB_script/src/commons-lang3-3.1.jar&quot;,
-    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
-    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
-    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
-    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
-    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
-    &quot;project.structure.last.edited&quot;: &quot;Modules&quot;,
-    &quot;project.structure.proportion&quot;: &quot;0.15&quot;,
-    &quot;project.structure.side.proportion&quot;: &quot;0.27117032&quot;,
-    &quot;settings.editor.selected.configurable&quot;: &quot;MavenSettings&quot;
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "RunOnceActivity.OpenProjectViewOnStart": "true",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "WebServerToolWindowFactoryState": "false",
+    "last_opened_file_path": "C:/Users/Dell/IdeaProjects/Database-Project-2023-Fall/source_file",
+    "node.js.detected.package.eslint": "true",
+    "node.js.detected.package.tslint": "true",
+    "node.js.selected.package.eslint": "(autodetect)",
+    "node.js.selected.package.tslint": "(autodetect)",
+    "nodejs_package_manager_path": "npm",
+    "project.structure.last.edited": "Modules",
+    "project.structure.proportion": "0.15",
+    "project.structure.side.proportion": "0.27117032",
+    "settings.editor.selected.configurable": "MavenSettings"
   }
-}</component>
+}]]></component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
+      <recent name="C:\Users\Dell\IdeaProjects\Database-Project-2023-Fall\source_file" />
       <recent name="D:\OWEN\本科学习\大二上\数据库原理\Project\DB_script\src" />
     </key>
     <key name="MoveFile.RECENT_KEYS">
@@ -62,8 +71,72 @@
       <recent name="D:\OWEN\本科学习\大二上\数据库原理\Project\DB_script\source_file" />
     </key>
     <key name="CopyClassDialog.RECENTS_KEY">
+      <recent name="version_2" />
       <recent name="" />
     </key>
+  </component>
+  <component name="RunManager">
+    <configuration name="Entrance" type="Application" factoryName="Application">
+      <option name="MAIN_CLASS_NAME" value="version_1.Danmu" />
+      <module name="DB_script" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="Likes" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
+      <option name="MAIN_CLASS_NAME" value="version_1.Likes" />
+      <module name="DB_script" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="version_1.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="Likes2" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
+      <option name="MAIN_CLASS_NAME" value="version_1.Likes2" />
+      <module name="DB_script" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="version_1.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="Main2" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
+      <option name="MAIN_CLASS_NAME" value="Main2" />
+      <module name="DB_script" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="Pretreatment" type="Application" factoryName="Application">
+      <option name="MAIN_CLASS_NAME" value="utils.Pretreatment_data" />
+      <module name="DB_script" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <list>
+      <item itemvalue="应用程序.Entrance" />
+      <item itemvalue="应用程序.Pretreatment" />
+      <item itemvalue="应用程序.Likes" />
+      <item itemvalue="应用程序.Likes2" />
+      <item itemvalue="应用程序.Main2" />
+    </list>
+    <recent_temporary>
+      <list>
+        <item itemvalue="应用程序.Main2" />
+        <item itemvalue="应用程序.Likes2" />
+        <item itemvalue="应用程序.Likes" />
+      </list>
+    </recent_temporary>
   </component>
   <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
   <component name="TaskManager">
@@ -93,13 +166,6 @@
       <workItem from="1699264447130" duration="985000" />
       <workItem from="1699275250384" duration="661000" />
       <workItem from="1699314734205" duration="1461000" />
-      <workItem from="1699316216937" duration="37000" />
-      <workItem from="1699316404990" duration="2880000" />
-      <workItem from="1699343861301" duration="13730000" />
-      <workItem from="1699370637609" duration="145000" />
-      <workItem from="1699370876633" duration="3873000" />
-      <workItem from="1699417695907" duration="24872000" />
-      <workItem from="1699461799841" duration="4890000" />
     </task>
     <task id="LOCAL-00001" summary="Initial project">
       <created>1698383623158</created>
@@ -283,77 +349,7 @@
       <option name="project" value="LOCAL" />
       <updated>1699260080963</updated>
     </task>
-    <task id="LOCAL-00027" summary="0.2. untested">
-      <created>1699316243829</created>
-      <option name="number" value="00027" />
-      <option name="presentableId" value="LOCAL-00027" />
-      <option name="project" value="LOCAL" />
-      <updated>1699316243829</updated>
-    </task>
-    <task id="LOCAL-00028" summary="0.2.6 tested version for partial relationships">
-      <created>1699318586132</created>
-      <option name="number" value="00028" />
-      <option name="presentableId" value="LOCAL-00028" />
-      <option name="project" value="LOCAL" />
-      <updated>1699318586132</updated>
-    </task>
-    <task id="LOCAL-00029" summary="0.2.8 fine-tuned version for relationships">
-      <created>1699320322252</created>
-      <option name="number" value="00029" />
-      <option name="presentableId" value="LOCAL-00029" />
-      <option name="project" value="LOCAL" />
-      <updated>1699320322252</updated>
-    </task>
-    <task id="LOCAL-00030" summary="0.2.9 fine-tuned version for relationships">
-      <created>1699320597079</created>
-      <option name="number" value="00030" />
-      <option name="presentableId" value="LOCAL-00030" />
-      <option name="project" value="LOCAL" />
-      <updated>1699320597079</updated>
-    </task>
-    <task id="LOCAL-00031" summary="0.2.9 fine-tuned version for relationships">
-      <created>1699320755486</created>
-      <option name="number" value="00031" />
-      <option name="presentableId" value="LOCAL-00031" />
-      <option name="project" value="LOCAL" />
-      <updated>1699320755486</updated>
-    </task>
-    <task id="LOCAL-00032" summary="0.3.0 fine-tuned version for relationships">
-      <created>1699321043784</created>
-      <option name="number" value="00032" />
-      <option name="presentableId" value="LOCAL-00032" />
-      <option name="project" value="LOCAL" />
-      <updated>1699321043784</updated>
-    </task>
-    <task id="LOCAL-00033" summary="0.3.1 more! more!">
-      <created>1699446909650</created>
-      <option name="number" value="00033" />
-      <option name="presentableId" value="LOCAL-00033" />
-      <option name="project" value="LOCAL" />
-      <updated>1699446909650</updated>
-    </task>
-    <task id="LOCAL-00034" summary="0.3.1 more! more!">
-      <created>1699446981403</created>
-      <option name="number" value="00034" />
-      <option name="presentableId" value="LOCAL-00034" />
-      <option name="project" value="LOCAL" />
-      <updated>1699446981403</updated>
-    </task>
-    <task id="LOCAL-00035" summary="0.3.2 untested final version">
-      <created>1699458291350</created>
-      <option name="number" value="00035" />
-      <option name="presentableId" value="LOCAL-00035" />
-      <option name="project" value="LOCAL" />
-      <updated>1699458291350</updated>
-    </task>
-    <task id="LOCAL-00036" summary="0.3.3 tested final version">
-      <created>1699465056695</created>
-      <option name="number" value="00036" />
-      <option name="presentableId" value="LOCAL-00036" />
-      <option name="project" value="LOCAL" />
-      <updated>1699465056695</updated>
-    </task>
-    <option name="localTasksCounter" value="37" />
+    <option name="localTasksCounter" value="27" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -371,6 +367,9 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
+    <MESSAGE value="Initial project" />
+    <MESSAGE value="0.0.0" />
+    <MESSAGE value="0.0.1" />
     <MESSAGE value="0.0.2" />
     <MESSAGE value="0.1.0" />
     <MESSAGE value="0.1.1" />
@@ -388,33 +387,20 @@
     <MESSAGE value="0.2.3" />
     <MESSAGE value="0.2.4 Runnable version to load danmu" />
     <MESSAGE value="0.2.5 Module Version_1 updated&#10;Executable files are extended" />
-    <MESSAGE value="0.2. untested" />
-    <MESSAGE value="0.2.6 tested version for partial relationships" />
-    <MESSAGE value="0.2.8 fine-tuned version for relationships" />
-    <MESSAGE value="0.2.9 fine-tuned version for relationships" />
-    <MESSAGE value="0.3.0 fine-tuned version for relationships" />
-    <MESSAGE value="0.3.1 more! more!" />
-    <MESSAGE value="0.3.2 untested final version" />
-    <MESSAGE value="0.3.3 tested final version" />
-    <option name="LAST_COMMIT_MESSAGE" value="0.3.3 tested final version" />
+    <option name="LAST_COMMIT_MESSAGE" value="0.2.5 Module Version_1 updated&#10;Executable files are extended" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
       <breakpoints>
         <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/src/version_1/Favourites.java</url>
-          <line>36</line>
-          <option name="timeStamp" value="28" />
+          <url>file://$PROJECT_DIR$/src/version_1/Loader.java</url>
+          <line>28</line>
+          <option name="timeStamp" value="5" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/src/version_1/RelationLoader.java</url>
-          <line>189</line>
-          <option name="timeStamp" value="53" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/src/version_1/Reviewer.java</url>
-          <line>25</line>
-          <option name="timeStamp" value="54" />
+          <url>file://$PROJECT_DIR$/src/version_1/Likes.java</url>
+          <line>22</line>
+          <option name="timeStamp" value="10" />
         </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>
