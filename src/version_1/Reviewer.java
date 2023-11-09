@@ -2,6 +2,7 @@ package version_1;
 
 import com.opencsv.CSVReader;
 import utils.Database;
+import version_2.Loader2;
 
 import java.io.FileNotFoundException;
 import java.io.FileReader;
@@ -66,6 +67,8 @@ public class Reviewer
                 }
                 cnt++;
             }
+            stmt.executeBatch();
+            stmt.clearBatch();
             try
             {
                 con.commit();//提交事务，运行后才导入数据库
