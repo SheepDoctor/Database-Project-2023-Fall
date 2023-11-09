@@ -18,8 +18,7 @@ public class Reviewer
         Properties prop = new Properties();
         prop.put("host", "localhost");
         prop.put("user", "postgres");
-//        prop.put("password", "123456");
-        prop.put("password", "123abc");
+        prop.put("password", "123456");
         prop.put("database", "Project");
         Database database = new Database(prop);
         Loader loader = new Loader();

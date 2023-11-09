@@ -14,8 +14,7 @@ public class Users
         Properties prop = new Properties();
         prop.put("host", "localhost");
         prop.put("user", "postgres");
-//        prop.put("password", "123456");
-        prop.put("password", "123abc");
+        prop.put("password", "123456");
         prop.put("database", "Project");
         String file_path = "source_file/users.csv";
         String[] queue = {"Long", "String", "String", "Date", "Int", "String", "Skip", "String"};
