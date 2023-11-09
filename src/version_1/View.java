@@ -11,11 +11,11 @@ public class View
         Properties prop = new Properties();
         prop.put("host", "localhost");
         prop.put("user", "postgres");
-        prop.put("password", "123456");
+        prop.put("password", "123abc");
         prop.put("database", "Project");
 
-        //String file_path = "source_file/videos.csv";
-        String file_path = "source_file/draft.csv";
+        String file_path = "source_file/videos.csv";
+        //String file_path = "source_file/draft.csv";
         String[] queue = {
                 "Long",
                 "Skip",
