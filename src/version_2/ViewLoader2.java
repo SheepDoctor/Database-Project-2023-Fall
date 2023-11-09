@@ -125,7 +125,7 @@ public class ViewLoader2
                         stmt.setLong(index, Long.parseLong(sub_data2));
                         stmt.addBatch();
                         cnt++;
-                        if (cnt % BATCH_SIZE == 0)
+                        if (cnt % (BATCH_SIZE*4) == 0)
                         {
                             executorService.submit(()-> {
                                 try {

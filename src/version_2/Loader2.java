@@ -7,7 +7,9 @@ import java.sql.*;
 import java.util.ArrayList;
 import java.sql.Date;
 import java.sql.Timestamp;
+import java.util.Enumeration;
 import java.util.Objects;
+import java.util.concurrent.ExecutorService;
 
 import com.opencsv.CSVReader;
 
@@ -108,7 +110,7 @@ public class Loader2
         stmt.addBatch();
     }
 
-    public void write_data(String file_path, String[] queue, Database database, String sql, Boolean adder, Boolean pretreat, double num)
+    public void write_data(String file_path, String[] queue, Database database, String sql, Boolean adder, Boolean pretreat, double num, ExecutorService executorService)
     {
         con = database.open();
         int cnt = 0;
@@ -163,15 +165,28 @@ public class Loader2
                     {
                         System.out.printf("导入进度：%.3f%%\n", cnt / num * 100);
                     }
-                    stmt.executeBatch();
-                    stmt.clearBatch();
+                    executorService.submit(()-> {
+                        try {
+                            stmt.executeBatch();                        stmt.clearBatch();
+
+                        } catch (SQLException e) {
+                            throw new RuntimeException(e);
+                        }
+                    });
                 }
                 cnt++;
             }
-            stmt.executeBatch();
-            stmt.clearBatch();
+            executorService.submit(()-> {
+                try {
+                    stmt.executeBatch();                stmt.clearBatch();
+
+                } catch (SQLException e) {
+                    throw new RuntimeException(e);
+                }
+            });
             try
             {
+                executorService.shutdown();
                 con.commit();//提交事务，运行后才导入数据库
                 stmt.close();
                 database.close(stmt);
