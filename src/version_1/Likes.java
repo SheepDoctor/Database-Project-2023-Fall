@@ -10,7 +10,7 @@ public class Likes
         Properties prop = new Properties();
         prop.put("host", "localhost");
         prop.put("user", "postgres");
-        prop.put("password", "123456");
+         prop.put("password", "123456");
         prop.put("database", "Project");
 
         String file_path = "source_file/videos.csv";

@@ -1,11 +1,12 @@
 package version_2;
 
 import utils.Database;
+
 import java.util.Properties;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-public class Likes2
+public class Videos2
 {
     public static void main(String[] args)
     {
@@ -18,11 +19,11 @@ public class Likes2
         prop.put("database", "Project");
 
         String file_path = "source_file/videos.csv";
-        String[] queue = {"String", "Skip", "Skip", "Skip", "Skip", "Skip", "Skip", "Skip", "Skip", "Skip", "List", "Skip", "Skip", "Skip"};
-        String sql = "insert into likes(bv,mid) values(?,?)";
+        String[] queue = {"String", "String", "Long", "Skip", "Time", "Skip", "Time", "Int", "String", "Skip", "Skip", "Skip", "Skip", "Skip"};
+        String sql = "insert into videos(bv, title, owner_id, commit_time, public_time, duration, description) values(?,?,?,?,?,?,?)";
         Database database = new Database(prop);
 
-        RelationLoader2 loader = new RelationLoader2();
+        Loader2 loader = new Loader2();
         loader.write_data(file_path, queue, database, sql, false, false, 7865.0,executorService);
     }
 }

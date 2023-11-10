@@ -1,13 +1,17 @@
-package version_1;
+package version_2;
 
 import utils.Database;
 
 import java.util.Properties;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
-public class View
+public class Coins2
 {
     public static void main(String[] args)
     {
+
+        ExecutorService executorService= Executors.newCachedThreadPool();
         Properties prop = new Properties();
         prop.put("host", "localhost");
         prop.put("user", "postgres");
@@ -15,9 +19,8 @@ public class View
         prop.put("database", "Project");
 
         String file_path = "source_file/videos.csv";
-        //String file_path = "source_file/draft.csv";
         String[] queue = {
-                "Long",
+                "String",
                 "Skip",
                 "Skip",
                 "Skip",
@@ -28,13 +31,14 @@ public class View
                 "Skip",
                 "Skip",
                 "Skip",
+                "List",
                 "Skip",
-                "Skip",
-                "List"};
-        String sql = "insert into view(bv,mid,time) values(?,?,?)";
+                "Skip"};
+        //String sql = "insert into coin(bv,mid) values(?,?)";
+        String sql = "insert into coins(bv,mid) values(?,?)";
         Database database = new Database(prop);
 
-        ViewLoader loader = new ViewLoader();
-        loader.write_data(file_path, queue, database, sql, false, false);
+        RelationLoader2 loader = new RelationLoader2();
+        loader.write_data(file_path, queue, database, sql, false, false, 7865.0,executorService );
     }
 }
