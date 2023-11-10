@@ -5,13 +5,14 @@ import java.util.*;
 
 public class DeleteWithJavaIO {
     public static void main(String[] args) {
-        String inputCsvFile = "D:\\文件\\学习\\大二上\\数据库原理\\小组\\data\\users_1000000.csv"; // 原始 CSV 文件
-        String outputCsvFile = "D:\\文件\\学习\\大二上\\数据库原理\\小组\\data\\output.csv"; // 新的 CSV 文件
-        int linesToDelete = 1000; // 要删除的行数
-        for (int i = 0; i < 100; i++) {
+        String inputCsvFile = "D:\\文件\\学习\\大二上\\数据库原理\\小组\\data\\users_generated-copy.csv"; // 原始 CSV 文件
+        String outputCsvFile = "D:\\文件\\学习\\大二上\\数据库原理\\小组\\data\\users_deleted.csv"; // 新的 CSV 文件
+        int linesToDelete = 100000; // 要删除的行数
+        long startTime = System.currentTimeMillis();
+        for (int i = 0; i < 10; i++) {
             List<String> linesToKeep = new ArrayList<>();
             try {
-                long startTime = System.currentTimeMillis();
+
 
                 // 0 .随机选择要删除的行
                 Random random = new Random();
@@ -44,13 +45,14 @@ public class DeleteWithJavaIO {
                     writer.newLine(); // 添加换行符
                 }
                 writer.close();
-                long endTime = System.currentTimeMillis();
-                System.out.println(linesToDelete + " lines removed and saved to " + outputCsvFile);
-                System.out.println("Speed : " + (linesToDelete * 1000L) / (endTime - startTime) + " records/s");
-                System.out.printf("%d %d %d %d \n", startTime1 - startTime, startTime2 - startTime, startTime3 - startTime, endTime - startTime);
+
             } catch (IOException e) {
                 e.printStackTrace();
             }
         }
+        long endTime = System.currentTimeMillis();
+        //System.out.println(linesToDelete + " lines removed and saved to " + outputCsvFile);
+        System.out.println("Speed : " + (linesToDelete * 10000L) / (endTime - startTime) + " records/s");
+        //System.out.printf("%d %d %d %d \n", startTime1 - startTime, startTime2 - startTime, startTime3 - startTime, endTime - startTime);
     }
 }
