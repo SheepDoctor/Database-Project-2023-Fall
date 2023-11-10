@@ -64,7 +64,7 @@ public class UpdateWithDBMS {
             prop.put("database", "Project");
 
             Database database = new Database(prop);
-            int rowsUpdated = 1000;
+            int rowsUpdated = 10000;
             try {
                 Connection connection = database.open();
                 connection.setAutoCommit(false); // 关闭自动提交

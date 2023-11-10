@@ -10,7 +10,7 @@ public class UpdateWithJavaIO {
         for (int j = 0; j < 15; j++) {
             long startTime = System.nanoTime();
             List<Integer> linesWithEmptySign = new ArrayList<>();
-            int linesToUpdate = 100000;
+            int linesToUpdate = 1000;
 
             // 第一遍扫描，找出所有简介为空的行号
             try (BufferedReader reader = new BufferedReader(new FileReader(sourceCSVFile))) {

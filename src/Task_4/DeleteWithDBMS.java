@@ -7,7 +7,7 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.Properties;
 
-public class DeleteWithDBMSio {
+public class DeleteWithDBMS {
     public static void main(String[] args) {
         // 数据库连接参数
         Properties prop = new Properties();

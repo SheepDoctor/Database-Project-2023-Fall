@@ -44,11 +44,12 @@ public class DataGenerator {
                 do {
                     row = generateRow(mid);
                 } while (!names.add(row[1])); //确保名字是唯一的
-                writer.writeNext(row);
+                writer.writeNext(row, false);
             }
             Long endTime = System.currentTimeMillis();
             System.out.printf("共生成%d条数据，用时%f秒。", NUM_ROWS, (endTime - startTime) / 1000f);
         }
+
     }
 
     private static Set<Long> generateUniqueRandomNumbers(int num, long range) {
