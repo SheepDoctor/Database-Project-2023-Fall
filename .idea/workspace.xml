@@ -4,17 +4,23 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="983aa8dd-a81e-4e10-beeb-f458ad86c992" name="Changes" comment="1.0.12&#10;重命名了所有的表格，将其变为单数形式">
+    <list default="true" id="983aa8dd-a81e-4e10-beeb-f458ad86c992" name="Changes" comment="0.3.9">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/source_file/ddl.sql" beforeDir="false" afterPath="$PROJECT_DIR$/source_file/ddl.sql" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/version_1/View.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/version_1/View.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/version_1/ViewLoader.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/version_1/ViewLoader.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/version_2/Follow2.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/version_2/Follow2.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/version_2/Likes2.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/version_2/Likes2.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/version_2/Review2.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/version_2/Review2.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/version_2/Reviewer2.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/version_2/Reviewer2.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/version_2/Users2.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/version_2/Users2.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/version_2/Videos2.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/version_2/Videos2.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/version_2/View2.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/version_2/View2.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/version_2/ViewLoader2.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/version_2/ViewLoader2.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
     <option name="LAST_RESOLUTION" value="IGNORE" />
-  </component>
-  <component name="CodeInsightWorkspaceSettings">
-    <option name="optimizeImportsOnTheFly" value="true" />
   </component>
   <component name="FileTemplateManagerImpl">
     <option name="RECENT_TEMPLATES">
@@ -27,24 +33,12 @@
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
     <option name="RESET_MODE" value="MIXED" />
   </component>
-  <component name="GitHubPullRequestSearchHistory">{
-  &quot;lastFilter&quot;: {
-    &quot;state&quot;: &quot;OPEN&quot;
-  }
-}</component>
-  <component name="GithubPullRequestsUISettings">
-    <option name="selectedUrlAndAccountId">
-      <UrlAndAccount>
-        <option name="accountId" value="6f779f5b-b268-4d6c-aa5e-043411888625" />
-        <option name="url" value="https://github.com/SheepDoctor/Database-Project-2023-Fall.git" />
-      </UrlAndAccount>
-    </option>
-  </component>
   <component name="MarkdownSettingsMigration">
     <option name="stateVersion" value="1" />
   </component>
   <component name="ProjectId" id="2XKh94pLU8MJyN9aKWcCenrHR8g" />
   <component name="ProjectLevelVcsManager" settingsEditedManually="true">
+    <OptionsSetting value="false" id="Update" />
     <ConfirmationsSetting value="1" id="Add" />
   </component>
   <component name="ProjectViewState">
@@ -56,16 +50,16 @@
     &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
     &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
     &quot;WebServerToolWindowFactoryState&quot;: &quot;false&quot;,
-    &quot;last_opened_file_path&quot;: &quot;D:/qq files/opencsv-3.8.jar&quot;,
+    &quot;last_opened_file_path&quot;: &quot;D:/OWEN/本科学习/大二上/数据库原理/Project/DB_script/src/commons-lang3-3.1.jar&quot;,
     &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
     &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
     &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
     &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
-    &quot;project.structure.last.edited&quot;: &quot;库&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;project.structure.last.edited&quot;: &quot;Modules&quot;,
     &quot;project.structure.proportion&quot;: &quot;0.15&quot;,
     &quot;project.structure.side.proportion&quot;: &quot;0.27117032&quot;,
-    &quot;settings.editor.selected.configurable&quot;: &quot;database.query.execution&quot;,
-    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
+    &quot;settings.editor.selected.configurable&quot;: &quot;MavenSettings&quot;
   }
 }</component>
   <component name="RecentsManager">
@@ -73,78 +67,21 @@
       <recent name="D:\OWEN\本科学习\大二上\数据库原理\Project\DB_script\src" />
     </key>
     <key name="MoveFile.RECENT_KEYS">
-      <recent name="C:\Users\hlh\Database-Project-2023-Fall\src" />
-      <recent name="C:\Users\hlh\Database-Project-2023-Fall" />
       <recent name="D:\OWEN\本科学习\大二上\数据库原理\Project\DB_script\src" />
+      <recent name="D:\OWEN\本科学习\大二上\数据库原理\Project\DB_script\command" />
       <recent name="D:\OWEN\本科学习\大二上\数据库原理\Project\DB_script\source_file" />
     </key>
+    <key name="CopyClassDialog.RECENTS_KEY">
+      <recent name="" />
+    </key>
   </component>
-  <component name="RunManager" selected="应用程序.DataGenerator">
-    <configuration name="DataGenerator" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
-      <option name="MAIN_CLASS_NAME" value="Task_4.DataGenerator" />
+  <component name="RunManager">
+    <configuration name="Coins2" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
+      <option name="MAIN_CLASS_NAME" value="version_2.Coins2" />
       <module name="DB_script" />
       <extension name="coverage">
         <pattern>
-          <option name="PATTERN" value="Task_4.*" />
-          <option name="ENABLED" value="true" />
-        </pattern>
-      </extension>
-      <method v="2">
-        <option name="Make" enabled="true" />
-      </method>
-    </configuration>
-    <configuration name="DeleteWithJavaIO" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
-      <option name="MAIN_CLASS_NAME" value="Task_4.DeleteWithJavaIO" />
-      <module name="DB_script" />
-      <extension name="coverage">
-        <pattern>
-          <option name="PATTERN" value="Task_4.*" />
-          <option name="ENABLED" value="true" />
-        </pattern>
-      </extension>
-      <method v="2">
-        <option name="Make" enabled="true" />
-      </method>
-    </configuration>
-    <configuration name="Entrance" type="Application" factoryName="Application">
-      <option name="MAIN_CLASS_NAME" value="Main" />
-      <module name="DB_script" />
-      <method v="2">
-        <option name="Make" enabled="true" />
-      </method>
-    </configuration>
-    <configuration name="InsertWithJavaIO" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
-      <option name="MAIN_CLASS_NAME" value="Task_4.InsertWithJavaIO" />
-      <module name="DB_script" />
-      <extension name="coverage">
-        <pattern>
-          <option name="PATTERN" value="Task_4.*" />
-          <option name="ENABLED" value="true" />
-        </pattern>
-      </extension>
-      <method v="2">
-        <option name="Make" enabled="true" />
-      </method>
-    </configuration>
-    <configuration name="PreProcess" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
-      <option name="MAIN_CLASS_NAME" value="Task_4.PreProcess" />
-      <module name="DB_script" />
-      <extension name="coverage">
-        <pattern>
-          <option name="PATTERN" value="Task_4.*" />
-          <option name="ENABLED" value="true" />
-        </pattern>
-      </extension>
-      <method v="2">
-        <option name="Make" enabled="true" />
-      </method>
-    </configuration>
-    <configuration name="RandomCSVDeletion" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
-      <option name="MAIN_CLASS_NAME" value="Task_4.RandomCSVDeletion" />
-      <module name="DB_script" />
-      <extension name="coverage">
-        <pattern>
-          <option name="PATTERN" value="Task_4.InsertWithJavaIO" />
+          <option name="PATTERN" value="version_2.*" />
           <option name="ENABLED" value="true" />
         </pattern>
       </extension>
@@ -154,11 +91,7 @@
     </configuration>
     <recent_temporary>
       <list>
-        <item itemvalue="应用程序.DataGenerator" />
-        <item itemvalue="应用程序.DeleteWithJavaIO" />
-        <item itemvalue="应用程序.PreProcess" />
-        <item itemvalue="应用程序.InsertWithJavaIO" />
-        <item itemvalue="应用程序.RandomCSVDeletion" />
+        <item itemvalue="Application.Coins2" />
       </list>
     </recent_temporary>
   </component>
@@ -173,11 +106,30 @@
       <workItem from="1698383528029" duration="7942000" />
       <workItem from="1698393718987" duration="284000" />
       <workItem from="1698394116300" duration="225000" />
-      <workItem from="1698394608667" duration="12023000" />
-      <workItem from="1698413059786" duration="1252000" />
-      <workItem from="1698552299568" duration="35462000" />
-      <workItem from="1698645660383" duration="1243000" />
-      <workItem from="1698712615242" duration="6047000" />
+      <workItem from="1698394608667" duration="17595000" />
+      <workItem from="1698494017347" duration="435000" />
+      <workItem from="1698506989770" duration="216000" />
+      <workItem from="1698561501486" duration="711000" />
+      <workItem from="1698581955066" duration="16810000" />
+      <workItem from="1698631515070" duration="885000" />
+      <workItem from="1698712682638" duration="980000" />
+      <workItem from="1698714372216" duration="2627000" />
+      <workItem from="1698732260693" duration="289000" />
+      <workItem from="1698766404121" duration="980000" />
+      <workItem from="1699018746416" duration="1287000" />
+      <workItem from="1699020285196" duration="2613000" />
+      <workItem from="1699258016544" duration="200000" />
+      <workItem from="1699258475221" duration="1628000" />
+      <workItem from="1699264447130" duration="985000" />
+      <workItem from="1699275250384" duration="661000" />
+      <workItem from="1699314734205" duration="1461000" />
+      <workItem from="1699316216937" duration="37000" />
+      <workItem from="1699316404990" duration="2880000" />
+      <workItem from="1699343861301" duration="13730000" />
+      <workItem from="1699370637609" duration="145000" />
+      <workItem from="1699370876633" duration="3873000" />
+      <workItem from="1699417695907" duration="24872000" />
+      <workItem from="1699461799841" duration="4890000" />
     </task>
     <task id="LOCAL-00001" summary="Initial project">
       <created>1698383623158</created>
@@ -249,71 +201,200 @@
       <option name="project" value="LOCAL" />
       <updated>1698407062337</updated>
     </task>
-    <task id="LOCAL-00011" summary="1.0.9">
-      <created>1698567579265</created>
+    <task id="LOCAL-00011" summary="0.1.4">
+      <created>1698408774514</created>
       <option name="number" value="00011" />
       <option name="presentableId" value="LOCAL-00011" />
       <option name="project" value="LOCAL" />
-      <updated>1698567579265</updated>
+      <updated>1698408774514</updated>
     </task>
-    <task id="LOCAL-00012" summary="1.0.10">
-      <created>1698579995327</created>
+    <task id="LOCAL-00012" summary="0.1.5">
+      <created>1698413220835</created>
       <option name="number" value="00012" />
       <option name="presentableId" value="LOCAL-00012" />
       <option name="project" value="LOCAL" />
-      <updated>1698579995327</updated>
+      <updated>1698413220835</updated>
     </task>
-    <task id="LOCAL-00013" summary="1.0.10">
-      <created>1698592768002</created>
+    <task id="LOCAL-00013" summary="0.1.6">
+      <created>1698413297862</created>
       <option name="number" value="00013" />
       <option name="presentableId" value="LOCAL-00013" />
       <option name="project" value="LOCAL" />
-      <updated>1698592768002</updated>
+      <updated>1698413297862</updated>
     </task>
-    <task id="LOCAL-00014" summary="1.0.11&#10;修改了ddl和task4的一些文件">
-      <created>1698717302891</created>
+    <task id="LOCAL-00014" summary="0.1.6">
+      <created>1698415402624</created>
       <option name="number" value="00014" />
       <option name="presentableId" value="LOCAL-00014" />
       <option name="project" value="LOCAL" />
-      <updated>1698717302891</updated>
+      <updated>1698415402624</updated>
     </task>
-    <task id="LOCAL-00015" summary="1.0.12">
-      <created>1698717326303</created>
+    <task id="LOCAL-00015" summary="0.1.7">
+      <created>1698561595920</created>
       <option name="number" value="00015" />
       <option name="presentableId" value="LOCAL-00015" />
       <option name="project" value="LOCAL" />
-      <updated>1698717326303</updated>
+      <updated>1698561595920</updated>
     </task>
-    <task id="LOCAL-00016" summary="1.0.12">
-      <created>1698718436851</created>
+    <task id="LOCAL-00016" summary="0.1.8">
+      <created>1698583006123</created>
       <option name="number" value="00016" />
       <option name="presentableId" value="LOCAL-00016" />
       <option name="project" value="LOCAL" />
-      <updated>1698718436851</updated>
+      <updated>1698583006123</updated>
     </task>
-    <task id="LOCAL-00017" summary="1.0.12&#10;重命名了所有的表格，将其变为单数形式">
-      <created>1698720333308</created>
+    <task id="LOCAL-00017" summary="0.1.9">
+      <created>1698584253947</created>
       <option name="number" value="00017" />
       <option name="presentableId" value="LOCAL-00017" />
       <option name="project" value="LOCAL" />
-      <updated>1698720333308</updated>
+      <updated>1698584253947</updated>
     </task>
-    <option name="localTasksCounter" value="18" />
+    <task id="LOCAL-00018" summary="0.2.0">
+      <created>1698585590385</created>
+      <option name="number" value="00018" />
+      <option name="presentableId" value="LOCAL-00018" />
+      <option name="project" value="LOCAL" />
+      <updated>1698585590385</updated>
+    </task>
+    <task id="LOCAL-00019" summary="0.2.0">
+      <created>1698586127721</created>
+      <option name="number" value="00019" />
+      <option name="presentableId" value="LOCAL-00019" />
+      <option name="project" value="LOCAL" />
+      <updated>1698586127721</updated>
+    </task>
+    <task id="LOCAL-00020" summary="0.2.1">
+      <created>1698587747371</created>
+      <option name="number" value="00020" />
+      <option name="presentableId" value="LOCAL-00020" />
+      <option name="project" value="LOCAL" />
+      <updated>1698587747371</updated>
+    </task>
+    <task id="LOCAL-00021" summary="0.2.2 Loader for danmu">
+      <created>1698598894084</created>
+      <option name="number" value="00021" />
+      <option name="presentableId" value="LOCAL-00021" />
+      <option name="project" value="LOCAL" />
+      <updated>1698598894084</updated>
+    </task>
+    <task id="LOCAL-00022" summary="0.2.3">
+      <created>1698712852645</created>
+      <option name="number" value="00022" />
+      <option name="presentableId" value="LOCAL-00022" />
+      <option name="project" value="LOCAL" />
+      <updated>1698712852645</updated>
+    </task>
+    <task id="LOCAL-00023" summary="0.2.4 Runnable version to load danmu">
+      <created>1699259074190</created>
+      <option name="number" value="00023" />
+      <option name="presentableId" value="LOCAL-00023" />
+      <option name="project" value="LOCAL" />
+      <updated>1699259074190</updated>
+    </task>
+    <task id="LOCAL-00024" summary="0.2.4 Runnable version to load danmu">
+      <created>1699259393274</created>
+      <option name="number" value="00024" />
+      <option name="presentableId" value="LOCAL-00024" />
+      <option name="project" value="LOCAL" />
+      <updated>1699259393274</updated>
+    </task>
+    <task id="LOCAL-00025" summary="0.2.4 Runnable version to load danmu">
+      <created>1699259405993</created>
+      <option name="number" value="00025" />
+      <option name="presentableId" value="LOCAL-00025" />
+      <option name="project" value="LOCAL" />
+      <updated>1699259405993</updated>
+    </task>
+    <task id="LOCAL-00026" summary="0.2.5 Module Version_1 updated&#10;Executable files are extended">
+      <created>1699260080963</created>
+      <option name="number" value="00026" />
+      <option name="presentableId" value="LOCAL-00026" />
+      <option name="project" value="LOCAL" />
+      <updated>1699260080963</updated>
+    </task>
+    <task id="LOCAL-00027" summary="0.2. untested">
+      <created>1699316243829</created>
+      <option name="number" value="00027" />
+      <option name="presentableId" value="LOCAL-00027" />
+      <option name="project" value="LOCAL" />
+      <updated>1699316243829</updated>
+    </task>
+    <task id="LOCAL-00028" summary="0.2.6 tested version for partial relationships">
+      <created>1699318586132</created>
+      <option name="number" value="00028" />
+      <option name="presentableId" value="LOCAL-00028" />
+      <option name="project" value="LOCAL" />
+      <updated>1699318586132</updated>
+    </task>
+    <task id="LOCAL-00029" summary="0.2.8 fine-tuned version for relationships">
+      <created>1699320322252</created>
+      <option name="number" value="00029" />
+      <option name="presentableId" value="LOCAL-00029" />
+      <option name="project" value="LOCAL" />
+      <updated>1699320322252</updated>
+    </task>
+    <task id="LOCAL-00030" summary="0.2.9 fine-tuned version for relationships">
+      <created>1699320597079</created>
+      <option name="number" value="00030" />
+      <option name="presentableId" value="LOCAL-00030" />
+      <option name="project" value="LOCAL" />
+      <updated>1699320597079</updated>
+    </task>
+    <task id="LOCAL-00031" summary="0.2.9 fine-tuned version for relationships">
+      <created>1699320755486</created>
+      <option name="number" value="00031" />
+      <option name="presentableId" value="LOCAL-00031" />
+      <option name="project" value="LOCAL" />
+      <updated>1699320755486</updated>
+    </task>
+    <task id="LOCAL-00032" summary="0.3.0 fine-tuned version for relationships">
+      <created>1699321043784</created>
+      <option name="number" value="00032" />
+      <option name="presentableId" value="LOCAL-00032" />
+      <option name="project" value="LOCAL" />
+      <updated>1699321043784</updated>
+    </task>
+    <task id="LOCAL-00033" summary="0.3.1 more! more!">
+      <created>1699446909650</created>
+      <option name="number" value="00033" />
+      <option name="presentableId" value="LOCAL-00033" />
+      <option name="project" value="LOCAL" />
+      <updated>1699446909650</updated>
+    </task>
+    <task id="LOCAL-00034" summary="0.3.1 more! more!">
+      <created>1699446981403</created>
+      <option name="number" value="00034" />
+      <option name="presentableId" value="LOCAL-00034" />
+      <option name="project" value="LOCAL" />
+      <updated>1699446981403</updated>
+    </task>
+    <task id="LOCAL-00035" summary="0.3.2 untested final version">
+      <created>1699458291350</created>
+      <option name="number" value="00035" />
+      <option name="presentableId" value="LOCAL-00035" />
+      <option name="project" value="LOCAL" />
+      <updated>1699458291350</updated>
+    </task>
+    <task id="LOCAL-00036" summary="0.3.3 tested final version">
+      <created>1699465056695</created>
+      <option name="number" value="00036" />
+      <option name="presentableId" value="LOCAL-00036" />
+      <option name="project" value="LOCAL" />
+      <updated>1699465056695</updated>
+    </task>
+    <task id="LOCAL-00037" summary="0.3.9">
+      <created>1699537593371</created>
+      <option name="number" value="00037" />
+      <option name="presentableId" value="LOCAL-00037" />
+      <option name="project" value="LOCAL" />
+      <updated>1699537593371</updated>
+    </task>
+    <option name="localTasksCounter" value="38" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
     <option name="version" value="3" />
-  </component>
-  <component name="Vcs.Log.History.Properties">
-    <option name="COLUMN_ID_ORDER">
-      <list>
-        <option value="Default.Root" />
-        <option value="Default.Author" />
-        <option value="Default.Date" />
-        <option value="Default.Subject" />
-        <option value="Space.CommitStatus" />
-      </list>
-    </option>
   </component>
   <component name="Vcs.Log.Tabs.Properties">
     <option name="TAB_STATES">
@@ -327,23 +408,62 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="Initial project" />
-    <MESSAGE value="0.0.0" />
-    <MESSAGE value="0.0.1" />
-    <MESSAGE value="0.0.2" />
     <MESSAGE value="0.1.0" />
     <MESSAGE value="0.1.1" />
     <MESSAGE value="0.1.2" />
     <MESSAGE value="0.1.3" />
-    <MESSAGE value="Changes" />
-    <MESSAGE value="1.0.9" />
-    <MESSAGE value="1.0.10" />
-    <MESSAGE value="1.0.11&#10;修正了ddl的一些错误&#10;task4更新" />
-    <MESSAGE value="1.0.11&#10;修改了ddl和task4的一些文件" />
-    <MESSAGE value="1.0.12" />
-    <MESSAGE value="1.0.12&#10;重命名了所有的表格，将其变为单数形式" />
-    <option name="LAST_COMMIT_MESSAGE" value="1.0.12&#10;重命名了所有的表格，将其变为单数形式" />
-    <option name="REFORMAT_BEFORE_PROJECT_COMMIT" value="true" />
+    <MESSAGE value="0.1.4" />
+    <MESSAGE value="0.1.5" />
+    <MESSAGE value="0.1.6" />
+    <MESSAGE value="0.1.7" />
+    <MESSAGE value="0.1.8" />
+    <MESSAGE value="0.1.9" />
+    <MESSAGE value="0.2.0" />
+    <MESSAGE value="0.2.1" />
+    <MESSAGE value="0.2.2 Loader for danmu" />
+    <MESSAGE value="0.2.3" />
+    <MESSAGE value="0.2.4 Runnable version to load danmu" />
+    <MESSAGE value="0.2.5 Module Version_1 updated&#10;Executable files are extended" />
+    <MESSAGE value="0.2. untested" />
+    <MESSAGE value="0.2.6 tested version for partial relationships" />
+    <MESSAGE value="0.2.8 fine-tuned version for relationships" />
+    <MESSAGE value="0.2.9 fine-tuned version for relationships" />
+    <MESSAGE value="0.3.0 fine-tuned version for relationships" />
+    <MESSAGE value="0.3.1 more! more!" />
+    <MESSAGE value="0.3.2 untested final version" />
+    <MESSAGE value="0.3.3 tested final version" />
+    <MESSAGE value="0.3.9" />
+    <option name="LAST_COMMIT_MESSAGE" value="0.3.9" />
+  </component>
+  <component name="XDebuggerManager">
+    <breakpoint-manager>
+      <breakpoints>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/src/version_1/Favourites.java</url>
+          <line>36</line>
+          <option name="timeStamp" value="28" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/src/version_1/RelationLoader.java</url>
+          <line>189</line>
+          <option name="timeStamp" value="53" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/src/version_1/Reviewer.java</url>
+          <line>25</line>
+          <option name="timeStamp" value="54" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-method">
+          <url>file://$PROJECT_DIR$/src/version_2/Coins2.java</url>
+          <line>10</line>
+          <properties class="version_2.Coins2" method="main">
+            <option name="EMULATED" value="true" />
+            <option name="WATCH_EXIT" value="false" />
+          </properties>
+          <option name="timeStamp" value="55" />
+        </line-breakpoint>
+      </breakpoints>
+    </breakpoint-manager>
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
     <SUITE FILE_PATH="coverage/DB_script$Entrance.ic" NAME="Entrance Coverage Results" MODIFIED="1698407418442" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="idea" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" />

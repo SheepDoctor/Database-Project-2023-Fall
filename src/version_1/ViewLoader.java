@@ -128,6 +128,15 @@ public class ViewLoader
                         {
                             stmt.executeBatch();
                             stmt.clearBatch();
+                            end = System.currentTimeMillis();
+                            if (cnt % (BATCH_SIZE * 100) == 0)
+                            {
+                                end = System.currentTimeMillis();
+                                Duration duration = Duration.ofSeconds((end - start) / 1000);
+                                System.out.printf("已处理数：" + cnt / 10000 + " 万条，TIME：" +
+                                        duration.toHours() + "h " + duration.toMinutesPart() + "m " + duration.toSecondsPart() + "s，");
+                                System.out.printf("导入进度：%.4f%%\n", counter / 7865.0 * 100);
+                            }
                         }
                     }
                     break;
