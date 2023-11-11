@@ -14,7 +14,7 @@ import com.opencsv.CSVReader;
 
 public class RelationLoader
 {
-    private final int BATCH_SIZE = 5000;//initial 500
+    private final int BATCH_SIZE = 10000;//initial 500
     private Connection con = null;
     private PreparedStatement stmt = null;
     private int cnt = 0;
@@ -189,7 +189,7 @@ public class RelationLoader
                         {
                             stmt.executeBatch();
                             stmt.clearBatch();
-                            if (cnt % (BATCH_SIZE * 100) == 0)
+                            if (cnt % (BATCH_SIZE * 2) == 0)
                             {
                                 end = System.currentTimeMillis();
                                 Duration duration = Duration.ofSeconds((end - start) / 1000);
