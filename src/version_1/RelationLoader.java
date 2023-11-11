@@ -14,7 +14,7 @@ import com.opencsv.CSVReader;
 
 public class RelationLoader
 {
-    private final int BATCH_SIZE = 500;//initial 500
+    private final int BATCH_SIZE = 5000;//initial 500
     private Connection con = null;
     private PreparedStatement stmt = null;
     private int cnt = 0;
