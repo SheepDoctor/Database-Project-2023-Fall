@@ -10,12 +10,13 @@ import java.sql.Timestamp;
 import java.util.Enumeration;
 import java.util.Objects;
 import java.util.concurrent.ExecutorService;
+import java.util.concurrent.TimeUnit;
 
 import com.opencsv.CSVReader;
 
 public class Loader2
 {
-    private final int BATCH_SIZE = 500;//initial 500
+    private final int BATCH_SIZE = 100;//initial 500
     private Connection con = null;
     private PreparedStatement stmt = null;
 
@@ -113,7 +114,12 @@ public class Loader2
     public void write_data(String file_path, String[] queue, Database database, String sql, Boolean adder, Boolean pretreat, double num, ExecutorService executorService)
     {
         con = database.open();
-        int cnt = 0;
+        try {
+            con.setTransactionIsolation(Connection.TRANSACTION_READ_COMMITTED);
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+        int cnt = 1;
         try
         {
             stmt = con.prepareStatement(sql);
@@ -154,9 +160,14 @@ public class Loader2
                 {
                     row.add(cnt);
                 }
-                loadData(row, queue);
+                    try {
+                        loadData(row, queue);
+                    } catch (SQLException e) {
+                        throw new RuntimeException(e);
+                    }
                 if (cnt % BATCH_SIZE == 0)
                 {
+
                     if(num == 0)
                     {
                         System.out.println("当前进度：" + cnt + " 条");
@@ -165,10 +176,12 @@ public class Loader2
                     {
                         System.out.printf("导入进度：%.3f%%\n", cnt / num * 100);
                     }
+
+
                     executorService.submit(()-> {
                         try {
-                            stmt.executeBatch();                        stmt.clearBatch();
-
+                            stmt.executeBatch();
+                            stmt.clearBatch();
                         } catch (SQLException e) {
                             throw new RuntimeException(e);
                         }
@@ -178,8 +191,8 @@ public class Loader2
             }
             executorService.submit(()-> {
                 try {
-                    stmt.executeBatch();                stmt.clearBatch();
-
+                    stmt.executeBatch();
+                    stmt.clearBatch();
                 } catch (SQLException e) {
                     throw new RuntimeException(e);
                 }
@@ -187,13 +200,14 @@ public class Loader2
             try
             {
                 executorService.shutdown();
+
                 con.commit();//提交事务，运行后才导入数据库
                 stmt.close();
                 database.close(stmt);
                 long end = System.currentTimeMillis();//结束时间
                 System.out.println(cnt + " records successfully loaded");
                 System.out.println("TIME : " + (end - start) / 1000 + "s");
-                System.out.println("Loading speed : " + (long) cnt / ((end - start) / 1000) + " records/s");
+//                System.out.println("Loading speed : " +cnt / ( (long) (end - start) / 1000) + " records/s");
             }
             catch (Exception e)
             {
@@ -210,22 +224,7 @@ public class Loader2
                 database.close(stmt);
                 System.exit(1);
             }
-        }
-        catch (SQLException e)
-        {
-            System.err.println("SQL error: " + e.getMessage());
-            try
-            {
-                con.rollback();
-                stmt.close();
-            }
-            catch (Exception e2)
-            {
-            }
-            database.close(stmt);
-            System.exit(1);
-        }
-        catch (FileNotFoundException e)
+        } catch (FileNotFoundException e)
         {
             System.err.println("FileNotFound");
         }

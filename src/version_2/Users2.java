@@ -27,6 +27,6 @@ public class Users2
         System.out.println("USER导入......");
         loader.write_data(file_path, queue, database, sql, false, false, 37881.0, executorService);
 
-        reviewer();
+        //reviewer();
     }
 }

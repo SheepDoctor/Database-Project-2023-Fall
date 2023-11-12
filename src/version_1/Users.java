@@ -14,7 +14,7 @@ public class Users
         Properties prop = new Properties();
         prop.put("host", "localhost");
         prop.put("user", "postgres");
-        prop.put("password", "123456");
+        prop.put("password", "123abc");
         prop.put("database", "Project");
         String file_path = "source_file/users.csv";
         String[] queue = {"Long", "String", "String", "Date", "Int", "String", "Skip", "String"};
@@ -25,6 +25,6 @@ public class Users
         System.out.println("USER导入......");
         loader.write_data(file_path, queue, database, sql, false, false, 37881.0);
 
-        reviewer();
+       // reviewer();
     }
 }
