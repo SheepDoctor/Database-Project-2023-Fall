@@ -26,7 +26,7 @@ public class ViewLoader2
     private long end;
     private int counter = 1;
 
-    private void loadData(ArrayList<Object> row, String[] type,ExecutorService executorService) throws SQLException
+    private void loadData(ArrayList<Object> row, String[] type, ExecutorService executorService) throws SQLException
     {
         ArrayList<String> new_row = new ArrayList<>();
         for (int i = 0; i < row.size(); i++)
@@ -125,24 +125,29 @@ public class ViewLoader2
                         stmt.setLong(index, Long.parseLong(sub_data2));
                         stmt.addBatch();
                         cnt++;
-                        if (cnt % (BATCH_SIZE*4) == 0)
+                        if (cnt % BATCH_SIZE == 0)
                         {
-                            executorService.submit(()-> {
-                                try {
-                                    stmt.executeBatch();stmt.clearBatch();
-                                } catch (SQLException e) {
+                            executorService.submit(() ->
+                            {
+                                try
+                                {
+                                    stmt.executeBatch();
+                                    stmt.clearBatch();
+                                }
+                                catch (SQLException e)
+                                {
                                     throw new RuntimeException(e);
                                 }
 
                             });
-                        if (cnt % (BATCH_SIZE * 100) == 0)
-                        {
-                            end = System.currentTimeMillis();
-                            Duration duration = Duration.ofSeconds((end - start) / 1000);
-                            System.out.printf("已处理数：" + cnt / 10000 + " 万条，TIME：" +
-                                    duration.toHours() + "h " + duration.toMinutesPart() + "m " + duration.toSecondsPart() + "s，");
-                            System.out.printf("导入进度：%.4f%%\n", counter / 7865.0 * 100);
-                        }
+                            if (cnt % (BATCH_SIZE * 100) == 0)
+                            {
+                                end = System.currentTimeMillis();
+                                Duration duration = Duration.ofSeconds((end - start) / 1000);
+                                System.out.printf("已处理数：" + cnt / 10000 + " 万条，TIME：" +
+                                        duration.toHours() + "h " + duration.toMinutesPart() + "m " + duration.toSecondsPart() + "s，");
+                                System.out.printf("导入进度：%.4f%%\n", counter / 7865.0 * 100);
+                            }
 
                         }
                     }
@@ -199,20 +204,25 @@ public class ViewLoader2
                 {
                     row.add(cnt);
                 }
-                loadData(row, queue,executorService);
+                loadData(row, queue, executorService);
                 counter++;
 
             }
-            executorService.submit(()-> {
-                try {
-                    stmt.executeBatch();                stmt.clearBatch();
-
-                } catch (SQLException e) {
+            executorService.submit(() ->
+            {
+                try
+                {
+                    stmt.executeBatch();
+                    stmt.clearBatch();
+                }
+                catch (SQLException e)
+                {
                     throw new RuntimeException(e);
                 }
             });
             try
             {
+                executorService.shutdown();
                 con.commit();//提交事务，运行后才导入数据库
                 stmt.close();
                 database.close(stmt);

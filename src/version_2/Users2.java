@@ -13,7 +13,6 @@ public class Users2
     public static void main(String[] args)
     {
         ExecutorService executorService= Executors.newCachedThreadPool();
-
         Properties prop = new Properties();
         prop.put("host", "localhost");
         prop.put("user", "postgres");
@@ -26,7 +25,7 @@ public class Users2
 
         Loader2 loader = new Loader2();
         System.out.println("USER导入......");
-        loader.write_data(file_path, queue, database, sql, false, false, 37881.0,executorService);
+        loader.write_data(file_path, queue, database, sql, false, false, 37881.0, executorService);
 
         reviewer();
     }

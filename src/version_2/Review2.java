@@ -11,7 +11,6 @@ public class Review2
     public static void main(String[] args)
     {
         ExecutorService executorService= Executors.newCachedThreadPool();
-
         Properties prop = new Properties();
         prop.put("host", "localhost");
         prop.put("user", "postgres");

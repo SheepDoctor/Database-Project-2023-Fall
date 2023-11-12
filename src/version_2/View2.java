@@ -11,11 +11,10 @@ public class View2
     public static void main(String[] args)
     {
         ExecutorService executorService= Executors.newCachedThreadPool();
-
         Properties prop = new Properties();
         prop.put("host", "localhost");
         prop.put("user", "postgres");
-        prop.put("password", "123abc");
+        prop.put("password", "123456");
         prop.put("database", "Project");
 
         String file_path = "source_file/videos.csv";
@@ -40,6 +39,5 @@ public class View2
 
         ViewLoader2 loader = new ViewLoader2();
         loader.write_data(file_path, queue, database, sql, false, false,executorService);
-
     }
 }

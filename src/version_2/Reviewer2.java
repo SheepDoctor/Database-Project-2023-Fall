@@ -32,7 +32,7 @@ public class Reviewer2
                 "Skip", "Long", "Skip", "Skip", "Skip", "Skip"};
         String sql = "insert into users(Mid,identity) values(?,'Reviewer') on conflict (Mid) do nothing";
         System.out.println("REVIEWER导入......");
-        loader.write_data(file_path, queue, database, sql, false, false, 7865.0,executorService);
+        loader.write_data(file_path, queue, database, sql, false, false, 7865.0, executorService);
     }
     public static void check_data(Database database)
     {
