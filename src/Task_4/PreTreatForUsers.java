@@ -6,23 +6,25 @@ import com.opencsv.CSVWriter;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.List;
 
-public class PreProcess {
+public class PreTreatForUsers {
     //预处理文件，将所有回车转义为"\\n"
     public static void main(String[] args) {
-        String inputCsvFile = "D:\\文件\\学习\\大二上\\数据库原理\\小组\\data\\users_to_be_tested.csv";
-        String outputCsvFile = "D:\\文件\\学习\\大二上\\数据库原理\\小组\\data\\users_1000001.csv";
+        String inputFilePath = "source_file/users.csv";  // 输入文件路径
+        String outputFilePath = "source_file/users_p.csv";  // 输出文件路径
         try {
-            CSVReader reader = new CSVReader((new FileReader(inputCsvFile)));
+            CSVReader reader = new CSVReader((new FileReader(inputFilePath)));
             List<String[]> lines = reader.readAll();
             reader.close();
-            CSVWriter writer = new CSVWriter(new FileWriter(outputCsvFile));
+            CSVWriter writer = new CSVWriter(new FileWriter(outputFilePath));
             for (String[] strings : lines) {
                 for (int j = 0; j < strings.length; j++) {
                     strings[j] = strings[j].replace("\n", "\\n");
+                    strings[j] = strings[j].replace(",", "，");
                 }
-                writer.writeNext(strings);
+                writer.writeNext(Arrays.copyOfRange(strings, 0, strings.length - 2), false);
             }
             writer.close();
         } catch (IOException e) {
@@ -30,3 +32,6 @@ public class PreProcess {
         }
     }
 }
+
+
+

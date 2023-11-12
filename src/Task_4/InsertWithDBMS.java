@@ -26,14 +26,14 @@ public class InsertWithDBMS {
             String sql = "insert into users(Mid,Name,Sex,Birthday,Level,Sign,identity) values(?,?,?,?,?,?,?)";
             Database database = new Database(prop);
 
-            Loader loader = new Loader();
+            SimpleLoader loader = new SimpleLoader();
             System.out.println("USER导入......");
             loader.write_data(file_path, queue, database, sql, false, 1000000.0);
         }
     }
 }
 
-class Loader {
+class SimpleLoader {
 
     private final int BATCH_SIZE = 500;//initial 500
     private Connection con = null;

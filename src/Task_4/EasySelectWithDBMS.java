@@ -12,7 +12,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Properties;
 
-public class EasySelect {
+public class EasySelectWithDBMS {
     public static void main(String[] args) {
         // 数据库连接参数
         Properties prop = new Properties();
@@ -23,14 +23,17 @@ public class EasySelect {
 
         Database database = new Database(prop);
         QWriter qWriter = new QWriter();
-        double[] time = new double[100];
-        for (int i = 0; i < 100; i++) {
+        int runTime = 100;
+        double[] time = new double[runTime];
+        for (int i = 0; i < runTime; i++) {
             try {
                 long start = System.nanoTime();
                 Connection connection = database.open();
                 connection.setAutoCommit(false); // 关闭自动提交
 
-                selectLevel1Rows(connection, qWriter);
+                //selectOrderedLevel2(connection, qWriter);
+                //selectLevel1Count(connection, qWriter);
+                select100MinMidComment(connection, qWriter);
                 connection.commit();
 
                 database.close(null); // 关闭数据库连接
@@ -52,17 +55,37 @@ public class EasySelect {
         qWriter.close();
     }
 
-
-    private static void selectLevel1Rows(Connection connection, QWriter qWriter) throws SQLException {
-        // 构建一个查询，它会选择满足条件的行，并返回这些行的主键
-        String querySQL = "select level,count(*) from users group by  level order by level ;";
-        // "select mid from users where level = 1 order by mid asc;"
-        // "select count(*) from users where level = 1 ;"
-        // 执行语句
+    // 查询所有等级为2的行，并且按mid的升序输出
+    private static void selectOrderedLevel2(Connection connection, QWriter qWriter) throws SQLException {
+        String querySQL = "select mid from users where level = 2 order by mid;";
         try (PreparedStatement selectStatement = connection.prepareStatement(querySQL)) {
             ResultSet resultSet = selectStatement.executeQuery();
             while (resultSet.next()) {
-                qWriter.println(resultSet.getLong(1) + " " + resultSet.getLong(2));
+                //打印结果
+                qWriter.println(resultSet.getLong(1));
+            }
+        }
+    }
+
+    // 查询所有level为1的列的数量
+    private static void selectLevel1Count(Connection connection, QWriter qWriter) throws SQLException {
+        String querySQL = "select count(*) from users where level = 1;";
+        try (PreparedStatement selectStatement = connection.prepareStatement(querySQL)) {
+            ResultSet resultSet = selectStatement.executeQuery();
+            while (resultSet.next()) {
+                //打印结果
+                qWriter.println(resultSet.getInt(1));
+            }
+        }
+    }
+
+    private static void select100MinMidComment(Connection connection, QWriter qWriter) throws SQLException {
+        String querySQL = "SELECT u.mid, c.content FROM (SELECT mid FROM users ORDER BY mid LIMIT 100) AS u LEFT JOIN comment c ON u.mid = c.mid;";
+        try (PreparedStatement selectStatement = connection.prepareStatement(querySQL)) {
+            ResultSet resultSet = selectStatement.executeQuery();
+            while (resultSet.next()) {
+                //打印结果
+                qWriter.println(resultSet.getInt(1) + " " + resultSet.getString(2));
             }
         }
     }
