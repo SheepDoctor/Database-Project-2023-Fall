@@ -4,8 +4,9 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="983aa8dd-a81e-4e10-beeb-f458ad86c992" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+    <list default="true" id="983aa8dd-a81e-4e10-beeb-f458ad86c992" name="Changes" comment="0.4.3">
+      <change beforePath="$PROJECT_DIR$/src/version_2/ViewLoader2.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/version_2/ViewLoader2.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/数据库原理Project1报告.md" beforeDir="false" afterPath="$PROJECT_DIR$/数据库原理Project1报告.md" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -102,8 +103,7 @@
       <workItem from="1699461799841" duration="4890000" />
       <workItem from="1699694984399" duration="1050000" />
       <workItem from="1699696659493" duration="2381000" />
-      <workItem from="1699779029598" duration="7723000" />
-      <workItem from="1699796468547" duration="877000" />
+      <workItem from="1699779029598" duration="5508000" />
     </task>
     <task id="LOCAL-00001" summary="Initial project">
       <created>1698383623158</created>
@@ -406,35 +406,14 @@
       <option name="project" value="LOCAL" />
       <updated>1699786488700</updated>
     </task>
-    <task id="LOCAL-00044" summary="0.5.1">
-      <created>1699786710186</created>
+    <task id="LOCAL-00044" summary="0.4.3">
+      <created>1699795938247</created>
       <option name="number" value="00044" />
       <option name="presentableId" value="LOCAL-00044" />
       <option name="project" value="LOCAL" />
-      <updated>1699786710186</updated>
+      <updated>1699795938247</updated>
     </task>
-    <task id="LOCAL-00045" summary="0.5.1">
-      <created>1699787439194</created>
-      <option name="number" value="00045" />
-      <option name="presentableId" value="LOCAL-00045" />
-      <option name="project" value="LOCAL" />
-      <updated>1699787439194</updated>
-    </task>
-    <task id="LOCAL-00046" summary="0.5.2">
-      <created>1699792462643</created>
-      <option name="number" value="00046" />
-      <option name="presentableId" value="LOCAL-00046" />
-      <option name="project" value="LOCAL" />
-      <updated>1699792462643</updated>
-    </task>
-    <task id="LOCAL-00047" summary="0.5.4">
-      <created>1699796634549</created>
-      <option name="number" value="00047" />
-      <option name="presentableId" value="LOCAL-00047" />
-      <option name="project" value="LOCAL" />
-      <updated>1699796634549</updated>
-    </task>
-    <option name="localTasksCounter" value="48" />
+    <option name="localTasksCounter" value="45" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -458,6 +437,8 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
+    <MESSAGE value="0.1.7" />
+    <MESSAGE value="0.1.8" />
     <MESSAGE value="0.1.9" />
     <MESSAGE value="0.2.0" />
     <MESSAGE value="0.2.1" />
@@ -480,10 +461,8 @@
     <MESSAGE value="0.4.7 数据库设计写好了" />
     <MESSAGE value="0.4.8" />
     <MESSAGE value="0.5.0" />
-    <MESSAGE value="0.5.1" />
-    <MESSAGE value="0.5.2" />
-    <MESSAGE value="0.5.4" />
-    <option name="LAST_COMMIT_MESSAGE" value="0.5.4" />
+    <MESSAGE value="0.4.3" />
+    <option name="LAST_COMMIT_MESSAGE" value="0.4.3" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
