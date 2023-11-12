@@ -14,8 +14,29 @@
 ![[E-R图.png]]
 
 ## 任务2：数据库设计
-（数据库图表）  
-（简要描述表格和列的设计，包括但不限于表格和列的含义）
+### 2.1 数据库图表可视化
+![[tables.png]]
+### 2.1 表格属性含义
+#### 2.1.1 实体表
+实体表包含users, videos 以及 comment，具体介绍如下：
+1. users：包含用户的基本信息（包含是否为reviewer的信息），由用户的mid作为主键。表格中属性包含name（昵称）、sex（性别）、birthday（生日）、level（等级）、sign（签名）、identity（身份——会员、非会员）和 is_reviewer（是否为审查员）。
+2. videos：包含视频的基本信息，由视频的bv作为主键。表中属性包含title（标题）、owern_id（发布者id）、commit_time（提交时间）、public_time（发布时间）、duration（时长）和description（视频简介）。
+3. comment：包含弹幕信息，由于一个用户可以同时在一个视频中发出多条弹幕，故引入一个id作为主键。表中属性包含bv（视频的id）、mid（发布弹幕的用户的id）、time（发布弹幕的时间）、content（弹幕的内容）。
+#### 2.1.2 关系表
+关系表包括follow, review, favourites, coins, likes, view，具体介绍如下：
+1. follow：记录关注关系，由关注、被关注用户的mid作为联合主键。
+2. review：记录审核关系，由视频的bv以及审核员的mid作为联合主键。表中的review_time记录视频审核的时间。
+3. favourites：记录收藏关系，由视频的bv以及用户的mid作为联合主键。
+4. coins：记录投币关系，由视频的bv以及用户的mid作为联合主键。
+5. likes：记录点赞关系，由视频的bv以及用户的mid作为联合主键。
+6. view：记录观看关系，由视频的bv以及用户的mid作为联合主键。表中的time记录用户观看视频的时间。
+
+#### 2.2 外键设计
+数据库中有3个实体表，6个关表，其中关系表follow的两个外键均依赖于users表，其余的关系表均依赖于videos表和users表。实体表中的comment表格（弹幕信息）的外键也依赖于videos和users表格。
+#### 2.3 重要的约束
+1. 对视频的bv的格式做了相关约束
+2. 设置时间等数据非空
+3. 为性别等数据设置了默认值
 ## 任务3：数据导入
 ### 3.1 基础脚本 
 #### 3.1.1 语言以及依赖

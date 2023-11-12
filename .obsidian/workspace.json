@@ -4,11 +4,11 @@
     "type": "split",
     "children": [
       {
-        "id": "9bacde940457bc6c",
+        "id": "975be52167492093",
         "type": "tabs",
         "children": [
           {
-            "id": "9f75cd1588bc9902",
+            "id": "6765b15f76cd2a1e",
             "type": "leaf",
             "state": {
               "type": "markdown",
@@ -146,8 +146,11 @@
       "command-palette:Open command palette": false
     }
   },
-  "active": "9f75cd1588bc9902",
+  "active": "6765b15f76cd2a1e",
   "lastOpenFiles": [
+    "tables.png",
+    "数据库原理Project1报告.md",
+    "E-R图.png.md",
     "out/production/DB_script/version_1/Loader.class",
     "src/version_1/Loader.java~",
     "out/production/DB_script/version_2/ViewLoader2.class",
@@ -157,7 +160,6 @@
     "out/production/DB_script/version_2/Reviewer2.class",
     "out/production/DB_script/version_2/Review2.class",
     "out/production/DB_script/version_2/Likes2.class",
-    "out/production/DB_script/version_2/Follow2.class",
-    "out/production/DB_script/version_1/ViewLoader.class"
+    "out/production/DB_script/version_2/Follow2.class"
   ]
 }
