@@ -5,8 +5,6 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="983aa8dd-a81e-4e10-beeb-f458ad86c992" name="Changes" comment="0.4">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.obsidian/workspace.json" beforeDir="false" afterPath="$PROJECT_DIR$/.obsidian/workspace.json" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/version_2/Follow2.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/version_2/Follow2.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/version_2/Likes2.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/version_2/Likes2.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/version_2/Review2.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/version_2/Review2.java" afterDir="false" />
@@ -15,7 +13,6 @@
       <change beforePath="$PROJECT_DIR$/src/version_2/Videos2.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/version_2/Videos2.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/version_2/View2.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/version_2/View2.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/version_2/ViewLoader2.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/version_2/ViewLoader2.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/数据库原理Project1报告.md" beforeDir="false" afterPath="$PROJECT_DIR$/数据库原理Project1报告.md" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -112,7 +109,7 @@
       <workItem from="1699461799841" duration="4890000" />
       <workItem from="1699694984399" duration="1050000" />
       <workItem from="1699696659493" duration="2381000" />
-      <workItem from="1699779029598" duration="5361000" />
+      <workItem from="1699779029598" duration="5508000" />
     </task>
     <task id="LOCAL-00001" summary="Initial project">
       <created>1698383623158</created>
@@ -408,7 +405,14 @@
       <option name="project" value="LOCAL" />
       <updated>1699781738319</updated>
     </task>
-    <option name="localTasksCounter" value="43" />
+    <task id="LOCAL-00043" summary="0.5.0">
+      <created>1699786488700</created>
+      <option name="number" value="00043" />
+      <option name="presentableId" value="LOCAL-00043" />
+      <option name="project" value="LOCAL" />
+      <updated>1699786488700</updated>
+    </task>
+    <option name="localTasksCounter" value="44" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -432,7 +436,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="0.1.5" />
     <MESSAGE value="0.1.6" />
     <MESSAGE value="0.1.7" />
     <MESSAGE value="0.1.8" />
@@ -457,7 +460,8 @@
     <MESSAGE value="0.4.6" />
     <MESSAGE value="0.4.7 数据库设计写好了" />
     <MESSAGE value="0.4.8" />
-    <option name="LAST_COMMIT_MESSAGE" value="0.4.8" />
+    <MESSAGE value="0.5.0" />
+    <option name="LAST_COMMIT_MESSAGE" value="0.5.0" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
