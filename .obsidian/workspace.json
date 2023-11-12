@@ -148,6 +148,8 @@
   },
   "active": "6765b15f76cd2a1e",
   "lastOpenFiles": [
+    "er.png.crswap",
+    "er.png",
     "out/production/DB_script/version_3/AlterLoader.class",
     "out/production/DB_script/version_3",
     "src/version_3/AlterLoader.java",
@@ -160,7 +162,6 @@
     "out/production/DB_script/version_2/ViewLoader2.class",
     "out/production/DB_script/version_2/View2.class",
     "out/production/DB_script/version_2/Videos2.class",
-    "out/production/DB_script/version_2/Users2.class",
-    "out/production/DB_script/version_2/Reviewer2.class"
+    "out/production/DB_script/version_2/Users2.class"
   ]
 }

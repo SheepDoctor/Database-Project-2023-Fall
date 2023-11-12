@@ -11,25 +11,25 @@
 |董炳闻|12211111|33%|数据导入、数据库设计、报告撰写|
 ## 任务1：E-R图
 我们使用[draw.io](https://draw.io)绘制E-R图，如下。
-![[E-R图.png]]
+![[er.png]]
 
 ## 任务2：数据库设计
 ### 2.1 数据库图表可视化
 ![[tables.png]]
 ### 2.1 表格属性含义
 #### 2.1.1 实体表
-实体表包含users, videos 以及 comment，具体介绍如下：
+实体表包含users, videos，具体介绍如下：
 1. users：包含用户的基本信息（包含是否为reviewer的信息），由用户的mid作为主键。表格中属性包含name（昵称）、sex（性别）、birthday（生日）、level（等级）、sign（签名）、identity（身份——会员、非会员）和 is_reviewer（是否为审查员）。
 2. videos：包含视频的基本信息，由视频的bv作为主键。表中属性包含title（标题）、owern_id（发布者id）、commit_time（提交时间）、public_time（发布时间）、duration（时长）和description（视频简介）。
-3. comment：包含弹幕信息，由于一个用户可以同时在一个视频中发出多条弹幕，故引入一个id作为主键。表中属性包含bv（视频的id）、mid（发布弹幕的用户的id）、time（发布弹幕的时间）、content（弹幕的内容）。
 #### 2.1.2 关系表
-关系表包括follow, review, favourites, coins, likes, view，具体介绍如下：
+关系表包括follow, review, favourites, coins, likes, view, comment，具体介绍如下：
 1. follow：记录关注关系，由关注、被关注用户的mid作为联合主键。
 2. review：记录审核关系，由视频的bv以及审核员的mid作为联合主键。表中的review_time记录视频审核的时间。
 3. favourites：记录收藏关系，由视频的bv以及用户的mid作为联合主键。
 4. coins：记录投币关系，由视频的bv以及用户的mid作为联合主键。
 5. likes：记录点赞关系，由视频的bv以及用户的mid作为联合主键。
 6. view：记录观看关系，由视频的bv以及用户的mid作为联合主键。表中的time记录用户观看视频的时间。
+7. comment：包含弹幕信息，由于一个用户可以同时在一个视频中发出多条弹幕，故引入一个id作为主键。表中属性包含bv（视频的id）、mid（发布弹幕的用户的id）、time（发布弹幕的时间）、content（弹幕的内容）。
 
 #### 2.2 外键设计
 数据库中有3个实体表，6个关表，其中关系表follow的两个外键均依赖于users表，其余的关系表均依赖于videos表和users表。实体表中的comment表格（弹幕信息）的外键也依赖于videos和users表格。
@@ -45,15 +45,15 @@
 #### 3.1.2 数据记录
 实体表中的记录数：
 
-|user|video|comment|
-|-|-|-|
-|37881|7865|12478996|
+|user|video|
+|-|-|
+|37881|7865|
 
 关系表中的记录数：
 
-|view|follow|coins|likes|favourites|review|
-|-|-|-|-|-|-|
-|163997974|5958770|80571520|86757948|79181895|7865|
+|view|follow|coins|likes|favourites|review|comment|
+|-|-|-|-|-|-|-|
+|163997974|5958770|80571520|86757948|79181895|7865|12478996|
 
 #### 3.1.3 导入方法
 1. 数据预处理：对于弹幕数据，由于弹幕中会出现英文逗号(",")和转移字符，故经常导致opencsv分词错误。因此，我们需要进行数据预处理。首先将数据分隔符用正则表达式搜索出来，替换成'\7'，一个不会被用户输入的安全分隔符。与此同时，在数据中搜索转义字符‘\’，将所有的转义字符替换成非转移字符串"\_reversed"，在录入数据的时候进行还原操作即可。
