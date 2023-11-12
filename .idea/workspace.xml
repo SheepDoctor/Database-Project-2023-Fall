@@ -4,9 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="983aa8dd-a81e-4e10-beeb-f458ad86c992" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/数据库原理Project1报告.md" beforeDir="false" afterPath="$PROJECT_DIR$/数据库原理Project1报告.md" afterDir="false" />
-    </list>
+    <list default="true" id="983aa8dd-a81e-4e10-beeb-f458ad86c992" name="Changes" comment="" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -103,7 +101,7 @@
       <workItem from="1699694984399" duration="1050000" />
       <workItem from="1699696659493" duration="2381000" />
       <workItem from="1699779029598" duration="7723000" />
-      <workItem from="1699796468547" duration="1255000" />
+      <workItem from="1699796468547" duration="1561000" />
     </task>
     <task id="LOCAL-00001" summary="Initial project">
       <created>1698383623158</created>
@@ -441,7 +439,14 @@
       <option name="project" value="LOCAL" />
       <updated>1699797524314</updated>
     </task>
-    <option name="localTasksCounter" value="49" />
+    <task id="LOCAL-00049" summary="0.5.6">
+      <created>1699797935276</created>
+      <option name="number" value="00049" />
+      <option name="presentableId" value="LOCAL-00049" />
+      <option name="project" value="LOCAL" />
+      <updated>1699797935276</updated>
+    </task>
+    <option name="localTasksCounter" value="50" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -465,7 +470,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="0.2.0" />
     <MESSAGE value="0.2.1" />
     <MESSAGE value="0.2.2 Loader for danmu" />
     <MESSAGE value="0.2.3" />
@@ -490,7 +494,8 @@
     <MESSAGE value="0.5.2" />
     <MESSAGE value="0.5.4" />
     <MESSAGE value="0.5.5" />
-    <option name="LAST_COMMIT_MESSAGE" value="0.5.5" />
+    <MESSAGE value="0.5.6" />
+    <option name="LAST_COMMIT_MESSAGE" value="0.5.6" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
