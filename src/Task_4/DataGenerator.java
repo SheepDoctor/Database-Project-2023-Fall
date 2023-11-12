@@ -35,7 +35,7 @@ public class DataGenerator {
         Long startTime = System.currentTimeMillis();
         Set<Long> mids = generateUniqueRandomNumbers(NUM_ROWS, (long) Math.pow(2, 32));
         Set<String> names = new HashSet<>();
-        try (CSVWriter writer = new CSVWriter(new FileWriter("C:\\Users\\hlh\\Desktop\\user_generated.csv"))) {
+        try (CSVWriter writer = new CSVWriter(new FileWriter("source_file/user_generated.csv"))) {
             // 写入标题行
             writer.writeNext(new String[]{"mid", "name", "sex", "birthday", "level", "sign", "identity"});
             // 生成并写入数据行

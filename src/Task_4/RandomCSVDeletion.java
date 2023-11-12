@@ -15,7 +15,7 @@ public class RandomCSVDeletion {
         // 选择要删除的记录数
         int recordsToDelete = 1000;
         // 原始 CSV 文件路径
-        String inputCsvFile = "D:\\文件\\学习\\大二上\\数据库原理\\小组\\data\\users_generated.csv";
+        String inputCsvFile = "source_file/users_generated.csv";
 
 
         try {
@@ -37,11 +37,11 @@ public class RandomCSVDeletion {
                 }
             }
 
-            for (int i = 1; i <= 1; i++) {
+            for (int i = 1; i <= 10; i++) {
                 // 存储删除的记录的新 CSV 文件路径
-                String outputCsvFile = "D:\\文件\\学习\\大二上\\数据库原理\\小组\\data\\users_test_1000.csv";
+                String outputCsvFile = "source_file/users_left.csv";
                 // 创建新 CSV 文件
-                String outputDeletedCsvFile = "D:\\文件\\学习\\大二上\\数据库原理\\小组\\data\\user_999000(" + i + ").csv";
+                String outputDeletedCsvFile = "source_file/user_deleted(" + i + ").csv";
                 CSVWriter writer = new CSVWriter(new FileWriter(outputDeletedCsvFile)), writer1 = new CSVWriter((new FileWriter(outputCsvFile)));
 
                 // 写入未删除的记录到新文件

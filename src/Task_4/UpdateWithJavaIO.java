@@ -5,8 +5,8 @@ import java.util.*;
 
 public class UpdateWithJavaIO {
     public static void main(String[] args) {
-        String sourceCSVFile = "D:\\文件\\学习\\大二上\\数据库原理\\小组\\data\\users_generated-copy.csv";
-        String destinationCSVFile = "D:\\文件\\学习\\大二上\\数据库原理\\小组\\data\\users_updated.csv";
+        String sourceCSVFile = "source_file/users_generated.csv";
+        String destinationCSVFile = "source_file/users_updated.csv";
         for (int j = 0; j < 15; j++) {
             long startTime = System.nanoTime();
             List<Integer> linesWithEmptySign = new ArrayList<>();

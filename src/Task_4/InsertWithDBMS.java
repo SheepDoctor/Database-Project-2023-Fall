@@ -14,22 +14,22 @@ import java.util.Properties;
 
 public class InsertWithDBMS {
     public static void main(String[] args) {
-        for (int i = 0; i < 15; i++) {
+        //for (int i = 0; i < 15; i++) {
             Properties prop = new Properties();
             prop.put("host", "localhost");
             prop.put("user", "postgres");
             prop.put("password", "123456");
             prop.put("database", "Project");
 
-            String file_path = "D:\\文件\\学习\\大二上\\数据库原理\\小组\\data\\user_generated_2.csv";
-            String[] queue = {"Long", "String", "String", "Date", "Int", "String", "String"};
+        String file_path = "source_file/user_generated.csv";
+        String[] queue = {"Long", "String", "String", "Date", "Int", "String", "String"};
             String sql = "insert into users(Mid,Name,Sex,Birthday,Level,Sign,identity) values(?,?,?,?,?,?,?)";
             Database database = new Database(prop);
 
             SimpleLoader loader = new SimpleLoader();
             System.out.println("USER导入......");
             loader.write_data(file_path, queue, database, sql, false, 1000000.0);
-        }
+
     }
 }
 

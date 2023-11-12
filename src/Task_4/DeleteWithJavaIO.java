@@ -5,8 +5,8 @@ import java.util.*;
 
 public class DeleteWithJavaIO {
     public static void main(String[] args) {
-        String inputCsvFile = "D:\\文件\\学习\\大二上\\数据库原理\\小组\\data\\users_generated-copy.csv"; // 原始 CSV 文件
-        String outputCsvFile = "D:\\文件\\学习\\大二上\\数据库原理\\小组\\data\\users_deleted.csv"; // 新的 CSV 文件
+        String inputCsvFile = "source_file/users_generated.csv"; // 原始 CSV 文件
+        String outputCsvFile = "source_file/users_deleted.csv"; // 新的 CSV 文件
         int linesToDelete = 100000; // 要删除的行数
         long startTime = System.currentTimeMillis();
         for (int i = 0; i < 10; i++) {

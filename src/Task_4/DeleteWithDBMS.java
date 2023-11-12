@@ -17,17 +17,14 @@ public class DeleteWithDBMS {
         prop.put("database", "Project");
 
         // 随机删除的行数
-        int rowsToDelete = 10000;
+        int rowsToDelete = 1000;
 
         Database database = new Database(prop);
-        for (int i = 0; i < 40; i++) {
-
-
+        for (int i = 0; i < 10; i++) {
             try {
                 long start = System.currentTimeMillis();
                 Connection connection = database.open();
                 connection.setAutoCommit(false); // 关闭自动提交
-
 
                 // 分页查询并批量删除
                 int pageSize = rowsToDelete / 5;
