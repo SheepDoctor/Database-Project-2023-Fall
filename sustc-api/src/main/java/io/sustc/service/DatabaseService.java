@@ -9,19 +9,19 @@ import java.util.List;
 public interface DatabaseService {
 
     /**
-     * Acknowledges the authors of this project.
+     * 确认此项目的作者。
      *
-     * @return a list of group members' student-id
+     * @return 小组成员的学生id列表
      */
     List<Integer> getGroupMembers();
 
     /**
-     * Imports data to an empty database.
-     * Invalid data will not be provided.
+     * 将数据导入到空数据库中。
+     * 不会提供无效数据。
      *
-     * @param danmuRecords danmu records parsed from csv
-     * @param userRecords  user records parsed from csv
-     * @param videoRecords video records parsed from csv
+     * @param danmuRecords 从csv解析的弹幕记录
+     * @param userRecords  从csv解析的用户记录
+     * @param videoRecords 从csv解析的视频记录
      */
     void importData(
             List<DanmuRecord> danmuRecords,
@@ -30,20 +30,19 @@ public interface DatabaseService {
     );
 
     /**
-     * Truncates all tables in the database.
+     * 截断数据库中的所有表。
      * <p>
-     * This would only be used in local benchmarking to help you
-     * clean the database without dropping it, and won't affect your score.
+     * 这将只在本地基准测试中使用，以帮助您清理数据库而不删除它，并且不会影响您的得分。
      */
     void truncate();
 
     /**
-     * Sums up two numbers via Postgres.
-     * This method only demonstrates how to access database via JDBC.
+     * 通过Postgres求两个数字的和。
+     * 此方法仅演示如何通过JDBC访问数据库。
      *
-     * @param a the first number
-     * @param b the second number
-     * @return the sum of two numbers
+     * @param a 第一个数字
+     * @param b 第二个数字
+     * @return 两个数字的和
      */
     Integer sum(int a, int b);
 }

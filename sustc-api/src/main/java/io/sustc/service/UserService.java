@@ -7,70 +7,70 @@ import io.sustc.dto.UserInfoResp;
 public interface UserService {
 
     /**
-     * Registers a new user.
-     * {@code password} is a mandatory field, while {@code qq} and {@code wechat} are optional
-     * <a href="https://openid.net/developers/how-connect-works/">OIDC</a> fields.
+     * 注册新用户。
+     * {@code password} 是必填字段，而 {@code qq} 和 {@code wechat} 是可选的
+     * <a href="https://openid.net/developers/how-connect-works/">OIDC</a> 字段。
      *
-     * @param req information of the new user
-     * @return the new user's {@code mid}
-     * @apiNote You may consider the following corner cases:
+     * @param req 新用户的信息
+     * @return 新用户的 {@code mid}
+     * @apiNote 您可能需要考虑以下边界情况：
      * <ul>
-     *   <li>{@code password} or {@code name} or {@code sex} in {@code req} is null or empty</li>
-     *   <li>{@code birthday} in {@code req} is valid (not null nor empty) while it's not a birthday (X月X日)</li>
-     *   <li>there is another user with same {@code name} or {@code qq} or {@code wechat} in {@code req}</li>
+     *   <li>{@code req} 中的 {@code password} 或 {@code name} 或 {@code sex} 为空或不存在</li>
+     *   <li>{@code req} 中的 {@code birthday} 有效（非空）但不是生日（X月X日）</li>
+     *   <li>存在另一个用户与 {@code req} 中的 {@code name} 或 {@code qq} 或 {@code wechat} 相同</li>
      * </ul>
-     * If any of the corner case happened, {@code -1} shall be returned.
+     * 如果发生任何边界情况，应返回 {@code -1}。
      */
     long register(RegisterUserReq req);
 
     /**
-     * Deletes a user.
+     * 删除用户。
      *
-     * @param auth indicates the current user
-     * @param mid  the user to be deleted
-     * @return operation success or not
-     * @apiNote You may consider the following corner cases:
+     * @param auth 表示当前用户
+     * @param mid  要删除的用户
+     * @return 操作是否成功
+     * @apiNote 您可能需要考虑以下边界情况：
      * <ul>
-     *   <li>cannot find a user corresponding to the {@code mid}</li>
-     *   <li>the {@code auth} is invalid
+     *   <li>找不到与 {@code mid} 对应的用户</li>
+     *   <li>{@code auth} 无效
      *     <ul>
-     *       <li>both {@code qq} and {@code wechat} are non-empty while they do not correspond to same user</li>
-     *       <li>{@code mid} is invalid while {@code qq} and {@code wechat} are both invalid (empty or not found)</li>
+     *       <li>{@code qq} 和 {@code wechat} 都非空但不对应同一用户</li>
+     *       <li>{@code mid} 无效，同时 {@code qq} 和 {@code wechat} 也无效（空或找不到）</li>
      *     </ul>
      *   </li>
-     *   <li>the current user is a regular user while the {@code mid} is not his/hers</li>
-     *   <li>the current user is a super user while the {@code mid} is neither a regular user's {@code mid} nor his/hers</li>
+     *   <li>当前用户是普通用户，但 {@code mid} 不是他/她的</li>
+     *   <li>当前用户是超级用户，但 {@code mid} 既不是普通用户的 {@code mid} 也不是他/她的</li>
      * </ul>
-     * If any of the corner case happened, {@code false} shall be returned.
+     * 如果发生任何边界情况，应返回 {@code false}。
      */
     boolean deleteAccount(AuthInfo auth, long mid);
 
     /**
-     * Follow the user with {@code mid}.
-     * If that user has already been followed, unfollow the user.
+     * 关注 {@code mid} 的用户。
+     * 如果该用户已经被关注，取消关注该用户。
      *
-     * @param auth        the authentication information of the follower
-     * @param followeeMid the user who will be followed
-     * @return the follow state after this operation
-     * @apiNote You may consider the following corner cases:
+     * @param auth        关注者的认证信息
+     * @param followeeMid 将被关注的用户
+     * @return 此操作后的关注状态
+     * @apiNote 您可能需要考虑以下边界情况：
      * <ul>
-     *   <li>{@code auth} is invalid, as stated in {@link io.sustc.service.UserService#deleteAccount(AuthInfo, long)}</li>
-     *   <li>cannot find a user corresponding to the {@code followeeMid}</li>
+     *   <li>{@code auth} 无效，如 {@link io.sustc.service.UserService#deleteAccount(AuthInfo, long)} 中所述</li>
+     *   <li>找不到与 {@code followeeMid} 对应的用户</li>
      * </ul>
-     * If any of the corner case happened, {@code false} shall be returned.
+     * 如果发生任何边界情况，应返回 {@code false}。
      */
     boolean follow(AuthInfo auth, long followeeMid);
 
     /**
-     * Gets the required information (in DTO) of a user.
+     * 获取用户的所需信息（以 DTO 形式）。
      *
-     * @param mid the user to be queried
-     * @return the personal information of given {@code mid}
-     * @apiNote You may consider the following corner cases:
+     * @param mid 要查询的用户
+     * @return 给定 {@code mid} 的个人信息
+     * @apiNote 您可能需要考虑以下边界情况：
      * <ul>
-     *   <li>cannot find a user corresponding to the {@code mid}</li>
+     *   <li>找不到与 {@code mid} 对应的用户</li>
      * </ul>
-     * If any of the corner case happened, {@code null} shall be returned.
+     * 如果发生任何边界情况，应返回 {@code null}。
      */
     UserInfoResp getUserInfo(long mid);
 }
