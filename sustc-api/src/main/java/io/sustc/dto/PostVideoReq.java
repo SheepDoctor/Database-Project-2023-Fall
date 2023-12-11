@@ -39,4 +39,45 @@ public class PostVideoReq {
      * update a video), this field should be ignored.
      */
     private Timestamp publicTime;
+
+    public String getTitle()
+    {
+        return title;
+    }
+
+    public String getDescription()
+    {
+        return description;
+    }
+
+    public long getDuration()
+    {
+        return duration;
+    }
+
+    public Timestamp getPublicTime()
+    {
+        return publicTime;
+    }
+
+    public void setTitle(String title)
+    {
+        this.title = title;
+    }
+
+    public void setDescription(String description)
+    {
+        this.description = description;
+    }
+
+    public void setDuration(long duration)
+    {
+        this.duration = duration;
+    }
+
+    public void setPublicTime(Timestamp publicTime)
+    {
+        this.publicTime = publicTime;
+    }
+
 }
