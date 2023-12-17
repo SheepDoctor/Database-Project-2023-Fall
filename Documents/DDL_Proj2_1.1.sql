@@ -12,7 +12,7 @@ create type gender_type as enum ('MALE', 'FEMALE', 'UNKNOWN');
 -- 创建一个表示用户的表 'users'
 create table users
 (
-    mid      bigint primary key, -- 用户的唯一识别号
+    mid      bigserial primary key, -- 用户的唯一识别号
     name     varchar(63),        -- 用户创建的名称
     sex      gender_type,        -- 性别，类型为 'gender_type' 枚举
     birthday date,               -- 用户的生日
@@ -46,7 +46,7 @@ create table videos
     owner_mid   bigint       not null, -- 视频所有者的用户ID
     commit_time timestamp    not null, -- 视频提交时间
     public_time timestamp    not null, -- 视频对外公开时间
-    duration    long         not null, -- 视频持续时间（秒）
+    duration    integer         not null, -- 视频持续时间（秒）
     description text,                  -- 视频简短介绍
     check ( bv like 'BV%')             -- 确保 'bv' 字段以 'BV' 开头
 );
