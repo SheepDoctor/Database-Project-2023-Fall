@@ -14,6 +14,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 
 /**
@@ -56,19 +57,120 @@ public class DatabaseServiceImpl implements DatabaseService
             List<VideoRecord> videoRecords
     )
     {
-        throw new UnsupportedOperationException("TODO: implement your import logic");
+        importDanmu(danmuRecords);
+        //throw new UnsupportedOperationException("TODO: implement your import logic");
     }
 
-    /*
+    private void importDanmu(List<DanmuRecord> danmuRecords)
+    {
+        String sqlImportDanmu = "INSERT INTO danmu (bv, mid, time, content, post_time) VALUES (?, ?, ?, ?, ?) returning id";
+        final int batchSize = 500; // 每批处理的记录数
+        int count = 0;
+
+        //插入所有的弹幕
+        try (Connection conn = dataSource.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sqlImportDanmu))
+        {
+            for (DanmuRecord record : danmuRecords)
+            {
+                stmt.setString(1, record.getBv());
+                stmt.setLong(2, record.getMid());
+                stmt.setFloat(3, record.getTime());
+                stmt.setString(4, record.getContent());
+                stmt.setTimestamp(5, record.getPostTime());
+
+                ResultSet resultSet = stmt.executeQuery(); // 返回一个自增主键
+                resultSet.next();
+                long current = resultSet.getLong(1);
+
+
+                String sqlImportDanmuLikedBy = "insert into danmu_likes (id, mid) values (?, ?)";
+                for (Long id : record.getLikedBy())
+                {
+                    try(PreparedStatement statement=conn.prepareStatement(sqlImportDanmuLikedBy)){
+
+                    }
+                }
+
+                stmt.addBatch(); // 将当前设置的参数添加到此 PreparedStatement 对象的批处理中
+                if (++count % batchSize == 0)
+                {
+                    stmt.executeBatch(); // 执行批量插入
+                    stmt.clearBatch(); // 清除当前批处理
+                }
+            }
+
+            stmt.executeBatch(); // 插入剩余的记录
+            conn.commit(); // 提交事务
+        }
+        catch (SQLException e)
+        {
+            throw new RuntimeException(e);
+        }
+
+        //查询对应弹幕的id
+        HashMap<DanmuRecord, Long> hashMap = new HashMap<>();
+        count = 0;
+        sqlImportDanmu = "select id from danmu where mid = ? and post_time = ? ";
+        try (Connection conn = dataSource.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sqlImportDanmu))
+        {
+            for (DanmuRecord record : danmuRecords)
+            {
+                stmt.setString(1, record.getBv());
+                stmt.setTimestamp(2, record.getPostTime());
+                ResultSet resultSet = stmt.executeQuery();
+                if (resultSet.next())
+                {
+                    hashMap.put(record, resultSet.getLong("id"));
+                }
+            }
+        }
+        catch (SQLException e)
+        {
+            throw new RuntimeException(e);
+        }
+
+        //导入用户喜欢弹幕的数据
+        sqlImportDanmu = "INSERT INTO danmu_likes (id, mid) VALUES (?, ?)";
+        try (Connection conn = dataSource.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sqlImportDanmu))
+        {
+            for (DanmuRecord danmuRecord : danmuRecords)
+            {
+                long id = hashMap.get(danmuRecord);
+                for (long mid :
+                        danmuRecord.getLikedBy())
+                {
+                    stmt.setLong(1, id);
+                    stmt.setLong(2, mid);
+                    stmt.addBatch(); // 将当前设置的参数添加到此 PreparedStatement 对象的批处理中
+                    if (++count % batchSize == 0)
+                    {
+                        stmt.executeBatch(); // 执行批量插入
+                        stmt.clearBatch(); // 清除当前批处理
+                    }
+                }
+                stmt.executeBatch(); // 执行批量插入
+                stmt.clearBatch(); // 清除当前批处理
+            }
+        }
+        catch (SQLException e)
+        {
+            throw new RuntimeException(e);
+        }
+    }
+
+    /**
      * The following code is just a quick example of using jdbc datasource.
      * Practically, the code interacts with database is usually written in a DAO layer.
-     *
+     * <p>
      * Reference: [Data Access Object pattern](https://www.baeldung.com/java-dao-pattern)
-     */
-    /*
+     * <p>
+     * <p>
      * 以下代码只是使用 jdbc 数据源的快速示例。
      * 实际上，与数据库交互的代码通常写在DAO层中。
-     *
+     * <p>
      * 参考：[数据访问对象模式](https://www.baeldung.com/java-dao-pattern)
      */
 

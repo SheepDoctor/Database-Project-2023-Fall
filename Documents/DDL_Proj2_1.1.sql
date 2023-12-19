@@ -13,16 +13,16 @@ create type gender_type as enum ('MALE', 'FEMALE', 'UNKNOWN');
 create table users
 (
     mid      bigserial primary key, -- 用户的唯一识别号
-    name     varchar(63),        -- 用户创建的名称
-    sex      gender_type,        -- 性别，类型为 'gender_type' 枚举
-    birthday date,               -- 用户的生日
-    level    int,                -- 用户参与度的等级
-    sign     text,               -- 用户创建的个人描述
-    identity identity_type,      -- 用户角色的值（'user', 'superuser'）
-    qq       varchar(10),        -- QQ号，最长10位
-    wechat   varchar(20),        -- 微信号，最长20位
-    password varchar(63),        -- 登录密码，最长63位
-    coin     int                 -- 用户拥有的硬币数量
+    name     varchar(63),           -- 用户创建的名称
+    sex      gender_type,           -- 性别，类型为 'gender_type' 枚举
+    birthday date,                  -- 用户的生日
+    level    int,                   -- 用户参与度的等级
+    sign     text,                  -- 用户创建的个人描述
+    identity identity_type,         -- 用户角色的值（'user', 'superuser'）
+    qq       varchar(10) unique,    -- QQ号，最长10位
+    wechat   varchar(20) unique,    -- 微信号，最长20位
+    password varchar(63),           -- 登录密码，最长63位
+    coin     int default (0)        -- 用户拥有的硬币数量
 );
 
 
@@ -46,7 +46,7 @@ create table videos
     owner_mid   bigint       not null, -- 视频所有者的用户ID
     commit_time timestamp    not null, -- 视频提交时间
     public_time timestamp    not null, -- 视频对外公开时间
-    duration    integer         not null, -- 视频持续时间（秒）
+    duration    integer      not null, -- 视频持续时间（秒）
     description text,                  -- 视频简短介绍
     check ( bv like 'BV%')             -- 确保 'bv' 字段以 'BV' 开头
 );
@@ -73,23 +73,20 @@ create table danmu
     time      int  not null,                  -- 自视频开始以来弹幕显示的时间（秒）
     content   text not null,                  -- 弹幕的内容
     post_time timestamp,                      -- 弹幕的发布时间
-    id        SERIAL PRIMARY KEY,             -- 弹幕的唯一标识符
+    id        BIGSERIAL PRIMARY KEY,          -- 弹幕的唯一标识符
     foreign key (bv) references videos (bv),  -- 引用 'videos' 表的 'bv'
     foreign key (mid) references users (mid), -- 引用 'users' 表的 'mid'
     check ( bv like 'BV%')
 );
 
--- 创建一个表 'danmu_likes'，用于存储对弹幕的点赞信息
+-- 创建一个表 'danmu_likes'，用于存储用户对弹幕的点赞信息
 create table danmu_likes
 (
     id  int,                                  -- 弹幕的唯一标识符
-    bv  char(12),                             -- 弹幕所属视频的BV
     mid bigint,                               -- 点赞用户的ID
-    primary key (bv, mid, id),                -- 主键为视频BV、用户ID和弹幕ID的组合
-    foreign key (bv) references videos (bv),  -- 引用 'videos' 表的 'bv'
+    primary key (mid, id),                    -- 主键为用户ID和弹幕ID的组合
     foreign key (mid) references users (mid), -- 引用 'users' 表的 'mid'
-    foreign key (id) references danmu (id),   -- 引用 'danmu' 表的 'id'
-    check ( bv like 'BV%')
+    foreign key (id) references danmu (id)    -- 引用 'danmu' 表的 'id'
 );
 
 
