@@ -3,6 +3,7 @@ package io.sustc.service;
 import io.sustc.dto.AuthInfo;
 import io.sustc.dto.PostVideoReq;
 
+import java.sql.SQLException;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Set;
@@ -46,7 +47,7 @@ public interface VideoService {
      * </ul>
      * 如果出现任何边界情况，应该返回 {@code false}。
      */
-    boolean deleteVideo(AuthInfo auth, String bv);
+    boolean deleteVideo(AuthInfo auth, String bv) throws SQLException;
 
     /**
      * 更新视频信息。

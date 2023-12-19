@@ -4,6 +4,7 @@ import io.sustc.dto.AuthInfo;
 import io.sustc.dto.PostVideoReq;
 import io.sustc.dto.VideoRecord;
 import io.sustc.service.VideoService;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.sql.DataSource;
 import java.sql.*;
@@ -13,6 +14,7 @@ import java.util.Set;
 
 public class VideoServiceImp implements VideoService
 {
+    @Autowired
     private DataSource dataSource;
 
     public String postVideo(AuthInfo auth, PostVideoReq req)
@@ -63,12 +65,63 @@ public class VideoServiceImp implements VideoService
     @Override
     public boolean deleteVideo(AuthInfo auth, String bv)
     {
-        return false;
+        try
+        {
+            Connection conn = dataSource.getConnection();
+            // 查询auth相关信息
+            String select_user_info = "select identity from users where mid = " + auth.getMid();
+            PreparedStatement select_user_info_stmt = conn.prepareStatement(select_user_info);
+            ResultSet user_info = select_user_info_stmt.executeQuery();
+            // 判断是否是superuser
+            if (user_info.next() && user_info.getString("identity") == "superuser")
+            {
+                String sql = "delete from videos where bv =" + bv;
+                PreparedStatement stmt = conn.prepareStatement(sql);
+                return stmt.executeUpdate() != -1;
+            }
+
+            // 判断是否是视频的上传者
+            String select_video = "select owener_id from videos where bv = " + bv;
+            PreparedStatement select_video_stmt = conn.prepareStatement(select_video);
+            ResultSet video_info = select_video_stmt.executeQuery();
+            if (video_info.next() && video_info.getLong("owener_id") == auth.getMid())
+            {
+                String sql = "delete from videos where bv =" + bv;
+                PreparedStatement stmt = conn.prepareStatement(sql);
+                return stmt.executeUpdate() != -1;
+            }
+            return false;
+        }
+        catch (SQLException e)
+        {
+            System.out.println("VideoService deleteVideo: " + e);
+            return false;
+        }
     }
 
     @Override
     public boolean updateVideoInfo(AuthInfo auth, String bv, PostVideoReq req)
     {
+        try
+        {
+            Connection conn = dataSource.getConnection();
+            // 获取此视频信息
+            String select_video = "select * from videos where bv = " + bv;
+            PreparedStatement select_video_stmt = conn.prepareStatement(select_video);
+            ResultSet video_info = select_video_stmt.executeQuery();
+            // 验证更改者信息
+            if (video_info.getLong("owener_id") == auth.getMid())
+                return false;
+            //验证视频时长有无修改
+            if (video_info.getLong("duration") != req.getDuration())
+                return false;
+            //todo
+            return false;
+        }
+        catch (SQLException e)
+        {
+
+        }
         return false;
     }
 
