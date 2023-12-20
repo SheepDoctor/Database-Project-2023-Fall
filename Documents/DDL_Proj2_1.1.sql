@@ -140,7 +140,7 @@ create table view
 (
     bv   char(12),                            -- 观看的视频的唯一标识符 (BV号)。
     mid  bigint,                              -- 观看视频的用户的唯一识别号 (mid)。
-    time timestamp not null,                  -- 最后一次观看视频的时间戳。
+    time float not null,                  -- 最后一次观看视频的时间戳。
     primary key (bv, mid),                    -- 将 'bv' 和 'mid' 组合作为主键，确保唯一性。
     foreign key (bv) references videos (bv),  -- 'bv' 是视频表的外键。
     foreign key (mid) references users (mid), -- 'mid' 是用户表的外键。
