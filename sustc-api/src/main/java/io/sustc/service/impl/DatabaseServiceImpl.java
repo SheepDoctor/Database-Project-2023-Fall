@@ -63,7 +63,7 @@ public class DatabaseServiceImpl implements DatabaseService
     {
         String sqlImportDanmu = "INSERT INTO danmu (bv, mid, time, content, post_time) VALUES (?, ?, ?, ?, ?) returning id";
         final int batchSize = 500; // 每批处理的记录数
-        int count = 0;
+        long count = 0;
 
         //插入所有的弹幕
         try (Connection conn = dataSource.getConnection();
@@ -85,22 +85,22 @@ public class DatabaseServiceImpl implements DatabaseService
                 String sqlImportDanmuLikedBy = "insert into danmu_likes (id, mid) values (?, ?)";
                 try (PreparedStatement statement = conn.prepareStatement(sqlImportDanmuLikedBy))
                 {
-                    for (Long id : record.getLikedBy())
-                    {
-                        statement.setLong(1, current);
-                        statement.setLong(2, id);
-                        statement.addBatch(); // 将当前设置的参数添加到此 PreparedStatement 对象的批处理中
-                        if (++count % batchSize == 0)
+                    if (record.getLikedBy() != null)
+                        for (Long id : record.getLikedBy())
                         {
-                            statement.executeBatch(); // 执行批量插入
-                            statement.clearBatch(); // 清除当前批处理
+                            statement.setLong(1, current);
+                            statement.setLong(2, id);
+                            statement.addBatch(); // 将当前设置的参数添加到此 PreparedStatement 对象的批处理中
+                            if (++count % batchSize == 0)
+                            {
+                                statement.executeBatch(); // 执行批量插入
+                                statement.clearBatch(); // 清除当前批处理
+                            }
                         }
-                    }
                     statement.executeBatch(); // 插入剩余的记录
                     statement.clearBatch();
                 }
             }
-            conn.commit(); // 提交事务
         }
         catch (SQLException e)
         {
@@ -111,7 +111,7 @@ public class DatabaseServiceImpl implements DatabaseService
     private void importUser(List<UserRecord> userRecords)
     {
         String sqlImportUsers = "INSERT INTO users (mid, name, sex, birthday, level, coin, sign, identity, password, qq, wechat) " +
-                "VALUES (?, ?, ? , ?, ?, ?, ?, ?, ?, ?, ?);";
+                "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);";
         final int batchSize = 500; // 每批处理的记录数
         long count = 0;
 
@@ -132,6 +132,7 @@ public class DatabaseServiceImpl implements DatabaseService
                 stmt.setString(9, record.getPassword());
                 stmt.setString(10, record.getQq());
                 stmt.setString(11, record.getWechat());
+                log.info("SQL: {}", stmt);
 
                 if (++count % batchSize == 0)
                 {
@@ -148,6 +149,7 @@ public class DatabaseServiceImpl implements DatabaseService
             throw new RuntimeException(e);
         }
 
+        count = 0;
         String sqlImportUserFollowing = "insert into user_follow (follow_mid, follow_by_mid) values (?, ?);";
         try (Connection conn = dataSource.getConnection();
              PreparedStatement statement = conn.prepareStatement(sqlImportUserFollowing))
@@ -159,6 +161,7 @@ public class DatabaseServiceImpl implements DatabaseService
                     statement.setLong(1, record.getMid());
                     statement.setLong(2, followingMid);
                     statement.addBatch(); // 将当前设置的参数添加到此 PreparedStatement 对象的批处理中
+                    log.info("SQL: {}", statement);
                     if (++count % batchSize == 0)
                     {
                         statement.executeBatch(); // 执行批量插入
@@ -167,7 +170,7 @@ public class DatabaseServiceImpl implements DatabaseService
                 }
             }
             //statement.executeBatch(); // 执行批量插入
-            //statement.clearBatch(); // 清除当前批处理
+            statement.clearBatch(); // 清除当前批处理
         }
         catch (SQLException e)
         {
@@ -183,7 +186,7 @@ public class DatabaseServiceImpl implements DatabaseService
 
         // 插入所有的视频
         String sqlImportVideo = "INSERT INTO videos (bv, title, owner_mid, commit_time, public_time, duration, description) " +
-                "VALUES (?, ?, ?, ?, ?, ?);";
+                "VALUES (?, ?, ?, ?, ?, ?, ?);";
         String sqlImportReview = "Insert into review (bv, reviewer_mid, review_time) values (?, ?, ?)";
         String sqlImportView = "Insert into view (bv, mid, time) values (?, ?, ?)";
 
@@ -205,6 +208,7 @@ public class DatabaseServiceImpl implements DatabaseService
                 statementVideo.setString(7, record.getDescription());
 
                 statementVideo.addBatch();
+                log.info("SQL: {}", statementVideo);
                 // 执行批量插入
                 if (++count % batchSize == 0)
                 {
@@ -219,12 +223,13 @@ public class DatabaseServiceImpl implements DatabaseService
             count = 0;
             for (VideoRecord record : videoRecords)
             {
-                if (record.getReviewer() != null)
+                if (record.getReviewer() != null && record.getReviewTime() != null)
                 {
                     statementReview.setString(1, record.getBv());
                     statementReview.setLong(2, record.getOwnerMid());
                     statementReview.setTimestamp(3, record.getReviewTime());
                     statementReview.addBatch();
+                    log.info("SQL: {}", statementReview);
                     if (++count % batchSize == 0)
                     {
                         statementReview.executeBatch();
@@ -243,18 +248,20 @@ public class DatabaseServiceImpl implements DatabaseService
             //导入观看记录
             for (VideoRecord record : videoRecords)
             {
-                for (int i = 0; i < record.getViewerMids().length; i++)
-                {
-                    statementView.setString(1, record.getBv());
-                    statementView.setLong(2, record.getViewerMids()[i]);
-                    statementView.setFloat(3, record.getViewTime()[i]);
-                    statementView.addBatch();
-                    if (++count % batchSize == 0)
+                if (record.getViewerMids() != null)
+                    for (int i = 0; i < record.getViewerMids().length; i++)
                     {
-                        statementView.executeBatch();
-                        statementView.clearBatch();
+                        statementView.setString(1, record.getBv());
+                        statementView.setLong(2, record.getViewerMids()[i]);
+                        statementView.setFloat(3, record.getViewTime()[i]);
+                        statementView.addBatch();
+                        log.info("SQL: {}", statementView);
+                        if (++count % batchSize == 0)
+                        {
+                            statementView.executeBatch();
+                            statementView.clearBatch();
+                        }
                     }
-                }
             }
             statementView.executeBatch();
             statementView.clearBatch();
@@ -286,6 +293,7 @@ public class DatabaseServiceImpl implements DatabaseService
                 statement.setLong(2, id);
             }
             statement.addBatch();
+            log.info("SQL: {}", statement);
             if (++count % batchSize == 0)
             {
                 statement.executeBatch();
