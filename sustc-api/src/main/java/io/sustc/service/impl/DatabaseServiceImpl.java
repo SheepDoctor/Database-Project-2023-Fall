@@ -9,12 +9,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.sql.DataSource;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
 
 /**
@@ -57,7 +53,9 @@ public class DatabaseServiceImpl implements DatabaseService
             List<VideoRecord> videoRecords
     )
     {
+        importUser(userRecords);
         importDanmu(danmuRecords);
+        importVideo(videoRecords);
         //throw new UnsupportedOperationException("TODO: implement your import logic");
     }
 
@@ -85,80 +83,133 @@ public class DatabaseServiceImpl implements DatabaseService
 
 
                 String sqlImportDanmuLikedBy = "insert into danmu_likes (id, mid) values (?, ?)";
-                for (Long id : record.getLikedBy())
+                try (PreparedStatement statement = conn.prepareStatement(sqlImportDanmuLikedBy))
                 {
-                    try(PreparedStatement statement=conn.prepareStatement(sqlImportDanmuLikedBy)){
-
+                    for (Long id : record.getLikedBy())
+                    {
+                        statement.setLong(1, current);
+                        statement.setLong(2, id);
+                        statement.addBatch(); // 将当前设置的参数添加到此 PreparedStatement 对象的批处理中
+                        if (++count % batchSize == 0)
+                        {
+                            statement.executeBatch(); // 执行批量插入
+                            statement.clearBatch(); // 清除当前批处理
+                        }
                     }
-                }
-
-                stmt.addBatch(); // 将当前设置的参数添加到此 PreparedStatement 对象的批处理中
-                if (++count % batchSize == 0)
-                {
-                    stmt.executeBatch(); // 执行批量插入
-                    stmt.clearBatch(); // 清除当前批处理
+                    statement.executeBatch(); // 插入剩余的记录
+                    statement.clearBatch();
                 }
             }
-
-            stmt.executeBatch(); // 插入剩余的记录
             conn.commit(); // 提交事务
         }
         catch (SQLException e)
         {
             throw new RuntimeException(e);
         }
+    }
 
-        //查询对应弹幕的id
-        HashMap<DanmuRecord, Long> hashMap = new HashMap<>();
-        count = 0;
-        sqlImportDanmu = "select id from danmu where mid = ? and post_time = ? ";
+    private void importUser(List<UserRecord> userRecords)
+    {
+        String sqlImportDanmu = "INSERT INTO users (mid, name, sex, birthday, level, coin, sign, identity, password, qq, wechat) " +
+                "VALUES (?, ?, CAST( ? AS gender_type), ?, ?, ?, ?, ?, ?, ?, ?);";
+        final int batchSize = 500; // 每批处理的记录数
+        long count = 0;
+
+        //插入所有的用户
         try (Connection conn = dataSource.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sqlImportDanmu))
         {
-            for (DanmuRecord record : danmuRecords)
+            for (UserRecord record : userRecords)
             {
-                stmt.setString(1, record.getBv());
-                stmt.setTimestamp(2, record.getPostTime());
-                ResultSet resultSet = stmt.executeQuery();
-                if (resultSet.next())
-                {
-                    hashMap.put(record, resultSet.getLong("id"));
-                }
+                stmt.setLong(1, record.getMid());
+                stmt.setString(2, record.getName());
+                stmt.setString(3, record.getSex());
+                stmt.setDate(4, java.sql.Date.valueOf(record.getBirthday()));
+                stmt.setShort(5, record.getLevel());
+                stmt.setInt(6, record.getCoin());
+                stmt.setString(7, record.getSign());
+                stmt.setString(8, record.getIdentity().name());
+                stmt.setString(9, record.getPassword());
+                stmt.setString(10, record.getQq());
+                stmt.setString(11, record.getWechat());
+                stmt.executeBatch(); // 先插入该记录，因为被关注表有外键约束
+
+                //插入到关注表
             }
-        }
-        catch (SQLException e)
-        {
-            throw new RuntimeException(e);
-        }
-
-        //导入用户喜欢弹幕的数据
-        sqlImportDanmu = "INSERT INTO danmu_likes (id, mid) VALUES (?, ?)";
-        try (Connection conn = dataSource.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sqlImportDanmu))
-        {
-            for (DanmuRecord danmuRecord : danmuRecords)
+            String sqlImportUserFollowing = "insert into user_follow (follow_mid, follow_by_mid) values (?, ?);";
+            try (PreparedStatement statement = conn.prepareStatement(sqlImportUserFollowing))
             {
-                long id = hashMap.get(danmuRecord);
-                for (long mid :
-                        danmuRecord.getLikedBy())
+                for (UserRecord record : userRecords)
                 {
-                    stmt.setLong(1, id);
-                    stmt.setLong(2, mid);
-                    stmt.addBatch(); // 将当前设置的参数添加到此 PreparedStatement 对象的批处理中
-                    if (++count % batchSize == 0)
+                    for (long followingMid : record.getFollowing())
                     {
-                        stmt.executeBatch(); // 执行批量插入
-                        stmt.clearBatch(); // 清除当前批处理
+                        statement.setLong(1, record.getMid());
+                        statement.setLong(2, followingMid);
+                        statement.addBatch(); // 将当前设置的参数添加到此 PreparedStatement 对象的批处理中
+                        if (++count % batchSize == 0)
+                        {
+                            statement.executeBatch(); // 执行批量插入
+                            statement.clearBatch(); // 清除当前批处理
+                        }
                     }
                 }
-                stmt.executeBatch(); // 执行批量插入
-                stmt.clearBatch(); // 清除当前批处理
+                statement.executeBatch(); // 执行批量插入
+                statement.clearBatch(); // 清除当前批处理
             }
         }
         catch (SQLException e)
         {
+            e.printStackTrace();
             throw new RuntimeException(e);
         }
+    }
+
+    private void importVideo(List<VideoRecord> videoRecords)
+    {
+        final int batchSize = 500; // 每批处理的记录数
+        long count = 0;
+
+        // 插入所有的视频
+        String sqlImportVideo = "INSERT INTO videos (bv, title, owner_mid, commit_time, public_time, duration, description) " +
+                "VALUES (?, ?, ?, ?, ?, ?);";
+
+        try (Connection conn = dataSource.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sqlImportVideo))
+        {
+
+            for (VideoRecord record : videoRecords)
+            {
+                stmt.setString(1, record.getBv());
+                stmt.setString(2, record.getTitle());
+                stmt.setLong(3, record.getOwnerMid());
+                stmt.setTimestamp(4, record.getCommitTime());
+                stmt.setTimestamp(6, record.getPublicTime());
+                stmt.setFloat(8, record.getDuration());
+                stmt.setString(9, record.getDescription());
+                stmt.setObject(10, record.getReviewer());
+
+                stmt.addBatch();
+
+                // 执行批量插入
+                if (++count % batchSize == 0)
+                {
+                    stmt.executeBatch();
+                    stmt.clearBatch();
+                }
+            }
+            stmt.executeBatch();
+            conn.commit();
+        }
+        catch (SQLException e)
+        {
+            e.printStackTrace();
+            throw new RuntimeException(e);
+        }
+
+        // 接下来可以添加类似的逻辑，来插入点赞、投币、收藏和观看记录
+        // 例如，插入点赞记录的伪代码:
+        // String sqlInsertLike = "INSERT INTO video_likes (bv, mid) VALUES (?, ?);";
+        // ...
     }
 
     /**
@@ -182,18 +233,20 @@ public class DatabaseServiceImpl implements DatabaseService
         // 在大多数情况下，您可以使用我们提供的默认截断脚本、
         // 但如果它不能正常工作，您可能需要修改它。
 
-        String sql = "DO $$\n" +
-                "DECLARE\n" +
-                "    tables CURSOR FOR\n" +
-                "        SELECT tablename\n" +
-                "        FROM pg_tables\n" +
-                "        WHERE schemaname = 'public';\n" +
-                "BEGIN\n" +
-                "    FOR t IN tables\n" +
-                "    LOOP\n" +
-                "        EXECUTE 'TRUNCATE TABLE ' || QUOTE_IDENT(t.tablename) || ' CASCADE;';\n" +
-                "    END LOOP;\n" +
-                "END $$;\n";
+        String sql = """
+                DO $$
+                DECLARE
+                    tables CURSOR FOR
+                        SELECT tablename
+                        FROM pg_tables
+                        WHERE schemaname = 'public';
+                BEGIN
+                    FOR t IN tables
+                    LOOP
+                        EXECUTE 'TRUNCATE TABLE ' || QUOTE_IDENT(t.tablename) || ' CASCADE;';
+                    END LOOP;
+                END $$;
+                """;
 
         try (Connection conn = dataSource.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql))
