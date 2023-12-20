@@ -44,7 +44,7 @@ create table videos
     title       varchar(255) not null, -- 视频标题
     owner_mid   bigint       not null, -- 视频所有者的用户ID
     commit_time timestamp    not null, -- 视频提交时间
-    public_time timestamp    not null, -- 视频对外公开时间
+    public_time timestamp    , -- 视频对外公开时间
     duration    integer      not null, -- 视频持续时间（秒）
     description text,                  -- 视频简短介绍
     check ( bv like 'BV%')             -- 确保 'bv' 字段以 'BV' 开头
