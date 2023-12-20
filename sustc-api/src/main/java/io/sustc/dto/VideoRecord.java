@@ -1,10 +1,16 @@
 package io.sustc.dto;
 
 import lombok.Data;
+
+import java.io.Serializable;
 import java.sql.Timestamp;
 
+/**
+ * The video record used for data import
+ * @implNote You may implement your own {@link java.lang.Object#toString()} since the default one in {@link lombok.Data} prints all array values.
+ */
 @Data
-public class VideoRecord {
+public class VideoRecord implements Serializable {
 
     /**
      * The BV code of this video
@@ -80,12 +86,4 @@ public class VideoRecord {
      * The watch durations in seconds for the viewers {@code viewerMids}
      */
     private float[] viewTime;
-
-    static private long av;
-
-    public static long getav()
-    {
-        av++;
-        return av;
-    }
 }

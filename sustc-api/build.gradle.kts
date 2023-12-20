@@ -12,7 +12,6 @@ plugins {
 
 dependencies {
     implementation("org.springframework.boot:spring-boot-starter-jdbc")
-//    implementation("com.alibaba:druid:1.2.16")
     compileOnly("com.opencsv:opencsv:5.8")
 
     // You may add any utility library you want to use, such as guava.

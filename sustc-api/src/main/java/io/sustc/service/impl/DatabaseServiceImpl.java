@@ -320,9 +320,10 @@ public class DatabaseServiceImpl implements DatabaseService
     @Override
     public void truncate()
     {
+
         // You can use the default truncate script provided by us in most cases,
         // but if it doesn't work properly, you may need to modify it.
-        // 在大多数情况下，您可以使用我们提供的默认截断脚本、
+        // 在大多数情况下，您可以使用我们提供的默认截断脚本、、、、
         // 但如果它不能正常工作，您可能需要修改它。
 
         String sql = """
