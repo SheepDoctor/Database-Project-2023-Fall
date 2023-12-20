@@ -1,17 +1,14 @@
 package io.sustc.service.impl;
 
 import io.sustc.dto.AuthInfo;
-import io.sustc.dto.DanmuRecord;
-import io.sustc.dto.VideoRecord;
+
 import io.sustc.service.DanmuService;
-import io.sustc.service.UserService;
+
 import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.sql.DataSource;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
-import java.sql.Time;
+import java.math.BigDecimal;
+import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -28,24 +25,35 @@ class DanmuServiceImpl implements DanmuService
         try (Connection connection = dataSource.getConnection())
         {
             // 执行数据库操作，使用connection对象
-            String query1 = "SELECT * FROM videos WHERE bv = ?";
+            String query1 = "SELECT * FROM videos WHERE bv = ?;";
             PreparedStatement query = connection.prepareStatement(query1);
             query.setString(1, bv);
-            VideoRecord videoRecord = (VideoRecord) query.executeQuery(query1);
+            ResultSet videoRecord = query.executeQuery();
             if (videoRecord == null)
                 return -1;
-            boolean flag = false;
-            for (int i = 0; i < videoRecord.getViewerMids().length; i++)
-                if (videoRecord.getViewerMids()[i] == Long.parseLong(bv))
-                    flag = true;
-            if (!flag)
+            if (content.equals(" ")|content==null)
                 return -1;
-            String update1 = "INSERT INTO DANMU(BV,MID,TIME) values(?,?,?)";
-            PreparedStatement update = connection.prepareStatement(update1);
-            update.setString(1, bv);
-            update.setLong(2, auth.getMid());
-            update.setTime(3, new Time((long) time));
-
+            if (videoRecord.getTime("public_time")==null)
+                return  -1;
+            String query2 = "SELECT * FROM view WHERE bv = ?;";
+            PreparedStatement query2_= connection.prepareStatement(query2);
+            query2_.setString(1,bv);
+            ResultSet viewerRecord=query2_.executeQuery();
+            if (viewerRecord==null)
+                return -1;
+            String query3= "INSERT INTO danmu(BV,MID,TIME,CONTENT,POST_TIME,ID) VALUE (?,?,?,?,?,?);";
+            String query4="SELECT COUNT(*) FROM danmu;";
+            PreparedStatement query4_=connection.prepareStatement(query4);
+            PreparedStatement query3_=connection.prepareStatement(query3);
+            ResultSet q4=query4_.executeQuery();
+            query4_.execute();
+            query3_.setString(1,bv);
+            query3_.setLong(2,auth.getMid());
+            query3_.setTime(3,new Time((long) time));
+            query3_.setString(4,content);
+            query3_.setTime(5,new Time(System.currentTimeMillis()));
+            query3_.setBigDecimal(6, BigDecimal.valueOf(q4.getInt(1)));
+            query3_.executeUpdate();
         }
         catch (SQLException e)
         {
@@ -57,27 +65,48 @@ class DanmuServiceImpl implements DanmuService
     public List<Long> displayDanmu(String bv, float timeStart, float timeEnd, boolean filter)
     {
         List<Long> res = new ArrayList<>();
-        if (timeEnd < timeEnd | timeEnd < 0 | timeStart < 0)
+        if (timeEnd <= timeEnd | timeEnd < 0 | timeStart < 0)
             return null;
         try (Connection connection = dataSource.getConnection())
         {
-            String query1 = "SELECT * FROM videos WHERE bv = ?";
+            String query1 = "SELECT * FROM videos WHERE bv = ?;";
             PreparedStatement query = connection.prepareStatement(query1);
             query.setString(1, bv);
-            VideoRecord videoRecord = (VideoRecord) query.executeQuery(query1);
+            ResultSet videoRecord=query.executeQuery();
             if (videoRecord == null)
                 return null;
-            if (videoRecord.getPublicTime().after(new Time(System.currentTimeMillis())))
+            if (videoRecord.getTime("commit_time")==null)
                 return null;
-            if (timeEnd > videoRecord.getDuration())
+            if (timeEnd > videoRecord.getInt("duration"))
                 return null;
-            String query2 = "SELECT * FROM danmu WHERE bv = ? and time between ? and ?";
+            String query2 = "SELECT * FROM danmu WHERE bv = ? and time between ? and ?;";
             PreparedStatement query2_ = connection.prepareStatement(query2);
             query2_.setString(1, bv);
             query2_.setTime(2, new Time((long) timeStart));
             query2_.setTime(3, new Time((long) timeEnd));
-            DanmuRecord danmuRecord = (DanmuRecord) query2_.executeQuery();
-            res.add(danmuRecord.getMid());
+            ResultSet danmuRecord=query2_.executeQuery();
+            danmuRecord.last();
+            int rows=danmuRecord.getRow();
+            danmuRecord.first();
+            for (int i=0;i<rows;i++){
+                boolean flag=true;
+                if (filter){
+                    String cur_content=danmuRecord.getString("content");
+                    danmuRecord.first();
+                    for (int j=0;j<=i;j++){
+                        if (j!=i){
+                            if (danmuRecord.getString("content").equals(cur_content)) {
+                                flag = false;
+                                break;
+                            }
+                        }
+                        danmuRecord.next();
+                    }
+                }
+                if (flag)
+                    res.add(danmuRecord.getTime("time").getTime());
+                danmuRecord.next();
+            }
         }
         catch (SQLException e)
         {
@@ -88,53 +117,45 @@ class DanmuServiceImpl implements DanmuService
 
     public boolean likeDanmu(AuthInfo auth, long id)
     {
-        boolean res = false;
         try (Connection connection = dataSource.getConnection())
         {
             String query1 = "SELECT * FROM users WHERE bv = ?";
             PreparedStatement query = connection.prepareStatement(query1);
             query.setLong(1, auth.getMid());
-            UserService userService = (UserService) query.executeQuery(query1);
+            ResultSet userService=query.executeQuery();
             if (userService == null)
                 return false;
             String query2 = "SELECT * FROM danmu WHERE id = ? ";
             PreparedStatement query2_ = connection.prepareStatement(query2);
             query2_.setLong(1, id);
-            DanmuRecord danmuRecord = (DanmuRecord) query2_.executeQuery();
+            ResultSet danmuRecord=query2_.executeQuery();
             if (danmuRecord == null)
                 return false;
-            int index = 0;
-            for (int i = 0; i < danmuRecord.getLikedBy().length; i++)
-            {
-                index = i;
-                if (danmuRecord.getLikedBy()[i] == auth.getMid())
-                {
-                    res = false;
-                    break;
-                }
-                if (danmuRecord.getLikedBy()[i] == 0)
-                {
-                    res = true;
-                    break;
-                }
+            String q3="SELECT * FROM danmu_likes where id=? and mid =?";
+            PreparedStatement q3_=connection.prepareStatement(q3);
+            q3_.setLong(1,id);
+            q3_.setLong(2,auth.getMid());
+            ResultSet resultSet3=q3_.executeQuery();
+            if (resultSet3==null){
+                String up="INSERT INTO danmu_likes(id,mid) value(?,?);";
+                PreparedStatement preparedStatement4=connection.prepareStatement(up);
+                preparedStatement4.setLong(1,id);
+                preparedStatement4.setLong(2,auth.getMid());
+                preparedStatement4.executeUpdate();
+                return true;
             }
-            String update;
-            if (res)
-            {
-                update = "insert into DANMU (Mid,id) values(?,?)";
+            else {String up="DELETE FROM danmu_likes(id,mid) where id= ? and mid =?);";
+                PreparedStatement preparedStatement4=connection.prepareStatement(up);
+                preparedStatement4.setLong(1,id);
+                preparedStatement4.setLong(2,auth.getMid());
+                preparedStatement4.executeUpdate();
+                return false;
             }
-            else
-                update = "DELETE FROM DANMU WHERE ID=? and MID=?";
-            PreparedStatement update1 = connection.prepareStatement(update);
-            update1.setLong(1, auth.getMid());
-            update1.setLong(2, id);
-            update1.execute();
         }
         catch (SQLException e)
         {
             throw new RuntimeException(e);
         }
-        return res;
     }
 
 }
