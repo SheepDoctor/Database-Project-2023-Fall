@@ -169,7 +169,7 @@ public class DatabaseServiceImpl implements DatabaseService
                     }
                 }
             }
-            //statement.executeBatch(); // 执行批量插入
+            statement.executeBatch(); // 执行批量插入
             statement.clearBatch(); // 清除当前批处理
         }
         catch (SQLException e)
