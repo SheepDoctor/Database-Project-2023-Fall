@@ -54,8 +54,8 @@ public class DatabaseServiceImpl implements DatabaseService
     )
     {
         importUser(userRecords);
-        importDanmu(danmuRecords);
         importVideo(videoRecords);
+        importDanmu(danmuRecords);
         //throw new UnsupportedOperationException("TODO: implement your import logic");
     }
 
@@ -110,21 +110,21 @@ public class DatabaseServiceImpl implements DatabaseService
 
     private void importUser(List<UserRecord> userRecords)
     {
-        String sqlImportDanmu = "INSERT INTO users (mid, name, sex, birthday, level, coin, sign, identity, password, qq, wechat) " +
-                "VALUES (?, ?, CAST( ? AS gender_type), ?, ?, ?, ?, ?, ?, ?, ?);";
+        String sqlImportUsers = "INSERT INTO users (mid, name, sex, birthday, level, coin, sign, identity, password, qq, wechat) " +
+                "VALUES (?, ?, ? , ?, ?, ?, ?, ?, ?, ?, ?);";
         final int batchSize = 500; // 每批处理的记录数
         long count = 0;
 
         //插入所有的用户
         try (Connection conn = dataSource.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sqlImportDanmu))
+             PreparedStatement stmt = conn.prepareStatement(sqlImportUsers))
         {
             for (UserRecord record : userRecords)
             {
                 stmt.setLong(1, record.getMid());
                 stmt.setString(2, record.getName());
                 stmt.setString(3, record.getSex());
-                stmt.setDate(4, java.sql.Date.valueOf(record.getBirthday()));
+                stmt.setDate(4, record.getBirthday() != null ? java.sql.Date.valueOf(record.getBirthday()) : null);
                 stmt.setShort(5, record.getLevel());
                 stmt.setInt(6, record.getCoin());
                 stmt.setString(7, record.getSign());
@@ -132,30 +132,42 @@ public class DatabaseServiceImpl implements DatabaseService
                 stmt.setString(9, record.getPassword());
                 stmt.setString(10, record.getQq());
                 stmt.setString(11, record.getWechat());
-                stmt.executeBatch(); // 先插入该记录，因为被关注表有外键约束
 
-                //插入到关注表
-            }
-            String sqlImportUserFollowing = "insert into user_follow (follow_mid, follow_by_mid) values (?, ?);";
-            try (PreparedStatement statement = conn.prepareStatement(sqlImportUserFollowing))
-            {
-                for (UserRecord record : userRecords)
+                if (++count % batchSize == 0)
                 {
-                    for (long followingMid : record.getFollowing())
+                    stmt.executeBatch(); // 执行批量插入
+                    stmt.clearBatch(); // 清除当前批处理
+                }
+            }
+            stmt.executeBatch(); // 执行批量插入
+            stmt.clearBatch(); // 清除当前批处理
+        }
+        catch (SQLException e)
+        {
+            e.printStackTrace();
+            throw new RuntimeException(e);
+        }
+
+        String sqlImportUserFollowing = "insert into user_follow (follow_mid, follow_by_mid) values (?, ?);";
+        try (Connection conn = dataSource.getConnection();
+             PreparedStatement statement = conn.prepareStatement(sqlImportUserFollowing))
+        {
+            for (UserRecord record : userRecords)
+            {
+                for (long followingMid : record.getFollowing())
+                {
+                    statement.setLong(1, record.getMid());
+                    statement.setLong(2, followingMid);
+                    statement.addBatch(); // 将当前设置的参数添加到此 PreparedStatement 对象的批处理中
+                    if (++count % batchSize == 0)
                     {
-                        statement.setLong(1, record.getMid());
-                        statement.setLong(2, followingMid);
-                        statement.addBatch(); // 将当前设置的参数添加到此 PreparedStatement 对象的批处理中
-                        if (++count % batchSize == 0)
-                        {
-                            statement.executeBatch(); // 执行批量插入
-                            statement.clearBatch(); // 清除当前批处理
-                        }
+                        statement.executeBatch(); // 执行批量插入
+                        statement.clearBatch(); // 清除当前批处理
                     }
                 }
-                statement.executeBatch(); // 执行批量插入
-                statement.clearBatch(); // 清除当前批处理
             }
+            //statement.executeBatch(); // 执行批量插入
+            //statement.clearBatch(); // 清除当前批处理
         }
         catch (SQLException e)
         {
@@ -172,44 +184,116 @@ public class DatabaseServiceImpl implements DatabaseService
         // 插入所有的视频
         String sqlImportVideo = "INSERT INTO videos (bv, title, owner_mid, commit_time, public_time, duration, description) " +
                 "VALUES (?, ?, ?, ?, ?, ?);";
+        String sqlImportReview = "Insert into review (bv, reviewer_mid, review_time) values (?, ?, ?)";
+        String sqlImportView = "Insert into view (bv, mid, time) values (?, ?, ?)";
 
         try (Connection conn = dataSource.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sqlImportVideo))
+             PreparedStatement statementVideo = conn.prepareStatement(sqlImportVideo);
+             PreparedStatement statementReview = conn.prepareStatement(sqlImportReview);
+             PreparedStatement statementView = conn.prepareStatement(sqlImportView)
+        )
         {
-
+            //导入视频
             for (VideoRecord record : videoRecords)
             {
-                stmt.setString(1, record.getBv());
-                stmt.setString(2, record.getTitle());
-                stmt.setLong(3, record.getOwnerMid());
-                stmt.setTimestamp(4, record.getCommitTime());
-                stmt.setTimestamp(6, record.getPublicTime());
-                stmt.setFloat(8, record.getDuration());
-                stmt.setString(9, record.getDescription());
-                stmt.setObject(10, record.getReviewer());
+                statementVideo.setString(1, record.getBv());
+                statementVideo.setString(2, record.getTitle());
+                statementVideo.setLong(3, record.getOwnerMid());
+                statementVideo.setTimestamp(4, record.getCommitTime());
+                statementVideo.setTimestamp(5, record.getPublicTime());
+                statementVideo.setFloat(6, record.getDuration());
+                statementVideo.setString(7, record.getDescription());
 
-                stmt.addBatch();
-
+                statementVideo.addBatch();
                 // 执行批量插入
                 if (++count % batchSize == 0)
                 {
-                    stmt.executeBatch();
-                    stmt.clearBatch();
+                    statementVideo.executeBatch();
+                    statementVideo.clearBatch();
                 }
             }
-            stmt.executeBatch();
-            conn.commit();
+            statementVideo.executeBatch();
+            statementVideo.clearBatch();
+
+            // 导入审核记录
+            count = 0;
+            for (VideoRecord record : videoRecords)
+            {
+                if (record.getReviewer() != null)
+                {
+                    statementReview.setString(1, record.getBv());
+                    statementReview.setLong(2, record.getOwnerMid());
+                    statementReview.setTimestamp(3, record.getReviewTime());
+                    statementReview.addBatch();
+                    if (++count % batchSize == 0)
+                    {
+                        statementReview.executeBatch();
+                        statementReview.clearBatch();
+                    }
+                }
+            }
+            statementReview.executeBatch();
+            statementReview.clearBatch();
+
+            //导入三连记录
+            importTriple(videoRecords, conn.prepareStatement("Insert into likes (bv, mid) values (?, ?)"), "Like");
+            importTriple(videoRecords, conn.prepareStatement("Insert into coin (bv, mid) values (?, ?)"), "Coin");
+            importTriple(videoRecords, conn.prepareStatement("Insert into favorite (bv, mid) values (?, ?)"), "Favorite");
+
+            //导入观看记录
+            for (VideoRecord record : videoRecords)
+            {
+                for (int i = 0; i < record.getViewerMids().length; i++)
+                {
+                    statementView.setString(1, record.getBv());
+                    statementView.setLong(2, record.getViewerMids()[i]);
+                    statementView.setFloat(3, record.getViewTime()[i]);
+                    statementView.addBatch();
+                    if (++count % batchSize == 0)
+                    {
+                        statementView.executeBatch();
+                        statementView.clearBatch();
+                    }
+                }
+            }
+            statementView.executeBatch();
+            statementView.clearBatch();
+
         }
         catch (SQLException e)
         {
             e.printStackTrace();
             throw new RuntimeException(e);
         }
+    }
 
-        // 接下来可以添加类似的逻辑，来插入点赞、投币、收藏和观看记录
-        // 例如，插入点赞记录的伪代码:
-        // String sqlInsertLike = "INSERT INTO video_likes (bv, mid) VALUES (?, ?);";
-        // ...
+    private void importTriple(List<VideoRecord> videoRecords, PreparedStatement statement, String type) throws SQLException
+    {
+        int count = 0, batchSize = 500;
+        for (VideoRecord record : videoRecords)
+        {
+            long[] data;
+            switch (type)
+            {
+                case "Like" -> data = record.getLike();
+                case "Coin" -> data = record.getCoin();
+                default -> data = record.getFavorite();
+            }
+
+            for (long id : data)
+            {
+                statement.setString(1, record.getBv());
+                statement.setLong(2, id);
+            }
+            statement.addBatch();
+            if (++count % batchSize == 0)
+            {
+                statement.executeBatch();
+                statement.clearBatch();
+            }
+        }
+        statement.executeBatch();
+        statement.clearBatch();
     }
 
     /**
@@ -255,6 +339,7 @@ public class DatabaseServiceImpl implements DatabaseService
         }
         catch (SQLException e)
         {
+            e.printStackTrace();
             throw new RuntimeException(e);
         }
     }
