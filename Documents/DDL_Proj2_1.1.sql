@@ -1,6 +1,5 @@
--- 创建一个名为 "Project" 的数据库
--- create
--- database "Project";
+-- 创建一个名为 "sustc" 的数据库
+-- CREATE DATABASE sustc WITH ENCODING = 'UTF8' LC_COLLATE = 'C' TEMPLATE = template0;
 
 -- 定义一个枚举类型 'identity_type'，包含 'user' 和 'superuser' 两个值
 CREATE TYPE identity_type AS ENUM ('user', 'superuser');
