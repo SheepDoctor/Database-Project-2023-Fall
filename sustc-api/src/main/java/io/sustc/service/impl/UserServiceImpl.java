@@ -9,10 +9,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.sql.DataSource;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import javax.swing.*;
+import java.sql.*;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -175,14 +173,14 @@ public class UserServiceImpl implements UserService
 
     private boolean isAuthValid(AuthInfo auth)
     {
-        //1. mid和password，2. wechat 3.qq，
+        //1.mid和password 2.wechat 3.qq，
         //1.当方式1无效（mid查询出来不存在或mid为空)，qq和wechat此时必须有一个有效
         //2.qq和wechat有效时，这两个必须属于同一个用户
-        String str="TO DO";
-        try (Connection conn = dataSource.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(str))
+        try
         {
-
+            String str = "TO DO";
+            Connection conn = dataSource.getConnection();
+            PreparedStatement stmt = conn.prepareStatement(str);
         }
         catch (SQLException e)
         {
@@ -224,12 +222,92 @@ public class UserServiceImpl implements UserService
     @Override
     public boolean follow(AuthInfo auth, long followeeMid)
     {
-        return false;
+        try
+        {
+            Connection conn = dataSource.getConnection();
+            String check = "select *\n" +
+                    "from follow\n" +
+                    "where follow_mid = ? and follow_by_mid = ?";
+            PreparedStatement check_stmt = conn.prepareStatement(check);
+            check_stmt.setLong(1, auth.getMid());
+            check_stmt.setLong(2, followeeMid);
+            ResultSet check_rs = check_stmt.executeQuery();
+            if (check_rs.next())
+            {
+                String sql = "delete from follow\n" +
+                        "where follow_mid = ? and follow_by_mid = ?";
+                PreparedStatement stmt = conn.prepareStatement(sql);
+                stmt.setLong(1, auth.getMid());
+                stmt.setLong(2, followeeMid);
+                return stmt.executeUpdate() == -1;
+            }
+            else
+            {
+                String sql = "insert into follow (follow_mid, follow_by_mid) values (?, ?);";
+                PreparedStatement stmt = conn.prepareStatement(sql);
+                stmt.setLong(1, auth.getMid());
+                stmt.setLong(2, followeeMid);
+                return stmt.executeUpdate() == -1;
+            }
+        }
+        catch (SQLException e)
+        {
+            System.out.println("follow: " + e);
+            return false;
+        }
     }
 
     @Override
     public UserInfoResp getUserInfo(long mid)
     {
+        try
+        {
+            Connection conn = dataSource.getConnection();
+            String str = "select mid,\n" +
+                    "       coin,\n" +
+                    "       array(select follow_mid\n" +
+                    "             from user_follow\n" +
+                    "             where follow_mid = ?) following,\n" +
+                    "       array(select follow_mid\n" +
+                    "             from user_follow\n" +
+                    "             where follow_mid = ?) gollower,\n" +
+                    "       array(select bv\n" +
+                    "             from view\n" +
+                    "             where mid = ?)        watched,\n" +
+                    "       array(select bv\n" +
+                    "             from likes\n" +
+                    "             where mid = ?)        liked,\n" +
+                    "       array(select bv\n" +
+                    "             from collect\n" +
+                    "             where mid = ?)        collated,\n" +
+                    "       array(select bv\n" +
+                    "             from videos\n" +
+                    "             where owner_mid = ?)  posted\n" +
+                    "from users";
+            PreparedStatement stmt = conn.prepareStatement(str);
+            for (int i = 1; i < 7; i++)
+            {
+                stmt.setLong(i, mid);
+            }
+            ResultSet rs = stmt.executeQuery();
+            if (rs.next())
+            {
+                return new UserInfoResp(
+                        rs.getLong(1),
+                        rs.getInt(2),
+                        (long[]) rs.getArray(3).getArray(),
+                        (long[]) rs.getArray(4).getArray(),
+                        (String[]) rs.getArray(5).getArray(),
+                        (String[]) rs.getArray(6).getArray(),
+                        (String[]) rs.getArray(7).getArray(),
+                        (String[]) rs.getArray(8).getArray()
+                );
+            }
+        }
+        catch (SQLException e)
+        {
+            System.out.println("getUserInfo: " + e);
+        }
         return null;
     }
 

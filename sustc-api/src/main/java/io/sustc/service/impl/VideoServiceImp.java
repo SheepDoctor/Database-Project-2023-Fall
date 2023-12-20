@@ -28,7 +28,6 @@ public class VideoServiceImp implements VideoService
                 time.getMinute(),
                 time.getSecond(),
                 time.getNano());
-
         long av = VideoRecord.getav();
         String table = "fZodR9XQDSUm21yCkr6zBqiveYah8bt4xsWpHnJE7jL5VG3guMTKNPAwcF";
         int[] s = {11, 10, 3, 8, 4, 6};
