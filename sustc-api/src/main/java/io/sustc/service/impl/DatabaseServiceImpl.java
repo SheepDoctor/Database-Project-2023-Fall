@@ -132,7 +132,7 @@ public class DatabaseServiceImpl implements DatabaseService
                 stmt.setString(9, record.getPassword());
                 stmt.setString(10, record.getQq());
                 stmt.setString(11, record.getWechat());
-                log.info("SQL: {}", stmt);
+                //log.info("SQL: {}", stmt);
 
                 if (++count % batchSize == 0)
                 {
@@ -202,7 +202,9 @@ public class DatabaseServiceImpl implements DatabaseService
                 statementVideo.setString(1, record.getBv());
                 statementVideo.setString(2, record.getTitle());
                 statementVideo.setLong(3, record.getOwnerMid());
+                System.err.println(record.getCommitTime());
                 statementVideo.setTimestamp(4, record.getCommitTime());
+                System.err.println(record.getPublicTime());
                 statementVideo.setTimestamp(5, record.getPublicTime());
                 statementVideo.setFloat(6, record.getDuration());
                 statementVideo.setString(7, record.getDescription());

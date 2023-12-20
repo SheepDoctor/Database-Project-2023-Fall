@@ -56,7 +56,8 @@ public class VideoCommand {
             @ShellOption(defaultValue = ShellOption.NULL) String qq,
             @ShellOption(defaultValue = ShellOption.NULL) String wechat,
             String bv
-    ) {
+    ) throws SQLException
+    {
         val auth = AuthInfo.builder()
                 .mid(mid)
                 .password(pwd)
