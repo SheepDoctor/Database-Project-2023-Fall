@@ -220,7 +220,42 @@ public class VideoServiceImp implements VideoService
     @Override
     public boolean reviewVideo(AuthInfo auth, String bv)
     {
-        return false;
+        try {
+
+
+            Connection conn = dataSource.getConnection();
+
+            String query4="SELECT * FROM videos WHERE BV=?;";
+            PreparedStatement preparedStatement4=conn.prepareStatement(query4);
+            preparedStatement4.setString(1,bv);
+            ResultSet resultSet4=preparedStatement4.executeQuery();
+            if (resultSet4==null||resultSet4.getLong(1)==auth.getMid())
+                return false;
+
+
+
+            String query3="SELECT * FROM review WHERE BV=?;";
+            PreparedStatement preparedStatement3=conn.prepareStatement(query3);
+            preparedStatement3.setLong(1,auth.getMid());
+            ResultSet resultSet3=preparedStatement3.executeQuery();
+            if (resultSet3==null)
+
+            {
+                String query5 = "INSERT INTO review(bv,reviewer_mid,review_time) value (?,?,?);";
+                PreparedStatement preparedStatement5 = conn.prepareStatement(query5);
+                preparedStatement5.setLong(2, auth.getMid());
+                preparedStatement5.setString(1, bv);
+                preparedStatement5.setTime(3,new Time(System.currentTimeMillis()));
+                preparedStatement5.executeUpdate();
+                return true;
+            }
+            else{
+                return false;
+            }
+
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Override
