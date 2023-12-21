@@ -124,7 +124,8 @@ public class DatabaseServiceImpl implements DatabaseService
                 stmt.setLong(1, record.getMid());
                 stmt.setString(2, record.getName());
                 stmt.setString(3, record.getSex());
-                stmt.setDate(4, record.getBirthday() != null ? java.sql.Date.valueOf(record.getBirthday()) : null);
+                String[] date=record.getBirthday().split("月");
+                stmt.setDate(4, record.getBirthday() != null|record.getBirthday()==" " ? Date.valueOf("2022-1-1") : null);
                 stmt.setShort(5, record.getLevel());
                 stmt.setInt(6, record.getCoin());
                 stmt.setString(7, record.getSign());
