@@ -3,6 +3,7 @@ package io.sustc.service.impl;
 import io.sustc.dto.AuthInfo;
 import io.sustc.service.RecommenderService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import javax.sql.DataSource;
 import java.sql.Connection;
@@ -12,6 +13,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
+@Service
 public class RecommenderServiceImpl implements RecommenderService
 {
     @Autowired

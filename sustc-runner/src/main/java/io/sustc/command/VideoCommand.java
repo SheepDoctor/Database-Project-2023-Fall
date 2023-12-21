@@ -10,7 +10,6 @@ import org.springframework.shell.standard.ShellComponent;
 import org.springframework.shell.standard.ShellMethod;
 import org.springframework.shell.standard.ShellOption;
 
-import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.util.List;
 import java.util.Set;
@@ -56,8 +55,7 @@ public class VideoCommand {
             @ShellOption(defaultValue = ShellOption.NULL) String qq,
             @ShellOption(defaultValue = ShellOption.NULL) String wechat,
             String bv
-    ) throws SQLException
-    {
+    ) {
         val auth = AuthInfo.builder()
                 .mid(mid)
                 .password(pwd)

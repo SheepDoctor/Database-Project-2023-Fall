@@ -263,27 +263,28 @@ public class UserServiceImpl implements UserService
         try
         {
             Connection conn = dataSource.getConnection();
-            String str = "select mid,\n" +
-                    "       coin,\n" +
-                    "       array(select follow_mid\n" +
-                    "             from user_follow\n" +
-                    "             where follow_mid = ?) following,\n" +
-                    "       array(select follow_mid\n" +
-                    "             from user_follow\n" +
-                    "             where follow_mid = ?) gollower,\n" +
-                    "       array(select bv\n" +
-                    "             from view\n" +
-                    "             where mid = ?)        watched,\n" +
-                    "       array(select bv\n" +
-                    "             from likes\n" +
-                    "             where mid = ?)        liked,\n" +
-                    "       array(select bv\n" +
-                    "             from collect\n" +
-                    "             where mid = ?)        collated,\n" +
-                    "       array(select bv\n" +
-                    "             from videos\n" +
-                    "             where owner_mid = ?)  posted\n" +
-                    "from users";
+            String str = """
+                    select mid,
+                           coin,
+                           array(select follow_mid
+                                 from user_follow
+                                 where follow_mid = ?) following,
+                           array(select follow_mid
+                                 from user_follow
+                                 where follow_mid = ?) gollower,
+                           array(select bv
+                                 from view
+                                 where mid = ?)        watched,
+                           array(select bv
+                                 from likes
+                                 where mid = ?)        liked,
+                           array(select bv
+                                 from collect
+                                 where mid = ?)        collated,
+                           array(select bv
+                                 from videos
+                                 where owner_mid = ?)  posted
+                    from users""";
             PreparedStatement stmt = conn.prepareStatement(str);
             for (int i = 1; i < 7; i++)
             {

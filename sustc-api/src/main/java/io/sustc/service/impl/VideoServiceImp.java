@@ -2,15 +2,15 @@ package io.sustc.service.impl;
 
 import io.sustc.dto.AuthInfo;
 import io.sustc.dto.PostVideoReq;
-import io.sustc.dto.VideoRecord;
 import io.sustc.service.VideoService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import javax.sql.DataSource;
 import java.sql.*;
-import java.time.LocalDateTime;
 import java.util.*;
 
+@Service
 public class VideoServiceImp implements VideoService
 {
     @Autowired
@@ -18,15 +18,8 @@ public class VideoServiceImp implements VideoService
 
     public String postVideo(AuthInfo auth, PostVideoReq req)
     {
-        LocalDateTime time = LocalDateTime.now();
-        Timestamp current_time = new Timestamp(
-                time.getYear(),
-                time.getMonth().getValue(),
-                time.getDayOfMonth(),
-                time.getHour(),
-                time.getMinute(),
-                time.getSecond(),
-                time.getNano());
+        //LocalDateTime time = LocalDateTime.now();
+        Timestamp current_time = new Timestamp(System.currentTimeMillis());
         //long av = VideoRecord.getav();
         Random random = new Random();
         long av = random.nextInt(1000000000);
@@ -40,9 +33,9 @@ public class VideoServiceImp implements VideoService
         {
             bv_c[s[i]] = table.charAt((int) (av / Math.pow(58, i) % 58));
         }
-        String bv = bv_c.toString();
+        String bv = Arrays.toString(bv_c);
 
-        String sql = "insert into videos(bv, title, owner_id, commit_time, public_time, duration, description) values(?,?,?,?,?,?,?)";
+        String sql = "insert into videos(bv, title, owner_mid, commit_time, public_time, duration, description) values(?,?,?,?,?,?,?)";
         try (Connection conn = dataSource.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql))
         {
@@ -73,7 +66,7 @@ public class VideoServiceImp implements VideoService
             PreparedStatement select_user_info_stmt = conn.prepareStatement(select_user_info);
             ResultSet user_info = select_user_info_stmt.executeQuery();
             // 判断是否是superuser
-            if (user_info.next() && user_info.getString("identity") == "superuser")
+            if (user_info.next() && Objects.equals(user_info.getString("identity"), "superuser"))
             {
                 String sql = "delete from videos where bv =" + bv;
                 PreparedStatement stmt = conn.prepareStatement(sql);
@@ -81,10 +74,10 @@ public class VideoServiceImp implements VideoService
             }
 
             // 判断是否是视频的上传者
-            String select_video = "select owener_id from videos where bv = " + bv;
+            String select_video = "select owner_mid from videos where bv = " + bv;
             PreparedStatement select_video_stmt = conn.prepareStatement(select_video);
             ResultSet video_info = select_video_stmt.executeQuery();
-            if (video_info.next() && video_info.getLong("owener_id") == auth.getMid())
+            if (video_info.next() && video_info.getLong("owner_id") == auth.getMid())
             {
                 String sql = "delete from videos where bv =" + bv;
                 PreparedStatement stmt = conn.prepareStatement(sql);
@@ -110,7 +103,7 @@ public class VideoServiceImp implements VideoService
             PreparedStatement select_video_stmt = conn.prepareStatement(select_video);
             ResultSet video_info = select_video_stmt.executeQuery();
             // 验证更改者信息
-            if (video_info.getLong("owener_id") == auth.getMid())
+            if (video_info.getLong("owner_id") == auth.getMid())
                 return false;
             //验证视频时长有无修改
             if (video_info.getLong("duration") != req.getDuration())
@@ -134,7 +127,7 @@ public class VideoServiceImp implements VideoService
         try
         {
             Connection conn = dataSource.getConnection();
-            String query1 = "SELECT * FROM VIDEOS join users on bv WHERE TITLE LIKE '%?%' or text LIKE '%?%' or name like '%?%';";
+            String query1 = "SELECT * FROM VIDEOS join users on bv WHERE TITLE LIKE ? or videos.description LIKE ? or name like ?";
             PreparedStatement query_1 = conn.prepareStatement(query1);
             query_1.setString(1, keywords);
             ResultSet resultSet1 = query_1.executeQuery();
@@ -252,7 +245,7 @@ public class VideoServiceImp implements VideoService
             if (resultSet3 == null)
 
             {
-                String query5 = "INSERT INTO review(bv,reviewer_mid,review_time) value (?,?,?);";
+                String query5 = "INSERT INTO review(bv,reviewer_mid,review_time) values (?,?,?);";
                 PreparedStatement preparedStatement5 = conn.prepareStatement(query5);
                 preparedStatement5.setLong(2, auth.getMid());
                 preparedStatement5.setString(1, bv);
@@ -306,7 +299,7 @@ public class VideoServiceImp implements VideoService
             if (resultSet3 != null)
                 return false;
 
-            String query5 = "INSERT INTO coin(bv,mid) value (?,?);";
+            String query5 = "INSERT INTO coin(bv,mid) values (?,?);";
             PreparedStatement preparedStatement5 = conn.prepareStatement(query5);
             preparedStatement5.setLong(2, auth.getMid());
             preparedStatement5.setString(1, bv);
@@ -341,14 +334,14 @@ public class VideoServiceImp implements VideoService
                 return false;
 
 
-            String query3 = "SELECT * FROM like WHERE MID=?;";
+            String query3 = "SELECT * FROM likes WHERE MID=?;";
             PreparedStatement preparedStatement3 = conn.prepareStatement(query3);
             preparedStatement3.setLong(1, auth.getMid());
             ResultSet resultSet3 = preparedStatement3.executeQuery();
             if (resultSet3 == null)
 
             {
-                String query5 = "INSERT INTO like(bv,mid) value (?,?);";
+                String query5 = "INSERT INTO likes(bv,mid) values (?,?);";
                 PreparedStatement preparedStatement5 = conn.prepareStatement(query5);
                 preparedStatement5.setLong(2, auth.getMid());
                 preparedStatement5.setString(1, bv);
@@ -357,7 +350,7 @@ public class VideoServiceImp implements VideoService
             }
             else
             {
-                String query5 = "DELETE FROM like where mid = ? and bv= ?);";
+                String query5 = "DELETE FROM likes where mid = ? and bv= ?;";
                 PreparedStatement preparedStatement5 = conn.prepareStatement(query5);
                 preparedStatement5.setLong(1, auth.getMid());
                 preparedStatement5.setString(2, bv);
@@ -400,7 +393,7 @@ public class VideoServiceImp implements VideoService
             if (resultSet3 == null)
 
             {
-                String query5 = "INSERT INTO collect(bv,mid) value (?,?);";
+                String query5 = "INSERT INTO collect(bv,mid) values (?,?);";
                 PreparedStatement preparedStatement5 = conn.prepareStatement(query5);
                 preparedStatement5.setLong(2, auth.getMid());
                 preparedStatement5.setString(1, bv);
@@ -409,7 +402,7 @@ public class VideoServiceImp implements VideoService
             }
             else
             {
-                String query5 = "DELETE FROM collect where mid = ? and bv= ?);";
+                String query5 = "DELETE FROM collect where mid = ? and bv= ?;";
                 PreparedStatement preparedStatement5 = conn.prepareStatement(query5);
                 preparedStatement5.setLong(1, auth.getMid());
                 preparedStatement5.setString(2, bv);
