@@ -1,5 +1,6 @@
 package io.sustc.service.impl;
 
+import io.sustc.dto.AuthInfo;
 import io.sustc.dto.DanmuRecord;
 import io.sustc.dto.UserRecord;
 import io.sustc.dto.VideoRecord;
@@ -12,7 +13,6 @@ import javax.sql.DataSource;
 import java.sql.*;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Objects;
 
 /**
  * It's important to mark your implementation class with {@link Service} annotation.
@@ -302,18 +302,85 @@ public class DatabaseServiceImpl implements DatabaseService
                 statement.setString(1, record.getBv());
                 statement.setLong(2, id);
                 statement.addBatch();
+                if (++count % batchSize == 0)
+                {
+                    statement.executeBatch();
+                    statement.clearBatch();
+                }
             }
             //log.info("SQL: {}", statement);
-            if (++count % batchSize == 0)
-            {
-                statement.executeBatch();
-                statement.clearBatch();
-            }
         }
         statement.executeBatch();
         statement.clearBatch();
-        log.info("{} {} are imported", type, count);
+        log.info("{} {} are imported", count, type);
     }
+
+    /**
+     * Validates the given authentication information.
+     *
+     * @param auth The authentication information to be validated.
+     * @return Returns the user's `mid` if the authentication is valid, or -1 if it's invalid.
+     */
+    public long checkAuthValid(AuthInfo auth)
+    {
+        // 默认认为登录类型为 mid
+        String loginType = "mid";
+
+        // 如果有有效的 wechat，设置登录类型为 wechat
+        if (auth.getWechat() != null && !auth.getWechat().trim().isEmpty())
+        {
+            loginType = "wechat";
+        }
+        // 如果有有效的 qq，设置登录类型为 qq
+        else if (auth.getQq() != null && !auth.getQq().trim().isEmpty())
+        {
+            loginType = "qq";
+        }
+
+        // 构建用于查询身份验证信息的 SQL 语句
+        String sqlSelectAuth = "SELECT mid FROM users WHERE " + loginType + " = ?";
+
+        // 构建用于检查 mid 和密码的 SQL 语句
+        String sqlCheckMidAndPassWord = "SELECT password FROM users WHERE mid = ?";
+
+        try (Connection conn = dataSource.getConnection();
+             PreparedStatement stmtWechatAndQq = conn.prepareStatement(sqlSelectAuth);
+             PreparedStatement stmtMid = conn.prepareStatement(sqlCheckMidAndPassWord))
+        {
+
+            switch (loginType)
+            {
+                case "wechat", "qq" ->
+                {
+                    // 对于 wechat 和 qq 登录，只需检查数据库中是否存在对应记录
+                    String authValue = loginType.equals("wechat") ? auth.getWechat() : auth.getQq();
+                    stmtWechatAndQq.setString(1, authValue);
+                    try (ResultSet resultSet = stmtWechatAndQq.executeQuery();)
+                    {
+                        if (resultSet.next()) return resultSet.getLong(1); // 如果找到记录，返回对应的 mid
+                    }
+                }
+                default ->
+                {
+                    // 对于 mid 登录，需要检查 mid 和密码是否匹配
+                    stmtMid.setLong(1, auth.getMid());
+                    try (ResultSet resultSet = stmtMid.executeQuery();
+                    )
+                    {
+                        if (resultSet.next() && resultSet.getString(1).equals(auth.getPassword()))
+                            return resultSet.getLong(1); // 如果密码匹配，返回 mid
+                    }
+                }
+            }
+        }
+        catch (SQLException e)
+        {
+            e.printStackTrace();
+            return -1; // 发生异常时返回 -1
+        }
+        return -1; // 未通过验证时返回 -1
+    }
+
 
     /**
      * The following code is just a quick example of using jdbc datasource.

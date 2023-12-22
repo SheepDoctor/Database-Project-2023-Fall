@@ -113,9 +113,9 @@ public class VideoServiceImp implements VideoService
         }
         catch (SQLException e)
         {
-
+            e.printStackTrace();
+            throw new RuntimeException(e);
         }
-        return false;
     }
 
     @Override
@@ -173,13 +173,12 @@ public class VideoServiceImp implements VideoService
                 return -1;
             double tmp = 0;
             int cou = 0;
-            while (true)
+            do
             {
                 cou++;
                 tmp += resultSet2.getFloat(1);
-                if (!resultSet2.next())
-                    break;
             }
+            while (resultSet2.next());
             res = tmp / (cou * resultSet1.getInt(1));
         }
         catch (SQLException e)
@@ -196,8 +195,8 @@ public class VideoServiceImp implements VideoService
         try
         {
             Connection conn = dataSource.getConnection();
-            String query1 = "SELECT * FROM videos WHERE BV=?;";
-            String query2 = "SELECT * FROM danmu WHERE BV=?;";
+            String query1 = "SELECT * FROM videos WHERE BV= ? ;";
+            String query2 = "SELECT * FROM danmu WHERE BV= ? ;";
             PreparedStatement preparedStatement1 = conn.prepareStatement(query1);
             PreparedStatement preparedStatement2 = conn.prepareStatement(query2);
             ResultSet resultSet1 = preparedStatement1.executeQuery();
@@ -226,10 +225,7 @@ public class VideoServiceImp implements VideoService
     {
         try
         {
-
-
             Connection conn = dataSource.getConnection();
-
             String query4 = "SELECT * FROM videos WHERE BV=?;";
             PreparedStatement preparedStatement4 = conn.prepareStatement(query4);
             preparedStatement4.setString(1, bv);
@@ -270,8 +266,6 @@ public class VideoServiceImp implements VideoService
     {
         try
         {
-
-
             Connection conn = dataSource.getConnection();
 
             String query4 = "SELECT * FROM videos WHERE BV=?;";
@@ -292,6 +286,7 @@ public class VideoServiceImp implements VideoService
             ResultSet resultSet2 = preparedStatement2.executeQuery();
             if (resultSet2.getInt("coin") == 0)
                 return false;
+
             String query3 = "SELECT * FROM coin WHERE MID=?;";
             PreparedStatement preparedStatement3 = conn.prepareStatement(query3);
             preparedStatement3.setLong(1, auth.getMid());
@@ -299,7 +294,7 @@ public class VideoServiceImp implements VideoService
             if (resultSet3 != null)
                 return false;
 
-            String query5 = "INSERT INTO coin(bv,mid) values (?,?);";
+            String query5 = "INSERT INTO coin (bv, mid) values (?,?);";
             PreparedStatement preparedStatement5 = conn.prepareStatement(query5);
             preparedStatement5.setLong(2, auth.getMid());
             preparedStatement5.setString(1, bv);
@@ -318,8 +313,6 @@ public class VideoServiceImp implements VideoService
     {
         try
         {
-
-
             Connection conn = dataSource.getConnection();
 
             String query4 = "SELECT * FROM videos WHERE BV=?;";
@@ -334,14 +327,14 @@ public class VideoServiceImp implements VideoService
                 return false;
 
 
-            String query3 = "SELECT * FROM likes WHERE MID=?;";
+            String query3 = "SELECT * FROM likes WHERE MID= ? ;";
             PreparedStatement preparedStatement3 = conn.prepareStatement(query3);
             preparedStatement3.setLong(1, auth.getMid());
             ResultSet resultSet3 = preparedStatement3.executeQuery();
             if (resultSet3 == null)
 
             {
-                String query5 = "INSERT INTO likes(bv,mid) values (?,?);";
+                String query5 = "INSERT INTO likes (bv,mid) values (?,?);";
                 PreparedStatement preparedStatement5 = conn.prepareStatement(query5);
                 preparedStatement5.setLong(2, auth.getMid());
                 preparedStatement5.setString(1, bv);
@@ -370,8 +363,6 @@ public class VideoServiceImp implements VideoService
     {
         try
         {
-
-
             Connection conn = dataSource.getConnection();
 
             String query4 = "SELECT * FROM videos WHERE BV=?;";
@@ -386,14 +377,14 @@ public class VideoServiceImp implements VideoService
                 return false;
 
 
-            String query3 = "SELECT * FROM collect WHERE MID=?;";
+            String query3 = "SELECT * FROM favorite WHERE MID = ?;";
             PreparedStatement preparedStatement3 = conn.prepareStatement(query3);
             preparedStatement3.setLong(1, auth.getMid());
             ResultSet resultSet3 = preparedStatement3.executeQuery();
             if (resultSet3 == null)
 
             {
-                String query5 = "INSERT INTO collect(bv,mid) values (?,?);";
+                String query5 = "INSERT INTO favorite(bv,mid) values (?,?);";
                 PreparedStatement preparedStatement5 = conn.prepareStatement(query5);
                 preparedStatement5.setLong(2, auth.getMid());
                 preparedStatement5.setString(1, bv);
@@ -402,7 +393,7 @@ public class VideoServiceImp implements VideoService
             }
             else
             {
-                String query5 = "DELETE FROM collect where mid = ? and bv= ?;";
+                String query5 = "DELETE FROM favorite where mid = ? and bv= ?;";
                 PreparedStatement preparedStatement5 = conn.prepareStatement(query5);
                 preparedStatement5.setLong(1, auth.getMid());
                 preparedStatement5.setString(2, bv);
