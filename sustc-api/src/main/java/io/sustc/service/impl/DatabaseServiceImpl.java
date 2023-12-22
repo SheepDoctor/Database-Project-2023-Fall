@@ -312,7 +312,7 @@ public class DatabaseServiceImpl implements DatabaseService
         }
         statement.executeBatch();
         statement.clearBatch();
-        log.info("{} {} are imported", type,count);
+        log.info("{} {} are imported", type, count);
     }
 
     /**
