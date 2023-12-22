@@ -12,6 +12,7 @@ import javax.sql.DataSource;
 import java.sql.*;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * It's important to mark your implementation class with {@link Service} annotation.
@@ -56,18 +57,19 @@ public class DatabaseServiceImpl implements DatabaseService
         importUser(userRecords);
         importVideo(videoRecords);
         importDanmu(danmuRecords);
-        //throw new UnsupportedOperationException("TODO: implement your import logic");
     }
 
     private void importDanmu(List<DanmuRecord> danmuRecords)
     {
         String sqlImportDanmu = "INSERT INTO danmu (bv, mid, time, content, post_time) VALUES (?, ?, ?, ?, ?) returning id";
+        String sqlImportDanmuLikedBy = "insert into danmu_likes (id, mid) values (?, ?)";
         final int batchSize = 500; // 每批处理的记录数
         long count = 0;
 
         //插入所有的弹幕
         try (Connection conn = dataSource.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sqlImportDanmu))
+             PreparedStatement stmt = conn.prepareStatement(sqlImportDanmu);
+             PreparedStatement statement = conn.prepareStatement(sqlImportDanmuLikedBy))
         {
             for (DanmuRecord record : danmuRecords)
             {
@@ -81,37 +83,33 @@ public class DatabaseServiceImpl implements DatabaseService
                 resultSet.next();
                 long current = resultSet.getLong(1);
 
-
-                String sqlImportDanmuLikedBy = "insert into danmu_likes (id, mid) values (?, ?)";
-                try (PreparedStatement statement = conn.prepareStatement(sqlImportDanmuLikedBy))
-                {
-                    if (record.getLikedBy() != null)
-                        for (Long id : record.getLikedBy())
+                if (record.getLikedBy() != null)
+                    for (Long id : record.getLikedBy())
+                    {
+                        statement.setLong(1, current);
+                        statement.setLong(2, id);
+                        statement.addBatch(); // 将当前设置的参数添加到此 PreparedStatement 对象的批处理中
+                        if (++count % batchSize == 0)
                         {
-                            statement.setLong(1, current);
-                            statement.setLong(2, id);
-                            statement.addBatch(); // 将当前设置的参数添加到此 PreparedStatement 对象的批处理中
-                            if (++count % batchSize == 0)
-                            {
-                                statement.executeBatch(); // 执行批量插入
-                                statement.clearBatch(); // 清除当前批处理
-                            }
+                            statement.executeBatch(); // 执行批量插入
+                            statement.clearBatch(); // 清除当前批处理
                         }
-                    statement.executeBatch(); // 插入剩余的记录
-                    statement.clearBatch();
-                }
+                    }
+                statement.executeBatch(); // 插入剩余的记录
+                statement.clearBatch();
             }
         }
         catch (SQLException e)
         {
+            log.error("Error during importing danmu {}", e.toString());
             throw new RuntimeException(e);
         }
     }
 
     private void importUser(List<UserRecord> userRecords)
     {
-        String sqlImportUsers = "INSERT INTO users (mid, name, sex, birthday, level, coin, sign, identity, password, qq, wechat) " +
-                "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);";
+        String sqlImportUsers = "INSERT INTO users (mid, name, sex, birthday, level, coin, sign, identity, password, qq, wechat)" +
+                " VALUES (?, ?, CAST( ? AS gender_type), ?, ?, ?, ?, CAST( ? AS identity_type), ?, ?, ?)";
         final int batchSize = 500; // 每批处理的记录数
         long count = 0;
 
@@ -124,16 +122,18 @@ public class DatabaseServiceImpl implements DatabaseService
                 stmt.setLong(1, record.getMid());
                 stmt.setString(2, record.getName());
                 stmt.setString(3, record.getSex());
-                String[] date=record.getBirthday().split("月");
-                stmt.setDate(4, record.getBirthday() != null|record.getBirthday()==" " ? Date.valueOf("2022-1-1") : null);
+                //String[] date=record.getBirthday().split("月");
+                //stmt.setDate(4, record.getBirthday() != null|record.getBirthday()==" " ? Date.valueOf("2022-1-1") : null);
+                stmt.setString(4, record.getBirthday());
                 stmt.setShort(5, record.getLevel());
                 stmt.setInt(6, record.getCoin());
                 stmt.setString(7, record.getSign());
                 stmt.setString(8, record.getIdentity().name());
                 stmt.setString(9, record.getPassword());
-                stmt.setString(10, record.getQq());
-                stmt.setString(11, record.getWechat());
-                //log.info("SQL: {}", stmt);
+                stmt.setString(10, Objects.equals(record.getQq(), "") ? null : record.getQq());
+                stmt.setString(11, record.getWechat().equals("") ? null : record.getWechat());
+                stmt.addBatch();// 把预编译语句置入批中
+                log.info("SQL: {}", stmt);
 
                 if (++count % batchSize == 0)
                 {
@@ -175,9 +175,10 @@ public class DatabaseServiceImpl implements DatabaseService
         }
         catch (SQLException e)
         {
-            e.printStackTrace();
+            log.error("Error during importing users_follow {}", e.toString());
             throw new RuntimeException(e);
         }
+
     }
 
     private void importVideo(List<VideoRecord> videoRecords)
@@ -203,9 +204,9 @@ public class DatabaseServiceImpl implements DatabaseService
                 statementVideo.setString(1, record.getBv());
                 statementVideo.setString(2, record.getTitle());
                 statementVideo.setLong(3, record.getOwnerMid());
-                System.err.println(record.getCommitTime());
+                //System.err.println(record.getCommitTime());
                 statementVideo.setTimestamp(4, record.getCommitTime());
-                System.err.println(record.getPublicTime());
+                //System.err.println(record.getPublicTime());
                 statementVideo.setTimestamp(5, record.getPublicTime());
                 statementVideo.setFloat(6, record.getDuration());
                 statementVideo.setString(7, record.getDescription());
@@ -272,7 +273,7 @@ public class DatabaseServiceImpl implements DatabaseService
         }
         catch (SQLException e)
         {
-            e.printStackTrace();
+            log.error("Error during importing video detail {}", e.toString());
             throw new RuntimeException(e);
         }
     }

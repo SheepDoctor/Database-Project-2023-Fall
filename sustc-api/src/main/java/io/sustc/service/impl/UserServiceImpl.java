@@ -225,16 +225,17 @@ public class UserServiceImpl implements UserService
         try
         {
             Connection conn = dataSource.getConnection();
-            String check = "select *\n" +
-                    "from follow\n" +
-                    "where follow_mid = ? and follow_by_mid = ?";
+            String check = """
+                    select *
+                    from user_follow
+                    where follow_mid = ? and follow_by_mid = ?""";
             PreparedStatement check_stmt = conn.prepareStatement(check);
             check_stmt.setLong(1, auth.getMid());
             check_stmt.setLong(2, followeeMid);
             ResultSet check_rs = check_stmt.executeQuery();
             if (check_rs.next())
             {
-                String sql = "delete from follow\n" +
+                String sql = "delete from user_follow\n" +
                         "where follow_mid = ? and follow_by_mid = ?";
                 PreparedStatement stmt = conn.prepareStatement(sql);
                 stmt.setLong(1, auth.getMid());
@@ -243,7 +244,7 @@ public class UserServiceImpl implements UserService
             }
             else
             {
-                String sql = "insert into follow (follow_mid, follow_by_mid) values (?, ?);";
+                String sql = "insert into user_follow (follow_mid, follow_by_mid) values (?, ?);";
                 PreparedStatement stmt = conn.prepareStatement(sql);
                 stmt.setLong(1, auth.getMid());
                 stmt.setLong(2, followeeMid);
