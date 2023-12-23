@@ -9,7 +9,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.sql.DataSource;
-import javax.swing.*;
 import java.sql.*;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -21,6 +20,63 @@ public class UserServiceImpl implements UserService
 {
     @Autowired
     private DataSource dataSource;
+
+    public static long isAuthValid(AuthInfo auth, DataSource dataSource)
+    {
+
+        //qq和wechat都为空的时候使用mid
+        String type = "mid";
+
+        //有微信用微信
+        if (!(auth.getWechat() == null) && !auth.getWechat().trim().equals(""))
+        {
+            type = "wechat";
+        }
+        //有qq用qq
+        if (!(auth.getQq() == null) && !auth.getQq().trim().equals(""))
+        {
+            type = "qq";
+        }
+
+        String sqlSelectAuth = "select mid from users where " + type + " = ?";
+        String sqlCheckMidAndPassWord = "select password from users where mid = ?";
+        try (Connection conn = dataSource.getConnection();
+             PreparedStatement stmtWechatAndQq = conn.prepareStatement(sqlSelectAuth);
+             PreparedStatement stmtMid = conn.prepareStatement(sqlCheckMidAndPassWord)
+        )
+        {
+            switch (type)
+            {
+                case "wechat", "qq" ->
+                {
+                    // 对于 wechat 和 qq 登录，只需检查数据库中是否存在对应记录
+                    String authValue = type.equals("wechat") ? auth.getWechat() : auth.getQq();
+                    stmtWechatAndQq.setString(1, authValue);
+                    try (ResultSet resultSet = stmtWechatAndQq.executeQuery();)
+                    {
+                        if (resultSet.next()) return resultSet.getLong(1); // 如果找到记录，返回对应的 mid
+                    }
+                }
+                default ->
+                {
+                    // 对于 mid 登录，需要检查 mid 和密码是否匹配
+                    stmtMid.setLong(1, auth.getMid());
+                    try (ResultSet resultSet = stmtMid.executeQuery();
+                    )
+                    {
+                        if (resultSet.next() && resultSet.getString(1).equals(auth.getPassword()))
+                            return resultSet.getLong(1); // 如果密码匹配，返回 mid
+                    }
+                }
+            }
+        }
+        catch (SQLException e)
+        {
+            e.printStackTrace();
+            return -1;
+        }
+        return -1;
+    }
 
     @Override
     public long register(RegisterUserReq req)
@@ -132,38 +188,19 @@ public class UserServiceImpl implements UserService
         throw new RuntimeException("User creation failed");
     }
 
-    /**
-     * 删除用户。
-     *
-     * @param auth 表示当前用户
-     * @param mid  要删除的用户
-     * @return 操作是否成功
-     * @apiNote 您可能需要考虑以下边界情况：
-     * <ul>
-     *   <li>找不到与 {@code mid} 对应的用户</li>
-     *   <li>{@code auth} 无效
-     *     <ul>
-     *       <li>{@code qq} 和 {@code wechat} 都非空但不对应同一用户</li>
-     *       <li>{@code mid} 无效，同时 {@code qq} 和 {@code wechat} 也无效（空或找不到）</li>
-     *     </ul>
-     *   </li>
-     *   <li>当前用户是普通用户，但 {@code mid} 不是他/她的</li>
-     *   <li>当前用户是超级用户，但 {@code mid} 既不是普通用户的 {@code mid} 也不是他/她的</li>
-     * </ul>
-     * 如果发生任何边界情况，应返回 {@code false}。
-     */
     @Override
     public boolean deleteAccount(AuthInfo auth, long mid)
     {
 
+        long authMid = isAuthValid(auth, dataSource);
         // 首先，验证 auth 是否有效，并得到有效的mid
-        if (isAuthValid(auth) == -1)
+        if (authMid == -1)
         {
             return false;
         }
 
         // 检查 auth 是否拥有删除 mid 的权限
-        if (!hasDeletePermission(isAuthValid(auth), mid))
+        if (!hasDeletePermission(authMid, mid))
         {
             return false;
         }
@@ -172,66 +209,8 @@ public class UserServiceImpl implements UserService
         return performDelete(mid);
     }
 
-    private long isAuthValid(AuthInfo auth)
-    {
-
-        //qq和wechat都为空的时候使用mid
-        String type = "mid";
-
-        //有微信用微信
-        if (!(auth.getWechat() == null) && !auth.getWechat().trim().equals(""))
-        {
-            type = "wechat";
-        }
-        //有qq用qq
-        if (!(auth.getQq() == null) && !auth.getQq().trim().equals(""))
-        {
-            type = "qq";
-        }
-
-        String sqlSelectAuth = "select mid from users where " + type + " = ?";
-        String sqlCheckMidAndPassWord = "select password from users where mid = ?";
-        try (Connection conn = dataSource.getConnection();
-             PreparedStatement stmtWechatAndQq = conn.prepareStatement(sqlSelectAuth);
-             PreparedStatement stmtMid = conn.prepareStatement(sqlCheckMidAndPassWord)
-        )
-        {
-            switch (type)
-            {
-                //查找数据库中qq或微信的数量，如果为1则返回true
-                case "wechat" ->
-                {
-                    stmtWechatAndQq.setString(1, auth.getWechat());
-                    ResultSet resultSet = stmtWechatAndQq.executeQuery();
-                    if (resultSet.next()) return resultSet.getLong(1);
-                }
-                case "qq" ->
-                {
-                    stmtWechatAndQq.setString(1, auth.getQq());
-                    ResultSet resultSet = stmtWechatAndQq.executeQuery();
-                    if (resultSet.next()) return resultSet.getLong(1);
-                }
-                default ->
-                {
-                    stmtMid.setLong(1, auth.getMid());
-                    ResultSet resultSet = stmtMid.executeQuery();
-                    if (resultSet.next() && resultSet.getString(1).equals(auth.getPassword()))
-                        return resultSet.getLong(1);
-                }
-            }
-        }
-        catch (SQLException e)
-        {
-            e.printStackTrace();
-            return -1;
-        }
-        return -1;
-    }
-
     private boolean hasDeletePermission(long authMid, long mid)
     {
-
-        //用mid
         String sqlCheckIdentity = "select identity from users where mid = ?";
 
         //检查对应用户的identity是否为superuser，且删除用户的identity是user
@@ -279,18 +258,20 @@ public class UserServiceImpl implements UserService
     }
 
 
-    @Override
+    /*@Override
     public boolean follow(AuthInfo auth, long followeeMid)
     {
-        try
+        long authMid = isAuthValid(auth);
+        if (authMid == -1) return false;
+
+        String check = """
+                select *
+                from user_follow
+                where follow_mid = ? and follow_by_mid = ?""";
+        try (Connection conn = dataSource.getConnection();
+             PreparedStatement check_stmt = conn.prepareStatement(check))
         {
-            Connection conn = dataSource.getConnection();
-            String check = """
-                    select *
-                    from user_follow
-                    where follow_mid = ? and follow_by_mid = ?""";
-            PreparedStatement check_stmt = conn.prepareStatement(check);
-            check_stmt.setLong(1, auth.getMid());
+            check_stmt.setLong(1, authMid);
             check_stmt.setLong(2, followeeMid);
             ResultSet check_rs = check_stmt.executeQuery();
             if (check_rs.next())
@@ -298,7 +279,7 @@ public class UserServiceImpl implements UserService
                 String sql = "delete from user_follow\n" +
                         "where follow_mid = ? and follow_by_mid = ?";
                 PreparedStatement stmt = conn.prepareStatement(sql);
-                stmt.setLong(1, auth.getMid());
+                stmt.setLong(1, authMid);
                 stmt.setLong(2, followeeMid);
                 return stmt.executeUpdate() == -1;
             }
@@ -306,7 +287,7 @@ public class UserServiceImpl implements UserService
             {
                 String sql = "insert into user_follow (follow_mid, follow_by_mid) values (?, ?);";
                 PreparedStatement stmt = conn.prepareStatement(sql);
-                stmt.setLong(1, auth.getMid());
+                stmt.setLong(1, authMid);
                 stmt.setLong(2, followeeMid);
                 return stmt.executeUpdate() == -1;
             }
@@ -316,61 +297,153 @@ public class UserServiceImpl implements UserService
             System.out.println("follow: " + e);
             return false;
         }
-    }
-
+    }*/
     @Override
-    public UserInfoResp getUserInfo(long mid)
+    public boolean follow(AuthInfo auth, long followeeMid)
     {
-        try
+        // 验证授权信息是否有效
+        long authMid = isAuthValid(auth, dataSource);
+        // 如果授权信息无效，返回 false
+        if (authMid == -1) return false;
+
+        // SQL 查询，检查用户是否已经关注了 followee
+        String checkSql = """
+                SELECT *
+                FROM user_follow
+                WHERE follow_mid = ? AND follow_by_mid = ?""";
+
+        // SQL 删除，用于取消关注
+        String deleteSql = """
+                DELETE FROM user_follow
+                WHERE follow_mid = ? AND follow_by_mid = ?""";
+
+        // SQL 插入，用于添加新的关注
+        String insertSql = """
+                INSERT INTO user_follow (follow_mid, follow_by_mid)
+                VALUES (?, ?)""";
+
+        try (Connection conn = dataSource.getConnection();
+             PreparedStatement checkStmt = conn.prepareStatement(checkSql))
         {
-            Connection conn = dataSource.getConnection();
-            String str = """
-                    select mid,
-                           coin,
-                           array(select follow_mid
-                                 from user_follow
-                                 where follow_mid = ?) following,
-                           array(select follow_mid
-                                 from user_follow
-                                 where follow_mid = ?) gollower,
-                           array(select bv
-                                 from view
-                                 where mid = ?)        watched,
-                           array(select bv
-                                 from likes
-                                 where mid = ?)        liked,
-                           array(select bv
-                                 from favorite
-                                 where mid = ?)        collated,
-                           array(select bv
-                                 from videos
-                                 where owner_mid = ?)  posted
-                    from users""";
-            PreparedStatement stmt = conn.prepareStatement(str);
-            for (int i = 1; i < 7; i++)
+
+            checkStmt.setLong(1, authMid);
+            checkStmt.setLong(2, followeeMid);
+            try (ResultSet checkRs = checkStmt.executeQuery())
             {
-                stmt.setLong(i, mid);
-            }
-            ResultSet rs = stmt.executeQuery();
-            if (rs.next())
-            {
-                return new UserInfoResp(
-                        rs.getLong(1),
-                        rs.getInt(2),
-                        (long[]) rs.getArray(3).getArray(),
-                        (long[]) rs.getArray(4).getArray(),
-                        (String[]) rs.getArray(5).getArray(),
-                        (String[]) rs.getArray(6).getArray(),
-                        (String[]) rs.getArray(7).getArray(),
-                        (String[]) rs.getArray(8).getArray()
-                );
+                if (checkRs.next())
+                {
+                    // 如果已经关注，则执行删除操作
+                    return executeUpdate(conn, deleteSql, authMid, followeeMid) == 1;
+                }
+                else
+                {
+                    // 如果尚未关注，则执行插入操作
+                    return executeUpdate(conn, insertSql, authMid, followeeMid) == 1;
+                }
             }
         }
         catch (SQLException e)
         {
-            System.out.println("getUserInfo: " + e);
+            log.error("Error during follow: " + e);
+            return false;
         }
-        return null;
     }
 
+    private int executeUpdate(Connection conn, String sql, long authMid, long followeeMid) throws SQLException
+    {
+        try (PreparedStatement stmt = conn.prepareStatement(sql))
+        {
+            stmt.setLong(1, authMid); // 设置执行操作的用户的 mid
+            stmt.setLong(2, followeeMid); // 设置要关注或取消关注的用户的 mid
+            return stmt.executeUpdate(); // 执行更新操作并返回影响的行数
+        }
+    }
+
+
+    @Override
+    public UserInfoResp getUserInfo(long mid)
+    {
+        // SQL 查询语句，获取用户信息以及与用户相关的各种列表
+        String sql = """
+                SELECT mid,
+                       coin,
+                    array(SELECT follow_mid
+                             FROM user_follow
+                             WHERE follow_by_mid = ?) following,
+                    array(SELECT follow_by_mid
+                            FROM user_follow
+                            WHERE follow_mid = ?)    follower,
+                    array(SELECT bv
+                            FROM view
+                            WHERE mid = ?)           watched,
+                    array(SELECT bv
+                            FROM likes
+                            WHERE mid = ?)           liked,
+                    array(SELECT bv
+                            FROM favorite
+                            WHERE mid = ?)           favorited,
+                    array(SELECT bv
+                            FROM videos
+                            WHERE owner_mid = ?)     posted
+                        FROM users
+                        WHERE mid = ?;"""; // 查询用户基本信息及关联的列表
+
+        try (Connection conn = dataSource.getConnection(); // 获取数据库连接
+             PreparedStatement stmt = conn.prepareStatement(sql))
+        { // 准备 SQL 语句
+
+            // 设置查询参数
+            for (int i = 1; i < 8; i++)
+            {
+                stmt.setLong(i, mid);
+            }
+
+            try (ResultSet rs = stmt.executeQuery())
+            { // 执行查询并处理结果集
+                if (rs.next())
+                {
+                    // 封装查询结果到 UserInfoResp 对象并返回
+                    return new UserInfoResp(
+                            rs.getLong(1),
+                            rs.getInt(2),
+                            getLongArray(rs.getArray(3)),
+                            getLongArray(rs.getArray(4)),
+                            (String[]) safeGetArray(rs, 5),
+                            (String[]) safeGetArray(rs, 6),
+                            (String[]) safeGetArray(rs, 7),
+                            (String[]) safeGetArray(rs, 8)
+                    );
+                }
+            }
+        }
+        catch (SQLException e)
+        {
+            log.error("Error during getting user info: " + e); // 记录 SQL 异常
+        }
+        log.error("User info not found");
+        return null; // 发生异常或未找到用户时返回 null
+    }
+
+    private Object[] safeGetArray(ResultSet rs, int columnIndex) throws SQLException
+    {
+        Array array = rs.getArray(columnIndex);
+        if (array != null)
+        {
+            return (Object[]) array.getArray();
+        }
+        return new Object[0]; // 返回空数组
+    }
+
+    private long[] getLongArray(Array arrayFromDb) throws SQLException
+    {
+        Long[] longObjects = (Long[]) arrayFromDb.getArray();
+
+        long[] longs = new long[longObjects.length];
+        for (int i = 0; i < longObjects.length; i++)
+        {
+            Long currentLong = longObjects[i];
+            longs[i] = (currentLong != null) ? currentLong : 0L; // 添加空值检查
+        }
+        return longs;
+    }
 }

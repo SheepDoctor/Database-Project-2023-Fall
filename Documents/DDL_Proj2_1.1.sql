@@ -69,8 +69,8 @@ create table danmu
 (
     bv        char(12),                       -- 弹幕所属视频的BV
     mid       bigint,                         -- 弹幕发送者的用户ID
-    time      int  not null,                  -- 自视频开始以来弹幕显示的时间（秒）
-    content   text not null,                  -- 弹幕的内容
+    time      float not null,                 -- 自视频开始以来弹幕显示的时间（秒）
+    content   text  not null,                 -- 弹幕的内容
     post_time timestamp,                      -- 弹幕的发布时间
     id        BIGSERIAL PRIMARY KEY,          -- 弹幕的唯一标识符
     foreign key (bv) references videos (bv),  -- 引用 'videos' 表的 'bv'

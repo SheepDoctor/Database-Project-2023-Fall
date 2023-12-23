@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 
 import javax.sql.DataSource;
 import java.sql.*;
+import java.time.LocalDateTime;
 import java.util.*;
 
 @Service
@@ -16,44 +17,82 @@ public class VideoServiceImp implements VideoService
     @Autowired
     private DataSource dataSource;
 
-    public String postVideo(AuthInfo auth, PostVideoReq req)
-    {
-        //LocalDateTime time = LocalDateTime.now();
-        Timestamp current_time = new Timestamp(System.currentTimeMillis());
-        //long av = VideoRecord.getav();
+    /**
+     * Posts a video. Its commit time shall be {@link LocalDateTime#now()}.
+     *
+     * @param auth the current user's authentication information
+     * @param req  the video's information
+     * @return the video's {@code bv}
+     * @apiNote You may consider the following corner cases:
+     * <ul>
+     *   <li>{@code auth} is invalid, as stated in {@link io.sustc.service.UserService#deleteAccount(AuthInfo, long)}</li>
+     *   <li>{@code req} is invalid
+     *     <ul>
+     *       <li>{@code title} is null or empty</li>
+     *       <li>there is another video with same {@code title} and same user</li>
+     *       <li>{@code duration} is less than 10 (so that no chunk can be divided)</li>
+     *       <li>{@code publicTime} is earlier than {@link LocalDateTime#now()}</li>
+     *     </ul>
+     *   </li>
+     * </ul>
+     * If any of the corner case happened, {@code null} shall be returned.
+     */
+    @Override
+    public String postVideo(AuthInfo auth, PostVideoReq req) {
+        // 验证授权信息是否有效
+        long authenticatedUserId = UserServiceImpl.isAuthValid(auth, dataSource);
+        if (authenticatedUserId == -1) return null; // 如果授权无效，返回 null
+
+        // 检查视频请求的有效性
+        if (req == null || req.getTitle() == null || req.getTitle().trim().isEmpty()
+                || req.getDuration() < 10 || req.getPublicTime().before(Timestamp.valueOf(LocalDateTime.now()))) {
+            return null; // 请求无效，返回 null
+        }
+
+        // 生成视频 BV 号
+        String bv = generateBvNumber();
+
+        // SQL 语句插入视频数据
+        String insertVideoSql = "INSERT INTO videos(bv, title, owner_mid, commit_time, public_time, duration, description)" +
+                " VALUES(?, ?, ?, ?, ?, ?, ?)";
+        try (Connection conn = dataSource.getConnection();
+             PreparedStatement videoInsertStmt = conn.prepareStatement(insertVideoSql)) {
+            videoInsertStmt.setString(1, bv);
+            videoInsertStmt.setString(2, req.getTitle());
+            videoInsertStmt.setLong(3, auth.getMid());
+            videoInsertStmt.setTimestamp(4, Timestamp.valueOf(LocalDateTime.now())); // 使用当前时间作为提交时间
+            videoInsertStmt.setTimestamp(5, req.getPublicTime());
+            videoInsertStmt.setLong(6, (long) req.getDuration());
+            videoInsertStmt.setString(7, req.getDescription());
+
+            videoInsertStmt.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+            throw new RuntimeException("Failed to post video", e);
+        }
+        return bv;
+    }
+
+    /**
+     * 生成 BV 号
+     * 使用随机数和固定算法生成 BV 号。
+     * @return 生成的 BV 号
+     */
+    private String generateBvNumber() {
         Random random = new Random();
         long av = random.nextInt(1000000000);
         String table = "fZodR9XQDSUm21yCkr6zBqiveYah8bt4xsWpHnJE7jL5VG3guMTKNPAwcF";
         int[] s = {11, 10, 3, 8, 4, 6};
         long xor = 177451812L;
         long add = 8728348608L;
-        char[] bv_c = "BV1  4 1 7  ".toCharArray();
+        char[] bvChars = "BV1  4 1 7  ".toCharArray();
         av = (av ^ xor) + add;
-        for (int i = 0; i < 6; i++)
-        {
-            bv_c[s[i]] = table.charAt((int) (av / Math.pow(58, i) % 58));
+        for (int i = 0; i < 6; i++) {
+            bvChars[s[i]] = table.charAt((int) (av / Math.pow(58, i) % 58));
         }
-        String bv = Arrays.toString(bv_c);
-
-        String sql = "insert into videos(bv, title, owner_mid, commit_time, public_time, duration, description) values(?,?,?,?,?,?,?)";
-        try (Connection conn = dataSource.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql))
-        {
-            stmt.setString(1, bv);
-            stmt.setString(2, req.getTitle());
-            stmt.setLong(3, auth.getMid());
-            stmt.setTimestamp(4, current_time);
-            stmt.setTimestamp(5, req.getPublicTime());
-            stmt.setLong(6, (long) req.getDuration());
-            stmt.setString(7, req.getDescription());
-            stmt.executeUpdate();
-        }
-        catch (SQLException e)
-        {
-            throw new RuntimeException(e);
-        }
-        return bv;
+        return new String(bvChars);
     }
+
 
     @Override
     public boolean deleteVideo(AuthInfo auth, String bv)
@@ -65,6 +104,7 @@ public class VideoServiceImp implements VideoService
             String select_user_info = "select identity from users where mid = " + auth.getMid();
             PreparedStatement select_user_info_stmt = conn.prepareStatement(select_user_info);
             ResultSet user_info = select_user_info_stmt.executeQuery();
+
             // 判断是否是superuser
             if (user_info.next() && Objects.equals(user_info.getString("identity"), "superuser"))
             {
@@ -105,7 +145,7 @@ public class VideoServiceImp implements VideoService
             // 验证更改者信息
             if (video_info.getLong("owner_id") == auth.getMid())
                 return false;
-            //验证视频时长有无修改
+            // 验证视频时长有无修改
             if (video_info.getLong("duration") != req.getDuration())
                 return false;
             //todo
@@ -264,11 +304,9 @@ public class VideoServiceImp implements VideoService
     @Override
     public boolean coinVideo(AuthInfo auth, String bv)
     {
-        try
+        String query4 = "SELECT * FROM videos WHERE BV = ? ;";
+        try(Connection conn = dataSource.getConnection();)
         {
-            Connection conn = dataSource.getConnection();
-
-            String query4 = "SELECT * FROM videos WHERE BV=?;";
             PreparedStatement preparedStatement4 = conn.prepareStatement(query4);
             preparedStatement4.setString(1, bv);
             ResultSet resultSet4 = preparedStatement4.executeQuery();
