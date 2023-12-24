@@ -11,6 +11,8 @@ import java.sql.*;
 import java.time.LocalDateTime;
 import java.util.*;
 
+import static io.sustc.service.impl.UserServiceImpl.isAuthValid;
+
 @Service
 public class VideoServiceImp implements VideoService
 {
@@ -40,7 +42,7 @@ public class VideoServiceImp implements VideoService
     @Override
     public String postVideo(AuthInfo auth, PostVideoReq req) {
         // 验证授权信息是否有效
-        long authenticatedUserId = UserServiceImpl.isAuthValid(auth, dataSource);
+        long authenticatedUserId = isAuthValid(auth, dataSource);
         if (authenticatedUserId == -1) return null; // 如果授权无效，返回 null
 
         // 检查视频请求的有效性
@@ -167,9 +169,43 @@ public class VideoServiceImp implements VideoService
         try
         {
             Connection conn = dataSource.getConnection();
-            String query1 = "SELECT * FROM VIDEOS join users on bv WHERE TITLE LIKE ? or videos.description LIKE ? or name like ?";
+            String query1 = """
+                    select bv from (
+                    select  bv,(
+                        select count(*)
+                            from
+                        (
+                                (select *from key_word where a.description like key_word.column1)
+                                union
+                                (select *from key_word where a.title like key_word.column1)
+                                union
+                                (select *from key_word where b.name like key_word.column1)
+                                                                                                )tmp
+                        )  as rate,
+                        (
+                            select count(*)
+                            from(select *from view
+                                         where view.bv=a.bv)tmp2
+                            ) as view_time
+
+                    from videos a join users b on a.owner_mid=b.mid
+                    order by rate desc ,view_time desc )tmp3
+                    where rate>0;""";
+            StringBuilder with_zone= new StringBuilder("""
+                    with key_word as(
+                        select *
+                        from (values""");
+            String[] key_words=keywords.split(" ");
+            for (int i=0;i<key_words.length;i++){
+                if (i!=0)
+                    with_zone.append(",");
+                with_zone.append("(%?%)");
+            }
+            with_zone.append("))");
+            query1=with_zone+query1;
             PreparedStatement query_1 = conn.prepareStatement(query1);
-            query_1.setString(1, keywords);
+            for (int i=0;i<key_words.length;i++)
+                query_1.setString(i+1,key_words[i]);
             ResultSet resultSet1 = query_1.executeQuery();
             if (resultSet1.absolute(pageNum * pageNum))
                 return null;
@@ -178,7 +214,7 @@ public class VideoServiceImp implements VideoService
                 int cou = 0;
                 while (true)
                 {
-                    res.add(resultSet1.getString("id"));
+                    res.add(resultSet1.getString("bv"));
                     cou++;
                     if (cou == pageSize)
                         break;
@@ -236,7 +272,7 @@ public class VideoServiceImp implements VideoService
         {
             Connection conn = dataSource.getConnection();
             String query1 = "SELECT * FROM videos WHERE BV= ? ;";
-            String query2 = "SELECT * FROM danmu WHERE BV= ? ;";
+            String query2 = "SELECT * FROM danmu WHERE BV= ? order by time;";
             PreparedStatement preparedStatement1 = conn.prepareStatement(query1);
             PreparedStatement preparedStatement2 = conn.prepareStatement(query2);
             ResultSet resultSet1 = preparedStatement1.executeQuery();
@@ -245,13 +281,24 @@ public class VideoServiceImp implements VideoService
                 return null;
             if (resultSet2 == null)
                 return null;
-            int tmp;
-           /* while (true){
-                res.add()
-                if ()
+            int tmp = resultSet1.getInt("duration");
+            int cou=0;
+            int cou_max=0;
+            for (int i=0;i<tmp;i+=10){
+                while (resultSet2.getFloat("time")<i+10&&resultSet2.getFloat("time")>i) {
+                    cou++;
+                    resultSet2.next();
+                }
+                if (cou>cou_max){
+                    cou=cou_max;
+                    res.clear();
+                    res.add(i);
+                }
+                else if (cou==cou_max){
+                    res.add(i);
+                }
             }
 
-            */
         }
         catch (SQLException e)
         {
@@ -265,6 +312,8 @@ public class VideoServiceImp implements VideoService
     {
         try
         {
+            if (isAuthValid(auth,dataSource)==-1)
+                return false;
             Connection conn = dataSource.getConnection();
             String query4 = "SELECT * FROM videos WHERE BV=?;";
             PreparedStatement preparedStatement4 = conn.prepareStatement(query4);
@@ -307,6 +356,8 @@ public class VideoServiceImp implements VideoService
         String query4 = "SELECT * FROM videos WHERE BV = ? ;";
         try(Connection conn = dataSource.getConnection();)
         {
+            if (isAuthValid(auth,dataSource)==-1)
+                return false;
             PreparedStatement preparedStatement4 = conn.prepareStatement(query4);
             preparedStatement4.setString(1, bv);
             ResultSet resultSet4 = preparedStatement4.executeQuery();
@@ -351,6 +402,8 @@ public class VideoServiceImp implements VideoService
     {
         try
         {
+            if (isAuthValid(auth,dataSource)==-1)
+                return false;
             Connection conn = dataSource.getConnection();
 
             String query4 = "SELECT * FROM videos WHERE BV=?;";
@@ -401,6 +454,8 @@ public class VideoServiceImp implements VideoService
     {
         try
         {
+            if (isAuthValid(auth,dataSource)==-1)
+                return false;
             Connection conn = dataSource.getConnection();
 
             String query4 = "SELECT * FROM videos WHERE BV=?;";
