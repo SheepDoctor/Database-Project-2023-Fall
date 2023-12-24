@@ -71,14 +71,14 @@ public class RecommenderServiceImpl implements RecommenderService
                              left join (select bv, count(*) fav_cnt
                                         from favorite
                                         group by bv) fav on fav.bv = view.bv
-                             left join (select bv, count(*) comment_cnt
-                                        from comment
-                                        group by bv) comment on comment.bv = fav.bv
+                             left join (select bv, count(*) danmu_cnt
+                                        from danmu
+                                        group by bv) danmu on danmu.bv = fav.bv
                              left join (select v.bv, avg(v.time / videos.duration) as avg_time_ratio
                                         from view v
                                                  join videos on v.bv = videos.bv
-                                        group by v.bv) time on time.bv = comment.bv
-                    order by (like_cnt / view_cnt::float4 + fav_cnt / view_cnt::float4 + comment_cnt / view_cnt::float4 +
+                                        group by v.bv) time on time.bv = danmu.bv
+                    order by (like_cnt / view_cnt::float4 + fav_cnt / view_cnt::float4 + danmu_cnt / view_cnt::float4 +
                               avg_time_ratio) desc
                     limit ? offset ?""";
             PreparedStatement stmt = conn.prepareStatement(rank);
@@ -101,6 +101,8 @@ public class RecommenderServiceImpl implements RecommenderService
     @Override
     public List<String> recommendVideosForUser(AuthInfo auth, int pageSize, int pageNum)
     {
+        if (UserServiceImpl.isAuthValid(auth, dataSource) == -1)
+            return null;
         List<String> str = new ArrayList<>();
         try
         {
@@ -109,10 +111,10 @@ public class RecommenderServiceImpl implements RecommenderService
                     select view.bv bvi
                     from view
                              left join videos on view.bv = videos.bv
-                             left join users on users.mid = videos.owner_id
+                             left join users on users.mid = videos.owner_mid
                     where view.mid in (select f1.follow_by_mid as friend
-                                       from (select * from follow where follow_mid = ?) f1
-                                                join (select * from follow where follow_by_mid = ?) f2
+                                       from (select * from user_follow where follow_mid = ?) f1
+                                                join (select * from user_follow where follow_by_mid = ?) f2
                                                      on f1.follow_by_mid = f2.follow_mid
                                        where f1.follow_mid != f1.follow_by_mid)
                     group by view.bv, users.level, videos.commit_time
@@ -140,29 +142,34 @@ public class RecommenderServiceImpl implements RecommenderService
     @Override
     public List<Long> recommendFriends(AuthInfo auth, int pageSize, int pageNum)
     {
+        if (UserServiceImpl.isAuthValid(auth, dataSource) == -1)
+            return null;
         List<Long> str = new ArrayList<>();
         try
         {
             Connection conn = dataSource.getConnection();
             String sql = """
                     select follow_mid
-                    from follow left join users on follow.follow_mid = users.mid
+                    from user_follow left join users on user_follow.follow_mid = users.mid
                     where follow_by_mid in (select follow_by_mid
-                                            from follow
+                                            from user_follow
                                             where follow_mid = ?)
                       and follow_mid not in (select f1.follow_by_mid as friend
-                                             from (select * from follow where follow_mid = ?) f1
-                                                      join (select * from follow where follow_by_mid = 3610) f2
+                                             from (select * from user_follow where follow_mid = ?) f1
+                                                      join (select * from user_follow where follow_by_mid = ?) f2
                                                            on f1.follow_by_mid = f2.follow_mid
                                              where f1.follow_mid != f1.follow_by_mid)
                       and follow_mid != ?
                     group by follow_mid, users.level
-                    order by count(*) desc, users.level desclimit ? offset ?""";
+                    order by count(*) desc, users.level desc 
+                    limit ? offset ?""";
             PreparedStatement stmt = conn.prepareStatement(sql);
             stmt.setLong(1, auth.getMid());
             stmt.setLong(2, auth.getMid());
-            stmt.setInt(3, pageSize);
-            stmt.setInt(4, pageNum);
+            stmt.setLong(3, auth.getMid());
+            stmt.setLong(4, auth.getMid());
+            stmt.setInt(5, pageSize);
+            stmt.setInt(6, pageNum);
             ResultSet rs = stmt.executeQuery();
             while (rs.next())
             {

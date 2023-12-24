@@ -20,3 +20,4 @@ build/
 ### Project Spec Ignored ###
 /sustc-runner/data/postgresql/
 benchmark-*.csv
+application.yml

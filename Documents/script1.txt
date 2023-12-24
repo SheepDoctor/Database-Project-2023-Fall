@@ -1,0 +1,5 @@
+# Recommender 指令测试表
+rec friends 1703941 8UpAH5F)D= //Done
+rec user  1703941 8UpAH5F)D= //Done
+rec general 10 1
+rec video BV14r4y1i7vZ
