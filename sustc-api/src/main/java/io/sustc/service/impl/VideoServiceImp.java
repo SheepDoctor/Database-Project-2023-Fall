@@ -201,7 +201,7 @@ public class VideoServiceImp implements VideoService
                     with_zone.append(",");
                 with_zone.append("('%"+key_words[i]+"%')");
             }
-            with_zone.append("))");
+            with_zone.append(")as bieming114514)");
             query1=with_zone+query1;
             PreparedStatement query_1 = conn.prepareStatement(query1);
            // for (int i=0;i<key_words.length;i++)
