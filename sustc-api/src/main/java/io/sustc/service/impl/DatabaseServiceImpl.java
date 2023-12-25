@@ -1,6 +1,5 @@
 package io.sustc.service.impl;
 
-import io.sustc.dto.AuthInfo;
 import io.sustc.dto.DanmuRecord;
 import io.sustc.dto.UserRecord;
 import io.sustc.dto.VideoRecord;
@@ -10,7 +9,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.sql.DataSource;
-import java.sql.*;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.Arrays;
 import java.util.List;
 
@@ -169,6 +171,10 @@ public class DatabaseServiceImpl implements DatabaseService
                     {
                         statement.executeBatch(); // 执行批量插入
                         statement.clearBatch(); // 清除当前批处理
+                    }
+                    if (count % 100000 == 0)
+                    {
+                        log.info("{} follow are imported.", count);
                     }
                 }
             }
@@ -334,7 +340,7 @@ public class DatabaseServiceImpl implements DatabaseService
 
         // You can use the default truncate script provided by us in most cases,
         // but if it doesn't work properly, you may need to modify it.
-        // 在大多数情况下，您可以使用我们提供的默认截断脚本、、、、
+        // 在大多数情况下，您可以使用我们提供的默认截断脚本
         // 但如果它不能正常工作，您可能需要修改它。
 
         String sql = """
@@ -355,7 +361,9 @@ public class DatabaseServiceImpl implements DatabaseService
         try (Connection conn = dataSource.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql))
         {
+            log.info("start truncate");
             stmt.executeUpdate();
+            log.info("end truncate");
         }
         catch (SQLException e)
         {

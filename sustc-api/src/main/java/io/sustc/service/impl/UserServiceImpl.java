@@ -372,19 +372,19 @@ public class UserServiceImpl implements UserService
                              WHERE follow_by_mid = ?) following,
                     array(SELECT follow_by_mid
                             FROM user_follow
-                            WHERE follow_mid = ?)    follower,
+                            WHERE follow_mid = ?)     follower,
                     array(SELECT bv
                             FROM view
-                            WHERE mid = ?)           watched,
+                            WHERE mid = ?)            watched,
                     array(SELECT bv
                             FROM likes
-                            WHERE mid = ?)           liked,
+                            WHERE mid = ?)            liked,
                     array(SELECT bv
                             FROM favorite
-                            WHERE mid = ?)           favorited,
+                            WHERE mid = ?)            favorited,
                     array(SELECT bv
                             FROM videos
-                            WHERE owner_mid = ?)     posted
+                            WHERE owner_mid = ?)      posted
                         FROM users
                         WHERE mid = ?;"""; // 查询用户基本信息及关联的列表
 
