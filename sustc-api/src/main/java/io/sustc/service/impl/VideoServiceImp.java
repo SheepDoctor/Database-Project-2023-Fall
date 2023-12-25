@@ -153,21 +153,21 @@ public class VideoServiceImp implements VideoService
             //todo
             return false;
         }
-        catch (SQLException e)
-        {
+        catch (SQLException e) {
             e.printStackTrace();
             throw new RuntimeException(e);
         }
     }
 
+    public static void s() {
+    }
+
     @Override
-    public List<String> searchVideo(AuthInfo auth, String keywords, int pageSize, int pageNum)
-    {
+    public List<String> searchVideo(AuthInfo auth, String keywords, int pageSize, int pageNum) {
         List<String> res = new LinkedList<>();
         if (keywords.equals(" ") | pageNum <= 0 | pageSize <= 0)
             return null;
-        try
-        {
+        try {
             Connection conn = dataSource.getConnection();
             String query1 = """
                     select bv from (
@@ -189,38 +189,29 @@ public class VideoServiceImp implements VideoService
                             ) as view_time
 
                     from videos a join users b on a.owner_mid=b.mid
-                    order by rate desc ,view_time desc )tmp3
-                    where rate>0;""";
-            StringBuilder with_zone= new StringBuilder("""
+                    order by rate desc,view_time desc ,bv )tmp3
+                    where rate>0
+                    offset ?-1
+                    limit ?;""";
+            StringBuilder with_zone = new StringBuilder("""
                     with key_word as(
                         select distinct *
                         from (values""");
-            String[] key_words=keywords.split(" ");
-            for (int i=0;i<key_words.length;i++){
-                if (i!=0)
+            String[] key_words = keywords.split(" ");
+            for (int i = 0; i < key_words.length; i++) {
+                if (i != 0)
                     with_zone.append(",");
-                with_zone.append("('%"+key_words[i]+"%')");
+                with_zone.append("('%").append(key_words[i]).append("%')");
             }
             with_zone.append("))");
-            query1=with_zone+query1;
+            query1 = with_zone + query1;
             PreparedStatement query_1 = conn.prepareStatement(query1);
-           // for (int i=0;i<key_words.length;i++)
-           //     query_1.setString(i+1,key_words[i]);
+            query_1.setInt(1, (pageNum - 1) * pageSize + 1);
+
+            query_1.setInt(2, pageSize);
             ResultSet resultSet1 = query_1.executeQuery();
-            if (resultSet1.absolute(pageNum * pageNum))
-                return null;
-            else
-            {
-                int cou = 0;
-                while (true)
-                {
-                    res.add(resultSet1.getString("bv"));
-                    cou++;
-                    if (cou == pageSize)
-                        break;
-                    if (!resultSet1.next())
-                        break;
-                }
+            while (resultSet1.next()) {
+                res.add(resultSet1.getString("bv"));
             }
         }
         catch (SQLException e)
@@ -338,58 +329,29 @@ public class VideoServiceImp implements VideoService
     @Override
     public boolean coinVideo(AuthInfo auth, String bv)
     {
-        String query4 = "SELECT * FROM videos WHERE BV = ? ;";
-        try(Connection conn = dataSource.getConnection();)
-        {
-            if (isAuthValid(auth,dataSource)==-1)
-                return false;
-            PreparedStatement preparedStatement4 = conn.prepareStatement(query4);
-            preparedStatement4.setString(1, bv);
-            ResultSet resultSet4 = preparedStatement4.executeQuery();
-            if (!resultSet4.next() || resultSet4.getLong(1) == auth.getMid())
-                return false;
-
-            List<String> res = searchVideo(auth, bv, 1, 1);
-
-            if (res == null)
-                return false;
-
-            String query2 = "SELECT * FROM users WHERE MID=?;";
-            PreparedStatement preparedStatement2 = conn.prepareStatement(query2);
-            preparedStatement2.setLong(1, auth.getMid());
-            ResultSet resultSet2 = preparedStatement2.executeQuery();
-            if (resultSet2.getInt("coin") == 0)
-                return false;
-
-            String query3 = "SELECT * FROM coin WHERE MID=?;";
-            PreparedStatement preparedStatement3 = conn.prepareStatement(query3);
-            preparedStatement3.setLong(1, auth.getMid());
-            ResultSet resultSet3 = preparedStatement3.executeQuery();
-            if (!resultSet3.next())
-                return false;
-
-            String query5 = "INSERT INTO coin (bv, mid) values (?,?);";
-            PreparedStatement preparedStatement5 = conn.prepareStatement(query5);
-            preparedStatement5.setLong(2, auth.getMid());
-            preparedStatement5.setString(1, bv);
-            preparedStatement5.executeUpdate();
-            return true;
-
-        }
-        catch (SQLException e)
-        {
-            throw new RuntimeException(e);
-        }
+        return like_collect(auth, bv, "coin");
     }
 
     @Override
-    public boolean likeVideo(AuthInfo auth, String bv)
-    {
-        try
-        {
-            if (isAuthValid(auth,dataSource)==-1)
+    public boolean likeVideo(AuthInfo auth, String bv) {
+
+
+        return like_collect(auth, bv, "like");
+    }
+
+    @Override
+    public boolean collectVideo(AuthInfo auth, String bv) {
+
+
+        return like_collect(auth, bv, "favorite");
+
+
+    }
+
+    public boolean like_collect(AuthInfo auth, String bv, String op) {
+        try (Connection conn = dataSource.getConnection()) {
+            if (isAuthValid(auth, dataSource) == -1)
                 return false;
-            Connection conn = dataSource.getConnection();
 
             String query4 = "SELECT * FROM videos WHERE BV=?;";
             PreparedStatement preparedStatement4 = conn.prepareStatement(query4);
@@ -402,86 +364,30 @@ public class VideoServiceImp implements VideoService
             if (res == null)
                 return false;
 
-
-            String query3 = "SELECT * FROM likes WHERE MID= ? ;";
-            PreparedStatement preparedStatement3 = conn.prepareStatement(query3);
-            preparedStatement3.setLong(1, auth.getMid());
-            ResultSet resultSet3 = preparedStatement3.executeQuery();
-            if (!resultSet3.next())
-
-            {
-                String query5 = "INSERT INTO likes (bv,mid) values (?,?);";
-                PreparedStatement preparedStatement5 = conn.prepareStatement(query5);
-                preparedStatement5.setLong(2, auth.getMid());
-                preparedStatement5.setString(1, bv);
-                preparedStatement5.executeUpdate();
+            String check_done_before = "SELECT * FROM " + op + " WHERE MID = ?;";
+            PreparedStatement check_statement = conn.prepareStatement(check_done_before);
+            check_statement.setLong(1, auth.getMid());
+            ResultSet resultSet3 = check_statement.executeQuery();
+            if (!resultSet3.next()) {
+                String update_op = "INSERT INTO " + op + " (bv,mid) values (?,?);";
+                PreparedStatement insert_statement = conn.prepareStatement(update_op);
+                insert_statement.setLong(2, auth.getMid());
+                insert_statement.setString(1, bv);
+                insert_statement.executeUpdate();
                 return true;
             }
-            else
-            {
-                String query5 = "DELETE FROM likes where mid = ? and bv= ?;";
-                PreparedStatement preparedStatement5 = conn.prepareStatement(query5);
-                preparedStatement5.setLong(1, auth.getMid());
-                preparedStatement5.setString(2, bv);
-                preparedStatement5.executeUpdate();
+            else {
+                if (!op.equals("coin")) {
+                    String update_op = "DELETE FROM " + op + " where mid = ? and bv= ?;";
+                    PreparedStatement insert_statement = conn.prepareStatement(update_op);
+                    insert_statement.setLong(1, auth.getMid());
+                    insert_statement.setString(2, bv);
+                    insert_statement.executeUpdate();
+                }
                 return false;
             }
-
         }
-        catch (SQLException e)
-        {
-            throw new RuntimeException(e);
-        }
-    }
-
-    @Override
-    public boolean collectVideo(AuthInfo auth, String bv)
-    {
-        try
-        {
-            if (isAuthValid(auth,dataSource)==-1)
-                return false;
-            Connection conn = dataSource.getConnection();
-
-            String query4 = "SELECT * FROM videos WHERE BV=?;";
-            PreparedStatement preparedStatement4 = conn.prepareStatement(query4);
-            preparedStatement4.setString(1, bv);
-            ResultSet resultSet4 = preparedStatement4.executeQuery();
-            if (!resultSet4.next() || resultSet4.getLong(1) == auth.getMid())
-                return false;
-
-            List<String> res = searchVideo(auth, bv, 1, 1);
-            if (res == null)
-                return false;
-
-
-            String query3 = "SELECT * FROM favorite WHERE MID = ?;";
-            PreparedStatement preparedStatement3 = conn.prepareStatement(query3);
-            preparedStatement3.setLong(1, auth.getMid());
-            ResultSet resultSet3 = preparedStatement3.executeQuery();
-            if (!resultSet3.next())
-
-            {
-                String query5 = "INSERT INTO favorite(bv,mid) values (?,?);";
-                PreparedStatement preparedStatement5 = conn.prepareStatement(query5);
-                preparedStatement5.setLong(2, auth.getMid());
-                preparedStatement5.setString(1, bv);
-                preparedStatement5.executeUpdate();
-                return true;
-            }
-            else
-            {
-                String query5 = "DELETE FROM favorite where mid = ? and bv= ?;";
-                PreparedStatement preparedStatement5 = conn.prepareStatement(query5);
-                preparedStatement5.setLong(1, auth.getMid());
-                preparedStatement5.setString(2, bv);
-                preparedStatement5.executeUpdate();
-                return false;
-            }
-
-        }
-        catch (SQLException e)
-        {
+        catch (SQLException e) {
             throw new RuntimeException(e);
         }
     }
