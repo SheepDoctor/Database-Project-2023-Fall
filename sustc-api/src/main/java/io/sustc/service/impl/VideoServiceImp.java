@@ -199,7 +199,7 @@ public class VideoServiceImp implements VideoService
             for (int i=0;i<key_words.length;i++){
                 if (i!=0)
                     with_zone.append(",");
-                with_zone.append("'(%"+key_words[i]+"%)'");
+                with_zone.append("('%"+key_words[i]+"%')");
             }
             with_zone.append("))");
             query1=with_zone+query1;
