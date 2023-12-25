@@ -168,6 +168,8 @@ public class VideoServiceImp implements VideoService
             return null;
         try
         {
+            if (isAuthValid(auth,dataSource)==-1)
+                return null;
             Connection conn = dataSource.getConnection();
             String query1 = """
                     select bv from (
@@ -189,8 +191,8 @@ public class VideoServiceImp implements VideoService
                             ) as view_time
 
                     from videos a join users b on a.owner_mid=b.mid
-                    order by rate desc,view_time desc ,bv )tmp3
-                    where rate>0
+                    order by rate desc,bv )tmp3
+                    where rate>0 and (bv not in (select bv from review) or 'SUPERUSER' in (select identity from users where mid=?))
                     offset ?-1
                     limit ?;""";
             StringBuilder with_zone= new StringBuilder("""
@@ -206,9 +208,10 @@ public class VideoServiceImp implements VideoService
             with_zone.append(")as bieming114514)");
             query1=with_zone+query1;
             PreparedStatement query_1 = conn.prepareStatement(query1);
-            query_1.setInt(1,(pageNum-1)*pageSize+1);
+            query_1.setLong(1,auth.getMid());
+            query_1.setInt(2,(pageNum-1)*pageSize+1);
 
-            query_1.setInt(2,pageSize);
+            query_1.setInt(3,pageSize);
             ResultSet resultSet1 = query_1.executeQuery();
             while (resultSet1.next()){
                 res.add(resultSet1.getString("bv"));
