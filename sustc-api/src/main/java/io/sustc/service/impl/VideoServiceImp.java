@@ -237,23 +237,21 @@ public class VideoServiceImp implements VideoService
         try
         {
             Connection conn = dataSource.getConnection();
-            String query1 = "SELECT * FROM videos WHERE BV=?;";
-            String query2 = "select *from (\n" +
-                    "select sum(time),count(*) from view where bv=?)tmp\n" +
-                    "where tmp is not null ;";
-            PreparedStatement preparedStatement1 = conn.prepareStatement(query1);
-            PreparedStatement preparedStatement2 = conn.prepareStatement(query2);
-            preparedStatement1.setString(1,bv);
-            preparedStatement2.setString(1,bv);
-            ResultSet resultSet1 = preparedStatement1.executeQuery();
-            ResultSet resultSet2 = preparedStatement2.executeQuery();
-            if (!resultSet1.next())
+            String query = """
+                    select *from (
+                                        select sum(time),count(*) from view where bv=?)tmp,
+                   (SELECT duration FROM videos WHERE BV=?)tmp1
+                    where tmp is not null
+                    ;""";
+            PreparedStatement preparedStatement = conn.prepareStatement(query);
+            preparedStatement.setString(1,bv);
+            preparedStatement.setString(2,bv);
+            ResultSet resultSet = preparedStatement.executeQuery();
+            if (!resultSet.next())
                 return -1;
-            if (!resultSet2.next())
-                return -1;
-            double tmp = resultSet2.getFloat(1);
-            int cou = resultSet2.getInt(2);
-            res = tmp / (cou * resultSet1.getInt(1));
+            double tmp = resultSet.getFloat(1);
+            int cou = resultSet.getInt(2);
+            res = tmp / (cou * resultSet.getInt(3));
         }
         catch (SQLException e)
         {
@@ -269,35 +267,17 @@ public class VideoServiceImp implements VideoService
         try
         {
             Connection conn = dataSource.getConnection();
-            String query1 = "SELECT * FROM videos WHERE BV= ? ;";
-            String query2 = "SELECT * FROM danmu WHERE BV= ? order by time;";
-            PreparedStatement preparedStatement1 = conn.prepareStatement(query1);
+            String query2 = """
+                    select time2 from (
+                    select distinct time2,rank() over (order by cou desc ) as rank from (
+                    select floor(time/10) as time2,count(*) over (partition by floor(time/10)) as cou from danmu where bv=?)tmp)tmp2
+                    where rank=1::bigint;""";
             PreparedStatement preparedStatement2 = conn.prepareStatement(query2);
-            preparedStatement1.setString(1,bv);
             preparedStatement2.setString(1,bv);
-            ResultSet resultSet1 = preparedStatement1.executeQuery();
             ResultSet resultSet2 = preparedStatement2.executeQuery();
             resultSet2.next();
-            if (!resultSet1.next())
-                return null;
-            if (!resultSet2.next())
-                return null;
-            int tmp = resultSet1.getInt("duration");
-            int cou=0;
-            int cou_max=0;
-            for (int i=0;i<tmp;i+=10){
-                while (resultSet2.getFloat("time")<i+10&&resultSet2.getFloat("time")>i) {
-                    cou++;
-                    resultSet2.next();
-                }
-                if (cou>cou_max){
-                    cou=cou_max;
-                    res.clear();
-                    res.add(i);
-                }
-                else if (cou==cou_max){
-                    res.add(i);
-                }
+            while (resultSet2.next()){
+                res.add(resultSet2.getInt(1));
             }
 
         }
@@ -322,8 +302,12 @@ public class VideoServiceImp implements VideoService
             ResultSet resultSet4 = preparedStatement4.executeQuery();
             if (!resultSet4.next() || resultSet4.getLong(1) == auth.getMid())
                 return false;
-
-
+            String query6="SELECT identity FROM USERS where mid= ?";
+            PreparedStatement preparedStatement=conn.prepareStatement(query6);
+            preparedStatement.setLong(1,auth.getMid());
+            ResultSet resultSet=preparedStatement.executeQuery();
+            if (!resultSet.next())
+                return false;
             String query3 = "SELECT * FROM review WHERE BV=?;";
             PreparedStatement preparedStatement3 = conn.prepareStatement(query3);
             preparedStatement3.setLong(1, auth.getMid());
