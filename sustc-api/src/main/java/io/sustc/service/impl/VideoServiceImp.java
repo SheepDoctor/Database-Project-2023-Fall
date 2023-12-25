@@ -199,13 +199,13 @@ public class VideoServiceImp implements VideoService
             for (int i=0;i<key_words.length;i++){
                 if (i!=0)
                     with_zone.append(",");
-                with_zone.append("(%?%)");
+                with_zone.append("'(%"+key_words[i]+"%)'");
             }
             with_zone.append("))");
             query1=with_zone+query1;
             PreparedStatement query_1 = conn.prepareStatement(query1);
-            for (int i=0;i<key_words.length;i++)
-                query_1.setString(i+1,key_words[i]);
+           // for (int i=0;i<key_words.length;i++)
+           //     query_1.setString(i+1,key_words[i]);
             ResultSet resultSet1 = query_1.executeQuery();
             if (resultSet1.absolute(pageNum * pageNum))
                 return null;
@@ -241,11 +241,13 @@ public class VideoServiceImp implements VideoService
             String query2 = "SELECT * FROM view WHERE BV=?;";
             PreparedStatement preparedStatement1 = conn.prepareStatement(query1);
             PreparedStatement preparedStatement2 = conn.prepareStatement(query2);
+            preparedStatement1.setString(1,bv);
+            preparedStatement2.setString(1,bv);
             ResultSet resultSet1 = preparedStatement1.executeQuery();
             ResultSet resultSet2 = preparedStatement2.executeQuery();
-            if (resultSet1 == null)
+            if (!resultSet1.next())
                 return -1;
-            if (resultSet2 == null)
+            if (!resultSet2.next())
                 return -1;
             double tmp = 0;
             int cou = 0;
@@ -275,11 +277,14 @@ public class VideoServiceImp implements VideoService
             String query2 = "SELECT * FROM danmu WHERE BV= ? order by time;";
             PreparedStatement preparedStatement1 = conn.prepareStatement(query1);
             PreparedStatement preparedStatement2 = conn.prepareStatement(query2);
+            preparedStatement1.setString(1,bv);
+            preparedStatement2.setString(1,bv);
             ResultSet resultSet1 = preparedStatement1.executeQuery();
             ResultSet resultSet2 = preparedStatement2.executeQuery();
-            if (resultSet1 == null)
+            resultSet2.next();
+            if (!resultSet1.next())
                 return null;
-            if (resultSet2 == null)
+            if (!resultSet2.next())
                 return null;
             int tmp = resultSet1.getInt("duration");
             int cou=0;
@@ -319,7 +324,7 @@ public class VideoServiceImp implements VideoService
             PreparedStatement preparedStatement4 = conn.prepareStatement(query4);
             preparedStatement4.setString(1, bv);
             ResultSet resultSet4 = preparedStatement4.executeQuery();
-            if (resultSet4 == null || resultSet4.getLong(1) == auth.getMid())
+            if (!resultSet4.next() || resultSet4.getLong(1) == auth.getMid())
                 return false;
 
 
@@ -327,7 +332,7 @@ public class VideoServiceImp implements VideoService
             PreparedStatement preparedStatement3 = conn.prepareStatement(query3);
             preparedStatement3.setLong(1, auth.getMid());
             ResultSet resultSet3 = preparedStatement3.executeQuery();
-            if (resultSet3 == null)
+            if (!resultSet3.next())
 
             {
                 String query5 = "INSERT INTO review(bv,reviewer_mid,review_time) values (?,?,?);";
@@ -361,7 +366,7 @@ public class VideoServiceImp implements VideoService
             PreparedStatement preparedStatement4 = conn.prepareStatement(query4);
             preparedStatement4.setString(1, bv);
             ResultSet resultSet4 = preparedStatement4.executeQuery();
-            if (resultSet4 == null || resultSet4.getLong(1) == auth.getMid())
+            if (!resultSet4.next() || resultSet4.getLong(1) == auth.getMid())
                 return false;
 
             List<String> res = searchVideo(auth, bv, 1, 1);
@@ -380,7 +385,7 @@ public class VideoServiceImp implements VideoService
             PreparedStatement preparedStatement3 = conn.prepareStatement(query3);
             preparedStatement3.setLong(1, auth.getMid());
             ResultSet resultSet3 = preparedStatement3.executeQuery();
-            if (resultSet3 != null)
+            if (!resultSet3.next())
                 return false;
 
             String query5 = "INSERT INTO coin (bv, mid) values (?,?);";
@@ -410,7 +415,7 @@ public class VideoServiceImp implements VideoService
             PreparedStatement preparedStatement4 = conn.prepareStatement(query4);
             preparedStatement4.setString(1, bv);
             ResultSet resultSet4 = preparedStatement4.executeQuery();
-            if (resultSet4 == null || resultSet4.getLong(1) == auth.getMid())
+            if (!resultSet4.next() || resultSet4.getLong(1) == auth.getMid())
                 return false;
 
             List<String> res = searchVideo(auth, bv, 1, 1);
@@ -422,7 +427,7 @@ public class VideoServiceImp implements VideoService
             PreparedStatement preparedStatement3 = conn.prepareStatement(query3);
             preparedStatement3.setLong(1, auth.getMid());
             ResultSet resultSet3 = preparedStatement3.executeQuery();
-            if (resultSet3 == null)
+            if (!resultSet3.next())
 
             {
                 String query5 = "INSERT INTO likes (bv,mid) values (?,?);";
@@ -462,7 +467,7 @@ public class VideoServiceImp implements VideoService
             PreparedStatement preparedStatement4 = conn.prepareStatement(query4);
             preparedStatement4.setString(1, bv);
             ResultSet resultSet4 = preparedStatement4.executeQuery();
-            if (resultSet4 == null || resultSet4.getLong(1) == auth.getMid())
+            if (!resultSet4.next() || resultSet4.getLong(1) == auth.getMid())
                 return false;
 
             List<String> res = searchVideo(auth, bv, 1, 1);
@@ -474,7 +479,7 @@ public class VideoServiceImp implements VideoService
             PreparedStatement preparedStatement3 = conn.prepareStatement(query3);
             preparedStatement3.setLong(1, auth.getMid());
             ResultSet resultSet3 = preparedStatement3.executeQuery();
-            if (resultSet3 == null)
+            if (!resultSet3.next())
 
             {
                 String query5 = "INSERT INTO favorite(bv,mid) values (?,?);";
