@@ -159,7 +159,7 @@ public class VideoServiceImp implements VideoService
             throw new RuntimeException(e);
         }
     }
- public static void s(){}
+
     @Override
     public List<String> searchVideo(AuthInfo auth, String keywords, int pageSize, int pageNum)
     {
