@@ -193,7 +193,7 @@ public class VideoServiceImp implements VideoService
                     where rate>0;""";
             StringBuilder with_zone= new StringBuilder("""
                     with key_word as(
-                        select *
+                        select distinct *
                         from (values""");
             String[] key_words=keywords.split(" ");
             for (int i=0;i<key_words.length;i++){
@@ -238,7 +238,9 @@ public class VideoServiceImp implements VideoService
         {
             Connection conn = dataSource.getConnection();
             String query1 = "SELECT * FROM videos WHERE BV=?;";
-            String query2 = "SELECT * FROM view WHERE BV=?;";
+            String query2 = "select *from (\n" +
+                    "select sum(time),count(*) from view where bv=?)tmp\n" +
+                    "where tmp is not null ;";
             PreparedStatement preparedStatement1 = conn.prepareStatement(query1);
             PreparedStatement preparedStatement2 = conn.prepareStatement(query2);
             preparedStatement1.setString(1,bv);
@@ -249,14 +251,8 @@ public class VideoServiceImp implements VideoService
                 return -1;
             if (!resultSet2.next())
                 return -1;
-            double tmp = 0;
-            int cou = 0;
-            do
-            {
-                cou++;
-                tmp += resultSet2.getFloat(1);
-            }
-            while (resultSet2.next());
+            double tmp = resultSet2.getFloat(1);
+            int cou = resultSet2.getInt(2);
             res = tmp / (cou * resultSet1.getInt(1));
         }
         catch (SQLException e)
