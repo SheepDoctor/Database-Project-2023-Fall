@@ -62,6 +62,7 @@ public class VideoCommand {
                 .qq(qq)
                 .wechat(wechat)
                 .build();
+
         return videoService.deleteVideo(auth, bv);
     }
 
