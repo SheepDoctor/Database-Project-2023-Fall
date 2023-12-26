@@ -9,6 +9,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.sql.DataSource;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.sql.*;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -59,26 +61,53 @@ public class UserServiceImpl implements UserService
                 }
                 default ->
                 {
-                    // 对于 mid 登录，需要检查 mid 和密码是否匹配
+                    // 对于 mid 登录，需要检查 密码的哈希值是否匹配
                     stmtMid.setLong(1, auth.getMid());
                     try (ResultSet resultSet = stmtMid.executeQuery();
                     )
                     {
-                        if (resultSet.next() && resultSet.getString(1).equals(auth.getPassword()))
-                        {
-                            conn.close();
-                            return auth.getMid(); // 如果密码匹配，返回 mid
-                        }
+                        if (resultSet.next() &&
+                                checkSha256Hash(auth.getPassword(), resultSet.getString("password")))
+                            return auth.getMid(); // 如果密码的哈希值匹配，返回 mid
                     }
                 }
             }
         }
-        catch (SQLException e)
+        catch (Exception e)
         {
             e.printStackTrace();
             return -1;
         }
         return -1;
+    }
+
+    public static String generateSha256Hash(String password) throws NoSuchAlgorithmException
+    {
+        // 创建 SHA-256 摘要实例
+        MessageDigest digest = MessageDigest.getInstance("SHA-256");
+
+        // 执行哈希计算
+        byte[] hashBytes = digest.digest(password.getBytes());
+
+        // 将字节数组转换为十六进制格式
+        StringBuilder hexString = new StringBuilder();
+        for (byte hashByte : hashBytes)
+        {
+            String hex = Integer.toHexString(0xff & hashByte);
+            if (hex.length() == 1)
+            {
+                hexString.append('0');
+            }
+            hexString.append(hex);
+        }
+        return hexString.toString();
+    }
+
+    // 检查给定密码的 SHA-256 哈希是否与预期哈希匹配
+    public static boolean checkSha256Hash(String password, String expectedHash) throws NoSuchAlgorithmException
+    {
+        // 比较生成的哈希与预期哈希
+        return generateSha256Hash(password).equals(expectedHash);
     }
 
     @Override
@@ -110,6 +139,7 @@ public class UserServiceImpl implements UserService
     {
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy年MM月dd日");
         sdf.setLenient(false); // 设置为严格的日期解析，不允许日期溢出（例如2月30日）
+        birthday = "2024年" + birthday;
         try
         {
             // 尝试解析日期
@@ -163,10 +193,16 @@ public class UserServiceImpl implements UserService
         try (Connection conn = dataSource.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql))
         {
+            String sex = switch (req.getSex().name())
+                    {
+                        case "MAN" -> "男";
+                        case "WOMAN" -> "女";
+                        default -> "保密";
+                    };
             // 设置 PreparedStatement 参数
             stmt.setString(1, req.getName());
-            stmt.setString(2, req.getSex().name());
-            stmt.setDate(3, java.sql.Date.valueOf(req.getBirthday()));
+            stmt.setString(2, sex);
+            stmt.setString(3, req.getBirthday());
             stmt.setString(4, req.getSign());
             stmt.setString(5, req.getQq());
             stmt.setString(6, req.getWechat());
@@ -260,47 +296,6 @@ public class UserServiceImpl implements UserService
         }
     }
 
-
-    /*@Override
-    public boolean follow(AuthInfo auth, long followeeMid)
-    {
-        long authMid = isAuthValid(auth);
-        if (authMid == -1) return false;
-
-        String check = """
-                select *
-                from user_follow
-                where follow_mid = ? and follow_by_mid = ?""";
-        try (Connection conn = dataSource.getConnection();
-             PreparedStatement check_stmt = conn.prepareStatement(check))
-        {
-            check_stmt.setLong(1, authMid);
-            check_stmt.setLong(2, followeeMid);
-            ResultSet check_rs = check_stmt.executeQuery();
-            if (check_rs.next())
-            {
-                String sql = "delete from user_follow\n" +
-                        "where follow_mid = ? and follow_by_mid = ?";
-                PreparedStatement stmt = conn.prepareStatement(sql);
-                stmt.setLong(1, authMid);
-                stmt.setLong(2, followeeMid);
-                return stmt.executeUpdate() == -1;
-            }
-            else
-            {
-                String sql = "insert into user_follow (follow_mid, follow_by_mid) values (?, ?);";
-                PreparedStatement stmt = conn.prepareStatement(sql);
-                stmt.setLong(1, authMid);
-                stmt.setLong(2, followeeMid);
-                return stmt.executeUpdate() == -1;
-            }
-        }
-        catch (SQLException e)
-        {
-            System.out.println("follow: " + e);
-            return false;
-        }
-    }*/
     @Override
     public boolean follow(AuthInfo auth, long followeeMid)
     {
@@ -362,7 +357,6 @@ public class UserServiceImpl implements UserService
         }
     }
 
-
     @Override
     public UserInfoResp getUserInfo(long mid)
     {
@@ -370,12 +364,12 @@ public class UserServiceImpl implements UserService
         String sql = """
                 SELECT mid,
                        coin,
-                    array(SELECT follow_by_mid
-                             FROM user_follow
-                             WHERE follow_mid = ?) following,
                     array(SELECT follow_mid
+                             FROM user_follow
+                             WHERE follow_by_mid = ?) following,
+                    array(SELECT follow_by_mid
                             FROM user_follow
-                            WHERE follow_by_mid = ?)     follower,
+                            WHERE follow_mid = ?)     follower,
                     array(SELECT bv
                             FROM view
                             WHERE mid = ?)            watched,
@@ -405,12 +399,13 @@ public class UserServiceImpl implements UserService
             { // 执行查询并处理结果集
                 if (rs.next())
                 {
+                    //log.info("getUserInfo: {}", stmt);
                     // 封装查询结果到 UserInfoResp 对象并返回
                     return new UserInfoResp(
-                            rs.getLong(1),
+                            mid,
                             rs.getInt(2),
-                            getLongArray(rs.getArray(3)),
                             getLongArray(rs.getArray(4)),
+                            getLongArray(rs.getArray(3)),
                             (String[]) safeGetArray(rs, 5),
                             (String[]) safeGetArray(rs, 6),
                             (String[]) safeGetArray(rs, 7),
@@ -449,4 +444,6 @@ public class UserServiceImpl implements UserService
         }
         return longs;
     }
+
+
 }

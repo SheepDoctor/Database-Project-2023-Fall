@@ -20,7 +20,7 @@ create table users
     identity identity_type,         -- 用户角色的值（'user', 'superuser'）
     qq       varchar unique,        -- QQ号
     wechat   varchar unique,        -- 微信号
-    password varchar,               -- 登录密码
+    password varchar,               -- 登录密码,使用sha-256存储
     coin     int default (0)        -- 用户拥有的硬币数量
 );
 
@@ -139,3 +139,52 @@ GRANT SELECT, INSERT, UPDATE, DELETE ON ALL TABLES IN SCHEMA public TO sustc;
 GRANT CONNECT ON DATABASE "Project" TO sustc;
 GRANT TRUNCATE ON ALL TABLES IN SCHEMA public TO sustc;
 GRANT USAGE, SELECT, UPDATE ON SEQUENCE danmu_id_seq TO sustc;
+
+CREATE OR REPLACE FUNCTION search_videos(keywords text[], user_mid bigint, page_size integer, page_num integer)
+    RETURNS TABLE(bv character, title character varying, description text, owner_name character varying, relevance numeric, view_count bigint, title_match text, description_match text, owner_name_match text)
+    LANGUAGE plpgsql
+AS
+$$
+BEGIN
+    -- 返回查询结果
+    RETURN QUERY
+        SELECT v.bv,
+               v.title,
+               v.description,
+               u.name AS owner_name,
+               (SELECT SUM(title_count + description_count + owner_name_count)
+                FROM unnest(keywords) tk
+                         LEFT JOIN LATERAL (SELECT COUNT(*) AS title_count
+                                            FROM regexp_matches(lower(v.title), tk, 'g')) t ON true
+                         LEFT JOIN LATERAL (SELECT COUNT(*) AS description_count
+                                            FROM regexp_matches(lower(v.description), tk, 'g')) d ON true
+                         LEFT JOIN LATERAL (SELECT COUNT(*) AS owner_name_count
+                                            FROM regexp_matches(lower(u.name), tk, 'g')) o ON true) AS relevance,
+               (SELECT COUNT(*) FROM view vw WHERE vw.bv = v.bv) AS view_count,
+               (SELECT string_agg(DISTINCT tk, ', ')
+                FROM unnest(keywords) tk
+                WHERE lower(v.title) LIKE '%' || tk || '%' ESCAPE '\') AS title_match,
+               (SELECT string_agg(DISTINCT tk, ', ')
+                FROM unnest(keywords) tk
+                WHERE lower(v.description) LIKE '%' || tk || '%' ESCAPE '\') AS description_match,
+               (SELECT string_agg(DISTINCT tk, ', ')
+                FROM unnest(keywords) tk
+                WHERE lower(u.name) LIKE '%' || tk || '%' ESCAPE '\') AS owner_name_match
+        FROM videos v
+                 JOIN users u ON v.owner_mid = u.mid
+                 LEFT JOIN review r ON v.bv = r.bv
+        WHERE (r.bv IS NOT NULL OR v.owner_mid = user_mid)
+          AND (SELECT SUM(title_count + description_count + owner_name_count)
+               FROM unnest(keywords) tk
+                        LEFT JOIN LATERAL (SELECT COUNT(*) AS title_count
+                                           FROM regexp_matches(lower(v.title), tk, 'g')) t ON true
+                        LEFT JOIN LATERAL (SELECT COUNT(*) AS description_count
+                                           FROM regexp_matches(lower(v.description), tk, 'g')) d ON true
+                        LEFT JOIN LATERAL (SELECT COUNT(*) AS owner_name_count
+                                           FROM regexp_matches(lower(u.name), tk, 'g')) o ON true) > 0
+        ORDER BY relevance DESC, view_count DESC, bv
+        LIMIT page_size OFFSET (page_num - 1) * page_size;
+END;
+$$;
+
+ALTER FUNCTION search_videos(text[], bigint, integer, integer) OWNER TO postgres;

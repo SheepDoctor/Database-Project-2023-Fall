@@ -157,11 +157,10 @@ class DanmuServiceImpl implements DanmuService
             }
 
             // 检查用户是否已观看过该视频
-            String viewerQuerySql = "SELECT * FROM view WHERE bv = ? and mid=?;";
+            String viewerQuerySql = "SELECT * FROM view WHERE bv = ?;";
             try (PreparedStatement viewerQuery = connection.prepareStatement(viewerQuerySql))
             {
                 viewerQuery.setString(1, videoBv);
-                viewerQuery.setLong(2,authMid);
                 try (ResultSet viewerResult = viewerQuery.executeQuery())
                 {
                     if (!viewerResult.next())
@@ -296,7 +295,7 @@ class DanmuServiceImpl implements DanmuService
                         try (PreparedStatement insertLikeStmt = connection.prepareStatement(insertLikeSql))
                         {
                             insertLikeStmt.setLong(1, danmuId);
-                            insertLikeStmt.setLong(2,authMid);
+                            insertLikeStmt.setLong(2, authMid);
                             insertLikeStmt.executeUpdate();
                             return true; // 点赞成功
                         }
