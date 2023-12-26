@@ -176,7 +176,7 @@ public class VideoServiceImp implements VideoService
                     select  bv,(
                         select count(*)
                             from
-                        (
+                        ( 
                                 (select *from key_word where a.description like key_word.column1)
                                 union
                                 (select *from key_word where a.title like key_word.column1)
