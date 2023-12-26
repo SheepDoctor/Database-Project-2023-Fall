@@ -168,7 +168,7 @@ public class VideoServiceImp implements VideoService
             return null;
         try
         {
-            if (isAuthValid(auth,dataSource)==-1)
+            if (auth.getMid()!=0&&isAuthValid(auth,dataSource)==-1)
                 return null;
             Connection conn = dataSource.getConnection();
             String query1 = """
@@ -192,7 +192,7 @@ public class VideoServiceImp implements VideoService
 
                     from videos a join users b on a.owner_mid=b.mid
                     order by rate desc,bv )tmp3
-                    where rate>0 and (bv not in (select bv from review) or 'SUPERUSER' in (select identity from users where mid=?))
+                    where rate>0 and (bv not in (select bv from review) or 'SUPERUSER' in (select identity from users where mid=? or ? = 0))
                     offset ?-1
                     limit ?;""";
             StringBuilder with_zone= new StringBuilder("""
@@ -209,13 +209,16 @@ public class VideoServiceImp implements VideoService
             query1=with_zone+query1;
             PreparedStatement query_1 = conn.prepareStatement(query1);
             query_1.setLong(1,auth.getMid());
-            query_1.setInt(2,(pageNum-1)*pageSize+1);
+            query_1.setLong(2,auth.getMid());
+            query_1.setInt(3,(pageNum-1)*pageSize+1);
 
-            query_1.setInt(3,pageSize);
+            query_1.setInt(4,pageSize);
             ResultSet resultSet1 = query_1.executeQuery();
             while (resultSet1.next()){
                 res.add(resultSet1.getString("bv"));
             }
+            query_1.close();
+
         }
         catch (SQLException e)
         {
@@ -227,31 +230,31 @@ public class VideoServiceImp implements VideoService
     @Override
     public double getAverageViewRate(String bv)
     {
-        double res;
         try
         {
             Connection conn = dataSource.getConnection();
             String query = """
-                    select *from (
-                                        select sum(time),count(*) from view where bv=?)tmp,
-                   (SELECT duration FROM videos WHERE BV=?)tmp1
-                    where tmp is not null
-                    ;""";
+                    select total / (num *videos.duration)
+                      from (select sum(time) as total, count(*) as num from view where bv = ?) tmp
+                               join videos on videos.bv=?
+                      where tmp is not null;""";
             PreparedStatement preparedStatement = conn.prepareStatement(query);
             preparedStatement.setString(1,bv);
             preparedStatement.setString(2,bv);
             ResultSet resultSet = preparedStatement.executeQuery();
             if (!resultSet.next())
+            {
+                conn.close();
                 return -1;
-            double tmp = resultSet.getFloat(1);
-            int cou = resultSet.getInt(2);
-            res = tmp / (cou * resultSet.getInt(3));
+            }
+            conn.close();
+            return resultSet.getFloat(1);
+
         }
         catch (SQLException e)
         {
             throw new RuntimeException(e);
         }
-        return res;
     }
 
     @Override
