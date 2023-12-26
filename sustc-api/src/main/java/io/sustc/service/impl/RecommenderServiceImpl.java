@@ -80,7 +80,7 @@ public class RecommenderServiceImpl implements RecommenderService
                                                  left join videos on v.bv = videos.bv
                                         group by v.bv) time on time.bv = view.bv
                     order by score desc
-                    limit ? offset ?;""";
+                    limit ? offset ? ;""";
             PreparedStatement stmt = conn.prepareStatement(rank);
             stmt.setInt(1, pageSize);
             stmt.setInt(2, pageSize * (pageNum - 1));
