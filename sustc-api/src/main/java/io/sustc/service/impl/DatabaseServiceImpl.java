@@ -77,6 +77,7 @@ public class DatabaseServiceImpl implements DatabaseService
         importUsersInParallel(userRecords);
         System.out.println("************* import video... begin**************");
         importVideo(videoRecords, danmuRecords, userRecords);
+        bigSource.close();
     }
 
     private void importDanmu(List<DanmuRecord> danmuRecords)
@@ -87,7 +88,7 @@ public class DatabaseServiceImpl implements DatabaseService
         long count = 0, count2 = 0;
 
         //插入所有的弹幕
-        try (Connection conn = dataSource.getConnection();
+        try (Connection conn = bigSource.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sqlImportDanmu);
              PreparedStatement statement = conn.prepareStatement(sqlImportDanmuLikedBy))
         {
@@ -219,7 +220,7 @@ public class DatabaseServiceImpl implements DatabaseService
         String sqlImportReview = "Insert into review (bv, reviewer_mid, review_time) values (?, ?, ?)";
         String sqlImportView = "Insert into view (bv, mid, time) values (?, ?, ?)";
 
-        try (Connection conn = dataSource.getConnection();
+        try (Connection conn = bigSource.getConnection();
              PreparedStatement statementVideo = conn.prepareStatement(sqlImportVideo);
         )
         {
@@ -485,7 +486,7 @@ public class DatabaseServiceImpl implements DatabaseService
         String sqlImportReview = "Insert into review (bv, reviewer_mid, review_time) values (?, ?, ?)";
         long count = 0, batchSize = 1000;
 
-        try (Connection conn = dataSource.getConnection();
+        try (Connection conn = bigSource.getConnection();
              PreparedStatement statementReview = conn.prepareStatement(sqlImportReview))
         {
 

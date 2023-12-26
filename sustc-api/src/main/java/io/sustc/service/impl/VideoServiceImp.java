@@ -205,7 +205,7 @@ public class VideoServiceImp implements VideoService
             stmtSearchVideo.setLong(2, authMid);
             stmtSearchVideo.setInt(3, pageSize);
             stmtSearchVideo.setInt(4, pageNum);
-            log.info("search video sql {}", stmtSearchVideo);
+            //log.info("search video sql {}", stmtSearchVideo);
 
             // 执行查询并处理结果集
             try (ResultSet resultSet = stmtSearchVideo.executeQuery())
