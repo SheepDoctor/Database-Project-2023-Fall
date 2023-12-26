@@ -335,7 +335,6 @@ public class DatabaseServiceImpl implements DatabaseService
             {
                 executorService.submit(thread[i]);
             }
-
             // 关闭线程池，不再接受新任务，等待已提交任务完成
             executorService.shutdown();
 
