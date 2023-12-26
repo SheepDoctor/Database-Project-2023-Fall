@@ -23,9 +23,8 @@ public class RecommenderServiceImpl implements RecommenderService
     public List<String> recommendNextVideo(String bv)
     {
         List<String> str = new ArrayList<>();
-        try
+        try (Connection conn = dataSource.getConnection())
         {
-            Connection conn = dataSource.getConnection();
             String sql = """
                     select bv
                     from view
@@ -57,9 +56,8 @@ public class RecommenderServiceImpl implements RecommenderService
     public List<String> generalRecommendations(int pageSize, int pageNum)
     {
         List<String> str = new ArrayList<>();
-        try
+        try (Connection conn = dataSource.getConnection())
         {
-            Connection conn = dataSource.getConnection();
             String rank = """
                     select view.bv bvi
                     from (select bv, count(*) view_cnt
@@ -104,9 +102,8 @@ public class RecommenderServiceImpl implements RecommenderService
         if (UserServiceImpl.isAuthValid(auth, dataSource) == -1)
             return null;
         List<String> str = new ArrayList<>();
-        try
+        try (Connection conn = dataSource.getConnection())
         {
-            Connection conn = dataSource.getConnection();
             String sql = """
                     select view.bv bvi
                     from view
@@ -145,9 +142,9 @@ public class RecommenderServiceImpl implements RecommenderService
         if (UserServiceImpl.isAuthValid(auth, dataSource) == -1)
             return null;
         List<Long> str = new ArrayList<>();
-        try
+        try (Connection conn = dataSource.getConnection())
         {
-            Connection conn = dataSource.getConnection();
+
             String sql = """
                     select follow_mid
                     from user_follow left join users on user_follow.follow_mid = users.mid

@@ -166,17 +166,17 @@ public class VideoServiceImp implements VideoService
         List<String> res = new LinkedList<>();
         if (keywords.equals(" ") | pageNum <= 0 | pageSize <= 0)
             return null;
-        try
+        try (Connection conn = dataSource.getConnection())
         {
-            if (isAuthValid(auth,dataSource)==-1)
+            if (auth.getMid() != 0 && isAuthValid(auth, dataSource) == -1)
                 return null;
-            Connection conn = dataSource.getConnection();
+            conn.setClientInfo("test", "111");
             String query1 = """
                     select bv from (
                     select  bv,(
                         select count(*)
                             from
-                        (
+                        ( 
                                 (select *from key_word where a.description like key_word.column1)
                                 union
                                 (select *from key_word where a.title like key_word.column1)
@@ -192,30 +192,34 @@ public class VideoServiceImp implements VideoService
 
                     from videos a join users b on a.owner_mid=b.mid
                     order by rate desc,bv )tmp3
-                    where rate>0 and (bv not in (select bv from review) or 'SUPERUSER' in (select identity from users where mid=?))
+                    where rate>0 and (bv not in (select bv from review) or 'SUPERUSER' in (select identity from users where mid=? or ? = 0))
                     offset ?-1
                     limit ?;""";
             StringBuilder with_zone= new StringBuilder("""
                     with key_word as(
                         select distinct *
                         from (values""");
-            String[] key_words=keywords.split(" ");
-            for (int i=0;i<key_words.length;i++){
-                if (i!=0)
+            String[] key_words = keywords.split(" ");
+            for (int i = 0; i < key_words.length; i++)
+            {
+                if (i != 0)
                     with_zone.append(",");
                 with_zone.append("('%").append(key_words[i]).append("%')");
             }
             with_zone.append(")as bieming114514)");
-            query1=with_zone+query1;
+            query1 = with_zone + query1;
             PreparedStatement query_1 = conn.prepareStatement(query1);
-            query_1.setLong(1,auth.getMid());
-            query_1.setInt(2,(pageNum-1)*pageSize+1);
+            query_1.setLong(1, auth.getMid());
+            query_1.setLong(2, auth.getMid());
+            query_1.setInt(3, (pageNum - 1) * pageSize + 1);
 
-            query_1.setInt(3,pageSize);
+            query_1.setInt(4, pageSize);
             ResultSet resultSet1 = query_1.executeQuery();
-            while (resultSet1.next()){
+            while (resultSet1.next())
+            {
                 res.add(resultSet1.getString("bv"));
             }
+            query_1.close();
         }
         catch (SQLException e)
         {
@@ -227,53 +231,51 @@ public class VideoServiceImp implements VideoService
     @Override
     public double getAverageViewRate(String bv)
     {
-        double res;
-        try
+        try (Connection conn = dataSource.getConnection())
         {
-            Connection conn = dataSource.getConnection();
             String query = """
-                    select *from (
-                                        select sum(time),count(*) from view where bv=?)tmp,
-                   (SELECT duration FROM videos WHERE BV=?)tmp1
-                    where tmp is not null
-                    ;""";
+                    select total / (num *videos.duration)
+                      from (select sum(time) as total, count(*) as num from view where bv = ?) tmp
+                               join videos on videos.bv=?
+                      where tmp is not null;""";
+            //String query = """
+            //        select duration from videos""";
             PreparedStatement preparedStatement = conn.prepareStatement(query);
-            preparedStatement.setString(1,bv);
-            preparedStatement.setString(2,bv);
+            preparedStatement.setString(1, bv);
+            preparedStatement.setString(2, bv);
             ResultSet resultSet = preparedStatement.executeQuery();
-            if (!resultSet.next())
-                return -1;
-            double tmp = resultSet.getFloat(1);
-            int cou = resultSet.getInt(2);
-            res = tmp / (cou * resultSet.getInt(3));
+            float ans = -1;
+            if (resultSet.next())
+            {
+                ans = resultSet.getFloat(1);
+            }
+            conn.close();
+            return ans;
         }
         catch (SQLException e)
         {
             throw new RuntimeException(e);
         }
-        return res;
     }
 
     @Override
     public Set<Integer> getHotspot(String bv)
     {
         Set<Integer> res = new HashSet<>();
-        try
+        try (Connection conn = dataSource.getConnection())
         {
-            Connection conn = dataSource.getConnection();
             String query2 = """
                     select time2 from (
                     select distinct time2,rank() over (order by cou desc ) as rank from (
                     select floor(time/10) as time2,count(*) over (partition by floor(time/10)) as cou from danmu where bv=?)tmp)tmp2
                     where rank=1::bigint;""";
             PreparedStatement preparedStatement2 = conn.prepareStatement(query2);
-            preparedStatement2.setString(1,bv);
+            preparedStatement2.setString(1, bv);
             ResultSet resultSet2 = preparedStatement2.executeQuery();
             resultSet2.next();
             while (resultSet2.next()){
                 res.add(resultSet2.getInt(1));
             }
-
         }
         catch (SQLException e)
         {
@@ -285,29 +287,31 @@ public class VideoServiceImp implements VideoService
     @Override
     public boolean reviewVideo(AuthInfo auth, String bv)
     {
-        try
+        try (Connection conn = dataSource.getConnection())
         {
-            if (isAuthValid(auth,dataSource)==-1)
+            if (isAuthValid(auth, dataSource) == -1)
                 return false;
-            Connection conn = dataSource.getConnection();
             String query4 = "SELECT * FROM videos WHERE BV=?;";
             PreparedStatement preparedStatement4 = conn.prepareStatement(query4);
             preparedStatement4.setString(1, bv);
             ResultSet resultSet4 = preparedStatement4.executeQuery();
             if (!resultSet4.next() || resultSet4.getLong(1) == auth.getMid())
+            {
                 return false;
+            }
             String query6="SELECT identity FROM USERS where mid= ?";
             PreparedStatement preparedStatement=conn.prepareStatement(query6);
             preparedStatement.setLong(1,auth.getMid());
             ResultSet resultSet=preparedStatement.executeQuery();
             if (!resultSet.next())
+            {
                 return false;
+            }
             String query3 = "SELECT * FROM review WHERE BV=?;";
             PreparedStatement preparedStatement3 = conn.prepareStatement(query3);
             preparedStatement3.setLong(1, auth.getMid());
             ResultSet resultSet3 = preparedStatement3.executeQuery();
             if (!resultSet3.next())
-
             {
                 String query5 = "INSERT INTO review(bv,reviewer_mid,review_time) values (?,?,?);";
                 PreparedStatement preparedStatement5 = conn.prepareStatement(query5);
@@ -315,6 +319,7 @@ public class VideoServiceImp implements VideoService
                 preparedStatement5.setString(1, bv);
                 preparedStatement5.setTime(3, new Time(System.currentTimeMillis()));
                 preparedStatement5.executeUpdate();
+                ;
                 return true;
             }
             else
@@ -332,7 +337,7 @@ public class VideoServiceImp implements VideoService
     @Override
     public boolean coinVideo(AuthInfo auth, String bv)
     {
-       return like_collect(auth,bv,"coin");
+        return like_collect(auth, bv, "coin");
     }
 
     @Override
@@ -340,8 +345,7 @@ public class VideoServiceImp implements VideoService
     {
 
 
-
-            return like_collect(auth,bv,"like");
+        return like_collect(auth, bv, "like");
     }
 
     @Override

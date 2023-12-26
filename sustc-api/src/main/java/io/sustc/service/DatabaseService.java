@@ -4,6 +4,7 @@ import io.sustc.dto.DanmuRecord;
 import io.sustc.dto.UserRecord;
 import io.sustc.dto.VideoRecord;
 
+import java.sql.SQLException;
 import java.util.List;
 
 public interface DatabaseService {
@@ -27,7 +28,7 @@ public interface DatabaseService {
             List<DanmuRecord> danmuRecords,
             List<UserRecord> userRecords,
             List<VideoRecord> videoRecords
-    );
+    ) throws SQLException;
 
     /**
      * Truncates all tables in the database.

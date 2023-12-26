@@ -61,11 +61,25 @@ public class DatabaseServiceImpl implements DatabaseService
             List<DanmuRecord> danmuRecords,
             List<UserRecord> userRecords,
             List<VideoRecord> videoRecords
-    )
+    ) throws SQLException
     {
+        bigSource = new DruidDataSource();
+        bigSource.setDriverClassName("org.postgresql.Driver");
+        bigSource.setUsername("sustc");
+        bigSource.setPassword("123456");
+        bigSource.setUrl("jdbc:postgresql://localhost:5432/sustc?useUnicode=true&characterEncoding=UTF-8");
+        bigSource.setInitialSize(1);
+        bigSource.setMaxActive(200);
+        bigSource.setName("Druid connection");
         importUser(userRecords);
         System.out.println("************* import video... begin**************");
         importVideo(videoRecords, danmuRecords, userRecords);
+        System.out.println("***************************************************");
+        bigSource.clearStatementCache();
+        System.out.println(bigSource.getConnectCount());
+        bigSource.close();
+        System.out.println("***************************************************");
+        System.out.println(bigSource.getConnectCount());
     }
 
     private void importDanmu(List<DanmuRecord> danmuRecords)
@@ -76,7 +90,7 @@ public class DatabaseServiceImpl implements DatabaseService
         long count = 0;
 
         //插入所有的弹幕
-        try (Connection conn = dataSource.getConnection();
+        try (Connection conn = bigSource.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sqlImportDanmu);
              PreparedStatement statement = conn.prepareStatement(sqlImportDanmuLikedBy))
         {
@@ -123,7 +137,7 @@ public class DatabaseServiceImpl implements DatabaseService
         long count = 0;
 
         //插入所有的用户
-        try (Connection conn = dataSource.getConnection();
+        try (Connection conn = bigSource.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sqlImportUsers))
         {
             for (UserRecord record : userRecords)
@@ -163,26 +177,6 @@ public class DatabaseServiceImpl implements DatabaseService
 
     private void importVideo(List<VideoRecord> videoRecords, List<DanmuRecord> danmuRecords, List<UserRecord> userRecords)
     {
-        //int countt = 0;
-        //for(int finalI = 0; finalI < 70; finalI++) {
-        //    int m = videoRecords.size() / 70;
-        //    for (int j = finalI * m; j < ((finalI == 69) ? videoRecords.size() : (finalI + 1) * m); j++) {
-        //        VideoRecord record = videoRecords.get(j);
-        //        for (int i = 0; i < record.getViewerMids().length; i++) {
-        //            countt++;
-        //        }
-        //    }
-        //}
-        //System.out.println(countt);
-        //System.out.println("******************************************************");
-
-        bigSource = new DruidDataSource();
-        bigSource.setDriverClassName("org.postgresql.Driver");
-        bigSource.setUsername("postgres");
-        bigSource.setPassword("123abc");
-        bigSource.setUrl("jdbc:postgresql://localhost:5432/sustc?useUnicode=true&characterEncoding=UTF-8");
-        bigSource.setInitialSize(1);
-        bigSource.setMaxActive(200);
         final int batchSize = 2000; // 每批处理的记录数
         long count = 0;
 
@@ -192,7 +186,7 @@ public class DatabaseServiceImpl implements DatabaseService
         String sqlImportReview = "Insert into review (bv, reviewer_mid, review_time) values (?, ?, ?)";
         String sqlImportView = "Insert into view (bv, mid, time) values (?, ?, ?)";
 
-        try (Connection conn = dataSource.getConnection();
+        try (Connection conn = bigSource.getConnection();
              PreparedStatement statementVideo = conn.prepareStatement(sqlImportVideo);
              PreparedStatement statementReview = conn.prepareStatement(sqlImportReview);
         )
@@ -220,6 +214,7 @@ public class DatabaseServiceImpl implements DatabaseService
             statementVideo.executeBatch();
             statementVideo.clearBatch();
             log.info("{} videos are imported.", count);
+            conn.close();
 
             int n = 7;
             Thread[] thread = new Thread[n];
@@ -449,7 +444,7 @@ public class DatabaseServiceImpl implements DatabaseService
         String sqlImportReview = "Insert into review (bv, reviewer_mid, review_time) values (?, ?, ?)";
         long count = 0, batchSize = 1000;
 
-        try (Connection conn = dataSource.getConnection();
+        try (Connection conn = bigSource.getConnection();
              PreparedStatement statementReview = conn.prepareStatement(sqlImportReview))
         {
 
