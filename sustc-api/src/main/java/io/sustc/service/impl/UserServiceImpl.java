@@ -367,12 +367,12 @@ public class UserServiceImpl implements UserService
         String sql = """
                 SELECT mid,
                        coin,
-                    array(SELECT follow_mid
-                             FROM user_follow
-                             WHERE follow_by_mid = ?) following,
                     array(SELECT follow_by_mid
+                             FROM user_follow
+                             WHERE follow_mid = ?) following,
+                    array(SELECT follow_mid
                             FROM user_follow
-                            WHERE follow_mid = ?)     follower,
+                            WHERE follow_by_mid = ?)     follower,
                     array(SELECT bv
                             FROM view
                             WHERE mid = ?)            watched,
