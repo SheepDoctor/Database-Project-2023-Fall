@@ -157,10 +157,11 @@ class DanmuServiceImpl implements DanmuService
             }
 
             // 检查用户是否已观看过该视频
-            String viewerQuerySql = "SELECT * FROM view WHERE bv = ?;";
+            String viewerQuerySql = "SELECT * FROM view WHERE bv = ? and mid=?;";
             try (PreparedStatement viewerQuery = connection.prepareStatement(viewerQuerySql))
             {
                 viewerQuery.setString(1, videoBv);
+                viewerQuery.setLong(2,authMid);
                 try (ResultSet viewerResult = viewerQuery.executeQuery())
                 {
                     if (!viewerResult.next())
@@ -176,10 +177,10 @@ class DanmuServiceImpl implements DanmuService
             try (PreparedStatement danmuInsert = connection.prepareStatement(danmuInsertSql))
             {
                 danmuInsert.setString(1, videoBv);
-                danmuInsert.setLong(2, auth.getMid());
+                danmuInsert.setLong(2, authMid);
                 danmuInsert.setFloat(3, danmuTime);
                 danmuInsert.setString(4, danmuContent);
-                danmuInsert.setTime(5, new Time(System.currentTimeMillis()));
+                danmuInsert.setTimestamp(5, new Timestamp(System.currentTimeMillis()));
                 try (ResultSet resultSetInsert = danmuInsert.executeQuery())
                 {
                     if (resultSetInsert.next())
@@ -285,7 +286,7 @@ class DanmuServiceImpl implements DanmuService
             try (PreparedStatement likeCheckQuery = connection.prepareStatement(likeCheckSql))
             {
                 likeCheckQuery.setLong(1, danmuId);
-                likeCheckQuery.setLong(2, auth.getMid());
+                likeCheckQuery.setLong(2, authMid);
                 try (ResultSet likeCheckResult = likeCheckQuery.executeQuery())
                 {
                     if (!likeCheckResult.next())
@@ -295,7 +296,7 @@ class DanmuServiceImpl implements DanmuService
                         try (PreparedStatement insertLikeStmt = connection.prepareStatement(insertLikeSql))
                         {
                             insertLikeStmt.setLong(1, danmuId);
-                            insertLikeStmt.setLong(2, auth.getMid());
+                            insertLikeStmt.setLong(2,authMid);
                             insertLikeStmt.executeUpdate();
                             return true; // 点赞成功
                         }
@@ -307,7 +308,7 @@ class DanmuServiceImpl implements DanmuService
                         try (PreparedStatement deleteLikeStmt = connection.prepareStatement(deleteLikeSql))
                         {
                             deleteLikeStmt.setLong(1, danmuId);
-                            deleteLikeStmt.setLong(2, auth.getMid());
+                            deleteLikeStmt.setLong(2, authMid);
                             deleteLikeStmt.executeUpdate();
                             return false; // 取消点赞成功
                         }

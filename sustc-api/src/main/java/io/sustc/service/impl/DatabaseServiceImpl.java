@@ -65,8 +65,8 @@ public class DatabaseServiceImpl implements DatabaseService
     {
         bigSource = new DruidDataSource();
         bigSource.setDriverClassName("org.postgresql.Driver");
-        bigSource.setUsername("sustc");
-        bigSource.setPassword("123456");
+        bigSource.setUsername("postgres");
+        bigSource.setPassword("123abc");
         bigSource.setUrl("jdbc:postgresql://localhost:5432/sustc?useUnicode=true&characterEncoding=UTF-8");
         bigSource.setInitialSize(1);
         bigSource.setMaxActive(200);
