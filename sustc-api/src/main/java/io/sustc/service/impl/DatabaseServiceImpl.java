@@ -31,20 +31,6 @@ import java.util.concurrent.TimeUnit;
 public class DatabaseServiceImpl implements DatabaseService
 {
 
-
-    private static DruidDataSource bigSource;
-
-    static
-    {
-        bigSource = new DruidDataSource();
-        bigSource.setDriverClassName("org.postgresql.Driver");
-        bigSource.setUsername("sustc");
-        bigSource.setPassword("123456");
-        bigSource.setUrl("jdbc:postgresql://localhost:5432/sustc?useUnicode=true&characterEncoding=UTF-8");
-        bigSource.setInitialSize(1);
-        bigSource.setMaxActive(200);
-    }
-
     /**
      * Getting a {@link DataSource} instance from the framework, whose connections are managed by HikariCP.
      * <p>
@@ -61,6 +47,9 @@ public class DatabaseServiceImpl implements DatabaseService
     @Autowired
     private DataSource dataSource;
 
+
+    private DruidDataSource bigSource;
+
     @Override
     public List<Integer> getGroupMembers()
     {
@@ -72,11 +61,20 @@ public class DatabaseServiceImpl implements DatabaseService
             List<DanmuRecord> danmuRecords,
             List<UserRecord> userRecords,
             List<VideoRecord> videoRecords
-    )
+    ) throws SQLException
     {
-        importUsersInParallel(userRecords);
+        bigSource = new DruidDataSource();
+        bigSource.setDriverClassName("org.postgresql.Driver");
+        bigSource.setUsername("sustc");
+        bigSource.setPassword("123456");
+        bigSource.setUrl("jdbc:postgresql://localhost:5432/sustc?useUnicode=true&characterEncoding=UTF-8");
+        bigSource.setInitialSize(1);
+        bigSource.setMaxActive(200);
+        bigSource.setName("Druid connection");
+        importUser(userRecords);
         System.out.println("************* import video... begin**************");
         importVideo(videoRecords, danmuRecords, userRecords);
+        bigSource.close();
     }
 
     private void importDanmu(List<DanmuRecord> danmuRecords)
@@ -87,7 +85,7 @@ public class DatabaseServiceImpl implements DatabaseService
         long count = 0, count2 = 0;
 
         //插入所有的弹幕
-        try (Connection conn = dataSource.getConnection();
+        try (Connection conn = bigSource.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sqlImportDanmu);
              PreparedStatement statement = conn.prepareStatement(sqlImportDanmuLikedBy))
         {
@@ -115,9 +113,9 @@ public class DatabaseServiceImpl implements DatabaseService
                         statement.clearBatch(); // 清除当前批处理
                     }
                 }
+                statement.executeBatch(); // 插入剩余的记录
+                statement.clearBatch();
             }
-            statement.executeBatch(); // 插入剩余的记录
-            statement.clearBatch();
         }
         catch (SQLException e)
         {
@@ -128,45 +126,11 @@ public class DatabaseServiceImpl implements DatabaseService
         log.info("{} danmu_like are imported.", count);
     }
 
-    private void importUsersInParallel(List<UserRecord> userRecords)
-    {
-        final int threadCount = 16; // 使用多个线程
-        ExecutorService executorService = Executors.newFixedThreadPool(threadCount); // 创建固定大小的线程池
-
-        // 分割userRecords列表，以便每个线程处理列表的一部分
-        int totalRecords = userRecords.size();
-        int recordsPerThread = totalRecords / threadCount;
-
-        for (int i = 0; i < threadCount; i++)
-        {
-            int start = i * recordsPerThread;
-            int end = (i == threadCount - 1) ? totalRecords : (start + recordsPerThread);
-            List<UserRecord> subList = userRecords.subList(start, end);
-
-            // 将子列表分配给线程
-            executorService.submit(() -> importUser(subList));
-        }
-
-        // 关闭线程池，不再接受新任务，等待已提交任务完成
-        executorService.shutdown();
-        try
-        {
-            // 等待所有任务完成
-            executorService.awaitTermination(Long.MAX_VALUE, TimeUnit.NANOSECONDS);
-        }
-        catch (InterruptedException e)
-        {
-            Thread.currentThread().interrupt();
-        }
-
-        log.info("{} users are imported.", totalRecords);
-    }
-
     private void importUser(List<UserRecord> userRecords)
     {
         String sqlImportUsers = "INSERT INTO users (mid, name, sex, birthday, level, coin, sign, identity, password, qq, wechat)" +
                 " VALUES (?, ?, CAST( ? AS gender_type), ?, ?, ?, ?, CAST( ? AS identity_type), ?, ?, ?)";
-        final int batchSize = 500; // 每批处理的记录数
+        final int batchSize = 1000; // 每批处理的记录数
         long count = 0;
 
         //插入所有的用户
@@ -178,21 +142,21 @@ public class DatabaseServiceImpl implements DatabaseService
                 stmt.setLong(1, record.getMid());
                 stmt.setString(2, record.getName());
                 stmt.setString(3, record.getSex());
+
                 stmt.setString(4, record.getBirthday());
                 stmt.setShort(5, record.getLevel());
                 stmt.setInt(6, record.getCoin());
                 stmt.setString(7, record.getSign());
                 stmt.setString(8, record.getIdentity().name());
-                stmt.setString(9, UserServiceImpl.generateSha256Hash(record.getPassword()));
+                stmt.setString(9, record.getPassword());
                 stmt.setString(10, record.getQq().equals("") ? null : record.getQq());
                 stmt.setString(11, record.getWechat().equals("") ? null : record.getWechat());
-
                 stmt.addBatch();// 把预编译语句置入当前批次中
                 //log.info("SQL: {}", stmt);
 
                 if (++count % batchSize == 0)
                 {
-                    //log.info("****user: {}", count);
+                    //System.out.println("****user: " + count);
                     stmt.executeBatch(); // 执行批量插入
                     stmt.clearBatch(); // 清除当前批处理
                 }
@@ -200,7 +164,7 @@ public class DatabaseServiceImpl implements DatabaseService
             stmt.executeBatch(); // 执行批量插入
             stmt.clearBatch(); // 清除当前批处理
         }
-        catch (Exception e)
+        catch (SQLException e)
         {
             e.printStackTrace();
             throw new RuntimeException(e);
@@ -219,8 +183,9 @@ public class DatabaseServiceImpl implements DatabaseService
         String sqlImportReview = "Insert into review (bv, reviewer_mid, review_time) values (?, ?, ?)";
         String sqlImportView = "Insert into view (bv, mid, time) values (?, ?, ?)";
 
-        try (Connection conn = dataSource.getConnection();
+        try (Connection conn = bigSource.getConnection();
              PreparedStatement statementVideo = conn.prepareStatement(sqlImportVideo);
+             PreparedStatement statementReview = conn.prepareStatement(sqlImportReview);
         )
         {
             //导入视频
@@ -246,6 +211,7 @@ public class DatabaseServiceImpl implements DatabaseService
             statementVideo.executeBatch();
             statementVideo.clearBatch();
             log.info("{} videos are imported.", count);
+            conn.close();
 
             int n = 7;
             Thread[] thread = new Thread[n];
@@ -486,7 +452,7 @@ public class DatabaseServiceImpl implements DatabaseService
         String sqlImportReview = "Insert into review (bv, reviewer_mid, review_time) values (?, ?, ?)";
         long count = 0, batchSize = 1000;
 
-        try (Connection conn = dataSource.getConnection();
+        try (Connection conn = bigSource.getConnection();
              PreparedStatement statementReview = conn.prepareStatement(sqlImportReview))
         {
 
