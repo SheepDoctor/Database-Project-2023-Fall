@@ -168,9 +168,12 @@ public class VideoServiceImp implements VideoService
             return null;
         try(Connection conn = dataSource.getConnection())
         {
-            long mid=isAuthValid(auth,dataSource);
-            if (mid==-1)
+            long mid = isAuthValid(auth, dataSource);
+            if (mid == -1)
+            {
+                conn.close();
                 return null;
+            }
 
             String query1 = """
                     select bv from (

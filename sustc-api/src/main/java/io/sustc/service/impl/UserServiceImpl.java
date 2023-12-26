@@ -65,7 +65,10 @@ public class UserServiceImpl implements UserService
                     )
                     {
                         if (resultSet.next() && resultSet.getString(1).equals(auth.getPassword()))
+                        {
+                            conn.close();
                             return auth.getMid(); // 如果密码匹配，返回 mid
+                        }
                     }
                 }
             }

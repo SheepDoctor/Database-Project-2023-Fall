@@ -65,8 +65,8 @@ public class DatabaseServiceImpl implements DatabaseService
     {
         bigSource = new DruidDataSource();
         bigSource.setDriverClassName("org.postgresql.Driver");
-        bigSource.setUsername("postgres");
-        bigSource.setPassword("123abc");
+        bigSource.setUsername("sustc");
+        bigSource.setPassword("123456");
         bigSource.setUrl("jdbc:postgresql://localhost:5432/sustc?useUnicode=true&characterEncoding=UTF-8");
         bigSource.setInitialSize(1);
         bigSource.setMaxActive(200);
@@ -87,7 +87,7 @@ public class DatabaseServiceImpl implements DatabaseService
         String sqlImportDanmu = "INSERT INTO danmu (bv, mid, time, content, post_time) VALUES (?, ?, ?, ?, ?) returning id";
         String sqlImportDanmuLikedBy = "insert into danmu_likes (id, mid) values (?, ?)";
         final int batchSize = 1000; // 每批处理的记录数
-        long count = 0;
+        long count = 0, count2 = 0;
 
         //插入所有的弹幕
         try (Connection conn = bigSource.getConnection();
@@ -104,6 +104,7 @@ public class DatabaseServiceImpl implements DatabaseService
 
                 ResultSet resultSet = stmt.executeQuery(); // 返回一个自增主键
                 resultSet.next();
+                count2++;
                 long current = resultSet.getLong(1);
 
                 for (Long id : record.getLikedBy())
@@ -126,6 +127,7 @@ public class DatabaseServiceImpl implements DatabaseService
             log.error("Error during importing danmu {}", e.toString());
             throw new RuntimeException(e);
         }
+        log.info("{} danmu are imported.", count2);
         log.info("{} danmu_like are imported.", count);
     }
 

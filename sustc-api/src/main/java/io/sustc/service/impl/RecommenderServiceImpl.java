@@ -2,6 +2,7 @@ package io.sustc.service.impl;
 
 import io.sustc.dto.AuthInfo;
 import io.sustc.service.RecommenderService;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -14,6 +15,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Service
+@Slf4j
 public class RecommenderServiceImpl implements RecommenderService
 {
     @Autowired
@@ -26,19 +28,17 @@ public class RecommenderServiceImpl implements RecommenderService
         try (Connection conn = dataSource.getConnection())
         {
             String sql = """
-                    select bv
-                    from view
-                    where bv != ?
-                    group by bv
-                    order by abs(count(*) - (select count(*)
-                                          from view
-                                          where bv = ?
-                                          group by bv))
-                    limit 5""";
+                    select v2.bv bv
+                    from (select bv, mid from view where bv = ?) t1
+                             inner join (select * from view where bv != ?) v2 on t1.mid = v2.mid
+                    group by v2.bv
+                    order by count(v2.mid) desc, bv
+                    limit 5;""";
             PreparedStatement stmt = conn.prepareStatement(sql);
             stmt.setString(1, bv);
             stmt.setString(2, bv);
             ResultSet rs = stmt.executeQuery();
+            //log.info("SQL: {}", stmt);
             while (rs.next())
             {
                 str.add(rs.getString("bv"));
@@ -56,37 +56,39 @@ public class RecommenderServiceImpl implements RecommenderService
     public List<String> generalRecommendations(int pageSize, int pageNum)
     {
         List<String> str = new ArrayList<>();
+        if (pageNum <= 0 || pageSize <= 0)
+        {
+            return str;
+        }
         try (Connection conn = dataSource.getConnection())
         {
             String rank = """
-                    select view.bv bvi
-                    from (select bv, count(*) view_cnt
+                    select view.bv                                        bv,
+                           (coalesce(like_cnt, 0) / view_cnt::float4 * 100 + coalesce(fav_cnt, 0) / view_cnt::float4 * 100 +
+                            coalesce(coin_cnt, 0) / view_cnt::float4 * 100 + coalesce(danmu_cnt, 0) / view_cnt::float4 +
+                            coalesce(avg_time_ratio * 100, 0)) as         score
+                    from (select bv, count(bv) as view_cnt
                           from view
                           group by bv) view
-                             left join (select bv, count(*) like_cnt
-                                        from likes
-                                        group by bv) likes on view.bv = likes.bv
-                             left join (select bv, count(*) fav_cnt
-                                        from favorite
-                                        group by bv) fav on fav.bv = view.bv
-                             left join (select bv, count(*) danmu_cnt
-                                        from danmu
-                                        group by bv) danmu on danmu.bv = fav.bv
+                             left join (select bv, count(bv) as like_cnt from likes group by bv) likes on view.bv = likes.bv
+                             left join (select bv, count(bv) as fav_cnt from favorite group by bv) fav on fav.bv = view.bv
+                             left join (select bv, count(bv) as coin_cnt from coin group by bv) coin on coin.bv = view.bv
+                             left join (select bv, count(bv) as danmu_cnt from danmu group by bv) danmu on danmu.bv = view.bv
                              left join (select v.bv, avg(v.time / videos.duration) as avg_time_ratio
                                         from view v
-                                                 join videos on v.bv = videos.bv
-                                        group by v.bv) time on time.bv = danmu.bv
-                    order by (like_cnt / view_cnt::float4 + fav_cnt / view_cnt::float4 + danmu_cnt / view_cnt::float4 +
-                              avg_time_ratio) desc
-                    limit ? offset ?""";
+                                                 left join videos on v.bv = videos.bv
+                                        group by v.bv) time on time.bv = view.bv
+                    order by score desc
+                    limit ? offset ?;""";
             PreparedStatement stmt = conn.prepareStatement(rank);
             stmt.setInt(1, pageSize);
-            stmt.setInt(2, pageNum);
+            stmt.setInt(2, pageSize * (pageNum - 1));
             ResultSet rs = stmt.executeQuery();
             while (rs.next())
             {
-                str.add(rs.getString("bvi"));
+                str.add(rs.getString("bv"));
             }
+            //log.info("SQL: {}", stmt);
             return str;
         }
         catch (SQLException e)
@@ -99,13 +101,18 @@ public class RecommenderServiceImpl implements RecommenderService
     @Override
     public List<String> recommendVideosForUser(AuthInfo auth, int pageSize, int pageNum)
     {
-        if (UserServiceImpl.isAuthValid(auth, dataSource) == -1)
-            return null;
         List<String> str = new ArrayList<>();
+        if (pageNum <= 0 || pageSize <= 0)
+        {
+            return str;
+        }
+        long mid = UserServiceImpl.isAuthValid(auth, dataSource);
+        if (mid == -1)
+            return str;
         try (Connection conn = dataSource.getConnection())
         {
             String sql = """
-                    select view.bv bvi
+                    select view.bv bv
                     from view
                              left join videos on view.bv = videos.bv
                              left join users on users.mid = videos.owner_mid
@@ -114,19 +121,41 @@ public class RecommenderServiceImpl implements RecommenderService
                                                 join (select * from user_follow where follow_by_mid = ?) f2
                                                      on f1.follow_by_mid = f2.follow_mid
                                        where f1.follow_mid != f1.follow_by_mid)
+                    and view.bv not in (select bv from view where mid = ?)
                     group by view.bv, users.level, videos.commit_time
-                    order by count(*) desc , users.level desc, videos.commit_time desc
+                    order by count(*) desc, users.level desc, videos.commit_time desc
                     limit ? offset ?""";
             PreparedStatement stmt = conn.prepareStatement(sql);
-            stmt.setLong(1, auth.getMid());
-            stmt.setLong(2, auth.getMid());
-            stmt.setInt(3, pageSize);
-            stmt.setInt(4, pageNum);
+            stmt.setLong(1, mid);
+            stmt.setLong(2, mid);
+            stmt.setLong(3, mid);
+            stmt.setInt(4, pageSize);
+            stmt.setInt(5, pageSize * (pageNum - 1));
             ResultSet rs = stmt.executeQuery();
             while (rs.next())
             {
-                str.add(rs.getString("bvi"));
+                str.add(rs.getString("bv"));
             }
+            sql = """
+                    select count(f1.follow_by_mid) as cnt
+                                       from (select * from user_follow where follow_mid = ?) f1
+                                                join (select * from user_follow where follow_by_mid = ?) f2
+                                                     on f1.follow_by_mid = f2.follow_mid
+                                       where f1.follow_mid != f1.follow_by_mid
+                    """;
+            stmt = conn.prepareStatement(sql);
+            stmt.setLong(1, mid);
+            stmt.setLong(2, mid);
+            rs = stmt.executeQuery();
+            if (rs.next())
+            {
+                if (rs.getInt("cnt") == 0)
+                {
+                    conn.close();
+                    return generalRecommendations(pageSize, pageNum);
+                }
+            }
+            //log.info("SQL: {}", stmt);
             return str;
         }
         catch (SQLException e)
@@ -139,9 +168,13 @@ public class RecommenderServiceImpl implements RecommenderService
     @Override
     public List<Long> recommendFriends(AuthInfo auth, int pageSize, int pageNum)
     {
+        List<Long> str = new ArrayList<>();
+        if (pageNum <= 0 || pageSize <= 0)
+        {
+            return str;
+        }
         if (UserServiceImpl.isAuthValid(auth, dataSource) == -1)
             return null;
-        List<Long> str = new ArrayList<>();
         try (Connection conn = dataSource.getConnection())
         {
 
@@ -166,7 +199,7 @@ public class RecommenderServiceImpl implements RecommenderService
             stmt.setLong(3, auth.getMid());
             stmt.setLong(4, auth.getMid());
             stmt.setInt(5, pageSize);
-            stmt.setInt(6, pageNum);
+            stmt.setInt(6, pageSize * (pageNum - 1));
             ResultSet rs = stmt.executeQuery();
             while (rs.next())
             {
