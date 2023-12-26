@@ -54,7 +54,12 @@ public class UserServiceImpl implements UserService
                     stmtWechatAndQq.setString(1, authValue);
                     try (ResultSet resultSet = stmtWechatAndQq.executeQuery();)
                     {
-                        if (resultSet.next()) return resultSet.getLong(1); // 如果找到记录，返回对应的 mid
+                        if (resultSet.next())
+                        {
+                            long ans = resultSet.getLong(1);
+                            conn.close();
+                            return ans; // 如果找到记录，返回对应的 mid
+                        }
                     }
                 }
                 default ->

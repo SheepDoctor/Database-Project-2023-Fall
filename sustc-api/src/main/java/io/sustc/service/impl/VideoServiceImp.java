@@ -221,7 +221,6 @@ public class VideoServiceImp implements VideoService
                 res.add(resultSet1.getString("bv"));
             }
             query_1.close();
-
         }
         catch (SQLException e)
         {
