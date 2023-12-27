@@ -157,10 +157,11 @@ class DanmuServiceImpl implements DanmuService
             }
 
             // 检查用户是否已观看过该视频
-            String viewerQuerySql = "SELECT * FROM view WHERE bv = ?;";
+            String viewerQuerySql = "SELECT * FROM view WHERE mid = ? and bv=?;";
             try (PreparedStatement viewerQuery = connection.prepareStatement(viewerQuerySql))
             {
-                viewerQuery.setString(1, videoBv);
+                viewerQuery.setLong(1, authMid);
+                viewerQuery.setString(2,videoBv);
                 try (ResultSet viewerResult = viewerQuery.executeQuery())
                 {
                     if (!viewerResult.next())

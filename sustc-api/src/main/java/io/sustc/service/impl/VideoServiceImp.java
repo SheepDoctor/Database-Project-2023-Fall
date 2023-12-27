@@ -46,17 +46,14 @@ public class VideoServiceImp implements VideoService
     {
         // 验证授权信息是否有效
         long authenticatedUserId = isAuthValid(auth, dataSource);
-        if (authenticatedUserId == -1)
-            return null; // 如果授权无效，返回 null
+        if (authenticatedUserId == -1) return null; // 如果授权无效，返回 null
 
         // 检查视频请求的有效性
         if (req == null || req.getTitle() == null || req.getTitle().trim().isEmpty()
-                || req.getDuration() < 10 || req.getPublicTime() == null || req.getPublicTime().before(Timestamp.valueOf(LocalDateTime.now())))
+                || req.getDuration() < 10 || req.getPublicTime().before(Timestamp.valueOf(LocalDateTime.now())))
         {
             return null; // 请求无效，返回 null
         }
-        // 测试有无同名的
-        String check = "select count(*) cnt from videos where title=? and owner_mid=?;";
 
         // 生成视频 BV 号
         String bv = generateBvNumber();
@@ -65,8 +62,7 @@ public class VideoServiceImp implements VideoService
         String insertVideoSql = "INSERT INTO videos(bv, title, owner_mid, commit_time, public_time, duration, description)" +
                 " VALUES(?, ?, ?, ?, ?, ?, ?)";
         try (Connection conn = dataSource.getConnection();
-             PreparedStatement videoInsertStmt = conn.prepareStatement(insertVideoSql);
-             PreparedStatement checkStmt = conn.prepareStatement(check))
+             PreparedStatement videoInsertStmt = conn.prepareStatement(insertVideoSql))
         {
             videoInsertStmt.setString(1, bv);
             videoInsertStmt.setString(2, req.getTitle());
@@ -75,17 +71,7 @@ public class VideoServiceImp implements VideoService
             videoInsertStmt.setTimestamp(5, req.getPublicTime());
             videoInsertStmt.setLong(6, (long) req.getDuration());
             videoInsertStmt.setString(7, req.getDescription());
-            checkStmt.setString(1, req.getTitle());
-            checkStmt.setLong(2, authenticatedUserId);
-            ResultSet rs = checkStmt.executeQuery();
-            if (rs.next())
-            {
-                if (rs.getInt("cnt") != 0)
-                {
-                    conn.close();
-                    return null;
-                }
-            }
+
             videoInsertStmt.executeUpdate();
         }
         catch (SQLException e)
@@ -104,51 +90,32 @@ public class VideoServiceImp implements VideoService
      */
     private String generateBvNumber()
     {
+        Random random = new Random();
+        long av = random.nextInt(1000000000);
+        String table = "fZodR9XQDSUm21yCkr6zBqiveYah8bt4xsWpHnJE7jL5VG3guMTKNPAwcF";
+        int[] s = {11, 10, 3, 8, 4, 6};
+        long xor = 177451812L;
+        long add = 8728348608L;
         char[] bvChars = "BV1  4 1 7  ".toCharArray();
-        while (true)
+        av = (av ^ xor) + add;
+        for (int i = 0; i < 6; i++)
         {
-            Random random = new Random();
-            long av = random.nextInt(1000000000);
-            String table = "fZodR9XQDSUm21yCkr6zBqiveYah8bt4xsWpHnJE7jL5VG3guMTKNPAwcF";
-            int[] s = {11, 10, 3, 8, 4, 6};
-            long xor = 177451812L;
-            long add = 8728348608L;
-            av = (av ^ xor) + add;
-            for (int i = 0; i < 6; i++)
-            {
-                bvChars[s[i]] = table.charAt((int) (av / Math.pow(58, i) % 58));
-            }
-            String sql = "select count(bv) cnt from videos where bv=?";
-            try (Connection conn = dataSource.getConnection();
-                 PreparedStatement stmt = conn.prepareStatement(sql))
-            {
-                stmt.setString(1, new String(bvChars));
-                ResultSet rs = stmt.executeQuery();
-                if (rs.next())
-                {
-                    if (rs.getInt("cnt") == 0)
-                    {
-                        conn.close();
-                        return new String(bvChars);
-                    }
-                }
-            }
-            catch (SQLException e)
-            {
-                System.out.println(e);
-            }
+            bvChars[s[i]] = table.charAt((int) (av / Math.pow(58, i) % 58));
         }
+        return new String(bvChars);
     }
 
 
     @Override
     public boolean deleteVideo(AuthInfo auth, String bv)
     {
-        try
+        long mid = isAuthValid(auth, dataSource);
+        if (mid == -1) return false;
+
+        try (Connection conn = dataSource.getConnection())
         {
-            Connection conn = dataSource.getConnection();
             // 查询auth相关信息
-            String select_user_info = "select identity from users where mid = " + auth.getMid();
+            String select_user_info = "select identity from users where mid = " + mid;
             PreparedStatement select_user_info_stmt = conn.prepareStatement(select_user_info);
             ResultSet user_info = select_user_info_stmt.executeQuery();
 
@@ -164,7 +131,7 @@ public class VideoServiceImp implements VideoService
             String select_video = "select owner_mid from videos where bv = " + bv;
             PreparedStatement select_video_stmt = conn.prepareStatement(select_video);
             ResultSet video_info = select_video_stmt.executeQuery();
-            if (video_info.next() && video_info.getLong("owner_id") == auth.getMid())
+            if (video_info.next() && video_info.getLong("owner_id") == mid)
             {
                 String sql = "delete from videos where bv =" + bv;
                 PreparedStatement stmt = conn.prepareStatement(sql);
@@ -182,27 +149,39 @@ public class VideoServiceImp implements VideoService
     @Override
     public boolean updateVideoInfo(AuthInfo auth, String bv, PostVideoReq req)
     {
-        try
+        long mid = UserServiceImpl.isAuthValid(auth, dataSource);
+        if (mid == -1) return false;
+
+        try (Connection conn = dataSource.getConnection())
         {
-            Connection conn = dataSource.getConnection();
             // 获取此视频信息
-            String select_video = "select * from videos where bv = " + bv;
-            PreparedStatement select_video_stmt = conn.prepareStatement(select_video);
-            ResultSet video_info = select_video_stmt.executeQuery();
-            // 验证更改者信息
-            if (video_info.getLong("owner_id") == auth.getMid())
-                return false;
-            // 验证视频时长有无修改
-            if (video_info.getLong("duration") != req.getDuration())
-                return false;
-            //todo
-            return false;
+            String select_video = "select * from videos where bv = ?";
+
+            try (PreparedStatement select_video_stmt = conn.prepareStatement(select_video))
+            {
+                select_video_stmt.setString(1, bv);
+                try (ResultSet video_info = select_video_stmt.executeQuery())
+                {
+                    if (video_info.next())
+                    {
+                        // 验证更改者信息
+                        if (video_info.getLong("owner_mid") != mid)
+                            return false;
+                        // 验证视频时长有无修改
+                        if (video_info.getLong("duration") != req.getDuration())
+                            return false;
+                        //todo
+                        return false;
+                    }
+                }
+            }
         }
         catch (SQLException e)
         {
             e.printStackTrace();
             throw new RuntimeException(e);
         }
+        return false;
     }
 
     @Override
@@ -325,21 +304,22 @@ public class VideoServiceImp implements VideoService
     @Override
     public boolean reviewVideo(AuthInfo auth, String bv)
     {
+        long mid = isAuthValid(auth, dataSource);
+        if (mid == -1) return false;
+
         try (Connection conn = dataSource.getConnection())
         {
-            if (isAuthValid(auth, dataSource) == -1)
-                return false;
             String query4 = "SELECT * FROM videos WHERE BV=?;";
             PreparedStatement preparedStatement4 = conn.prepareStatement(query4);
             preparedStatement4.setString(1, bv);
             ResultSet resultSet4 = preparedStatement4.executeQuery();
-            if (!resultSet4.next() || resultSet4.getLong(1) == auth.getMid())
+            if (!resultSet4.next() || resultSet4.getLong(1) == mid)
             {
                 return false;
             }
             String query6 = "SELECT identity FROM USERS where mid= ?";
             PreparedStatement preparedStatement = conn.prepareStatement(query6);
-            preparedStatement.setLong(1, auth.getMid());
+            preparedStatement.setLong(1, mid);
             ResultSet resultSet = preparedStatement.executeQuery();
             if (!resultSet.next())
             {
@@ -347,13 +327,13 @@ public class VideoServiceImp implements VideoService
             }
             String query3 = "SELECT * FROM review WHERE BV=?;";
             PreparedStatement preparedStatement3 = conn.prepareStatement(query3);
-            preparedStatement3.setLong(1, auth.getMid());
+            preparedStatement3.setLong(1, mid);
             ResultSet resultSet3 = preparedStatement3.executeQuery();
             if (!resultSet3.next())
             {
                 String query5 = "INSERT INTO review(bv,reviewer_mid,review_time) values (?,?,?);";
                 PreparedStatement preparedStatement5 = conn.prepareStatement(query5);
-                preparedStatement5.setLong(2, auth.getMid());
+                preparedStatement5.setLong(2, mid);
                 preparedStatement5.setString(1, bv);
                 preparedStatement5.setTime(3, new Time(System.currentTimeMillis()));
                 preparedStatement5.executeUpdate();
@@ -392,53 +372,52 @@ public class VideoServiceImp implements VideoService
 
     public boolean like_collect(AuthInfo auth, String bv, String op)
     {
+        long mid = UserServiceImpl.isAuthValid(auth, dataSource);
         if (isAuthValid(auth, dataSource) == -1)
             return false;
+
         try (Connection conn = dataSource.getConnection())
         {
-            String query4 = "SELECT * FROM videos WHERE BV=?;";
-            PreparedStatement preparedStatement4 = conn.prepareStatement(query4);
-            preparedStatement4.setString(1, bv);
-            ResultSet resultSet4 = preparedStatement4.executeQuery();
-            if (!resultSet4.next() || resultSet4.getLong(1) == auth.getMid())
-            {
-                conn.close();
-                return false;
-            }
 
+            String query4 = "SELECT * FROM videos WHERE BV= ? ; ";
+            String check_done_before = "SELECT * FROM " + op + " WHERE MID = ? ;";
+            String update_op = "INSERT INTO " + op + " (bv, mid) values (?, ?) ;";
+
+            try (PreparedStatement stmtVideo = conn.prepareStatement(query4))
+            {
+                stmtVideo.setString(1, bv);
+                try (ResultSet resultSet4 = stmtVideo.executeQuery())
+                {
+                    if (!resultSet4.next() || resultSet4.getLong(1) == mid)
+                        return false;
+                }
+            }
             List<String> res = searchVideo(auth, bv, 1, 1);
             if (res == null)
-            {
-                conn.close();
                 return false;
-            }
 
-            String check_done_before = "SELECT * FROM " + op + " WHERE MID = ?;";
+
             PreparedStatement check_statement = conn.prepareStatement(check_done_before);
-            check_statement.setLong(1, auth.getMid());
+            check_statement.setLong(1, mid);
             ResultSet resultSet3 = check_statement.executeQuery();
             if (!resultSet3.next())
 
             {
-                String update_op = "INSERT INTO " + op + " (bv,mid) values (?,?);";
                 PreparedStatement insert_statement = conn.prepareStatement(update_op);
-                insert_statement.setLong(2, auth.getMid());
+                insert_statement.setLong(2, mid);
                 insert_statement.setString(1, bv);
                 insert_statement.executeUpdate();
-                conn.close();
                 return true;
             }
             else
             {
                 if (!op.equals("coin"))
                 {
-                    String update_op = "DELETE FROM " + op + " where mid = ? and bv= ?;";
                     PreparedStatement insert_statement = conn.prepareStatement(update_op);
-                    insert_statement.setLong(1, auth.getMid());
+                    insert_statement.setLong(1, mid);
                     insert_statement.setString(2, bv);
                     insert_statement.executeUpdate();
                 }
-                conn.close();
                 return false;
             }
         }
