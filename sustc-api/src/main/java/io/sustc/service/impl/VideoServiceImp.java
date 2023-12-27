@@ -46,14 +46,17 @@ public class VideoServiceImp implements VideoService
     {
         // 验证授权信息是否有效
         long authenticatedUserId = isAuthValid(auth, dataSource);
-        if (authenticatedUserId == -1) return null; // 如果授权无效，返回 null
+        if (authenticatedUserId == -1)
+            return null; // 如果授权无效，返回 null
 
         // 检查视频请求的有效性
         if (req == null || req.getTitle() == null || req.getTitle().trim().isEmpty()
-                || req.getDuration() < 10 || req.getPublicTime().before(Timestamp.valueOf(LocalDateTime.now())))
+                || req.getDuration() < 10 || req.getPublicTime() == null || req.getPublicTime().before(Timestamp.valueOf(LocalDateTime.now())))
         {
             return null; // 请求无效，返回 null
         }
+        // 测试有无同名的
+        String check = "select count(*) cnt from videos where title=? and owner_mid=?;";
 
         // 生成视频 BV 号
         String bv = generateBvNumber();
@@ -62,16 +65,27 @@ public class VideoServiceImp implements VideoService
         String insertVideoSql = "INSERT INTO videos(bv, title, owner_mid, commit_time, public_time, duration, description)" +
                 " VALUES(?, ?, ?, ?, ?, ?, ?)";
         try (Connection conn = dataSource.getConnection();
-             PreparedStatement videoInsertStmt = conn.prepareStatement(insertVideoSql))
+             PreparedStatement videoInsertStmt = conn.prepareStatement(insertVideoSql);
+             PreparedStatement checkStmt = conn.prepareStatement(check))
         {
             videoInsertStmt.setString(1, bv);
             videoInsertStmt.setString(2, req.getTitle());
-            videoInsertStmt.setLong(3, auth.getMid());
+            videoInsertStmt.setLong(3, authenticatedUserId);
             videoInsertStmt.setTimestamp(4, Timestamp.valueOf(LocalDateTime.now())); // 使用当前时间作为提交时间
             videoInsertStmt.setTimestamp(5, req.getPublicTime());
             videoInsertStmt.setLong(6, (long) req.getDuration());
             videoInsertStmt.setString(7, req.getDescription());
-
+            checkStmt.setString(1, req.getTitle());
+            checkStmt.setLong(2, authenticatedUserId);
+            ResultSet rs = checkStmt.executeQuery();
+            if (rs.next())
+            {
+                if (rs.getInt("cnt") != 0)
+                {
+                    conn.close();
+                    return null;
+                }
+            }
             videoInsertStmt.executeUpdate();
         }
         catch (SQLException e)
@@ -90,19 +104,40 @@ public class VideoServiceImp implements VideoService
      */
     private String generateBvNumber()
     {
-        Random random = new Random();
-        long av = random.nextInt(1000000000);
-        String table = "fZodR9XQDSUm21yCkr6zBqiveYah8bt4xsWpHnJE7jL5VG3guMTKNPAwcF";
-        int[] s = {11, 10, 3, 8, 4, 6};
-        long xor = 177451812L;
-        long add = 8728348608L;
         char[] bvChars = "BV1  4 1 7  ".toCharArray();
-        av = (av ^ xor) + add;
-        for (int i = 0; i < 6; i++)
+        while (true)
         {
-            bvChars[s[i]] = table.charAt((int) (av / Math.pow(58, i) % 58));
+            Random random = new Random();
+            long av = random.nextInt(1000000000);
+            String table = "fZodR9XQDSUm21yCkr6zBqiveYah8bt4xsWpHnJE7jL5VG3guMTKNPAwcF";
+            int[] s = {11, 10, 3, 8, 4, 6};
+            long xor = 177451812L;
+            long add = 8728348608L;
+            av = (av ^ xor) + add;
+            for (int i = 0; i < 6; i++)
+            {
+                bvChars[s[i]] = table.charAt((int) (av / Math.pow(58, i) % 58));
+            }
+            String sql = "select count(bv) cnt from videos where bv=?";
+            try (Connection conn = dataSource.getConnection();
+                 PreparedStatement stmt = conn.prepareStatement(sql))
+            {
+                stmt.setString(1, new String(bvChars));
+                ResultSet rs = stmt.executeQuery();
+                if (rs.next())
+                {
+                    if (rs.getInt("cnt") == 0)
+                    {
+                        conn.close();
+                        return new String(bvChars);
+                    }
+                }
+            }
+            catch (SQLException e)
+            {
+                System.out.println(e);
+            }
         }
-        return new String(bvChars);
     }
 
 
@@ -346,38 +381,37 @@ public class VideoServiceImp implements VideoService
     @Override
     public boolean likeVideo(AuthInfo auth, String bv)
     {
-
-
         return like_collect(auth, bv, "like");
     }
 
     @Override
     public boolean collectVideo(AuthInfo auth, String bv)
     {
-
-
         return like_collect(auth, bv, "favorite");
-
-
     }
 
     public boolean like_collect(AuthInfo auth, String bv, String op)
     {
+        if (isAuthValid(auth, dataSource) == -1)
+            return false;
         try (Connection conn = dataSource.getConnection())
         {
-            if (isAuthValid(auth, dataSource) == -1)
-                return false;
-
             String query4 = "SELECT * FROM videos WHERE BV=?;";
             PreparedStatement preparedStatement4 = conn.prepareStatement(query4);
             preparedStatement4.setString(1, bv);
             ResultSet resultSet4 = preparedStatement4.executeQuery();
             if (!resultSet4.next() || resultSet4.getLong(1) == auth.getMid())
+            {
+                conn.close();
                 return false;
+            }
 
             List<String> res = searchVideo(auth, bv, 1, 1);
             if (res == null)
+            {
+                conn.close();
                 return false;
+            }
 
             String check_done_before = "SELECT * FROM " + op + " WHERE MID = ?;";
             PreparedStatement check_statement = conn.prepareStatement(check_done_before);
@@ -391,6 +425,7 @@ public class VideoServiceImp implements VideoService
                 insert_statement.setLong(2, auth.getMid());
                 insert_statement.setString(1, bv);
                 insert_statement.executeUpdate();
+                conn.close();
                 return true;
             }
             else
@@ -403,6 +438,7 @@ public class VideoServiceImp implements VideoService
                     insert_statement.setString(2, bv);
                     insert_statement.executeUpdate();
                 }
+                conn.close();
                 return false;
             }
         }

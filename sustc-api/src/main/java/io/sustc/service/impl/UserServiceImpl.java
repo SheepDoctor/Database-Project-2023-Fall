@@ -142,9 +142,12 @@ public class UserServiceImpl implements UserService
     // 验证生日格式
     private boolean isValidBirthday(String birthday)
     {
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy年MM月dd日");
+        System.out.println(birthday);
+        birthday = birthday.replace('月', '-');
+        birthday = birthday.replace("日", "");
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
         sdf.setLenient(false); // 设置为严格的日期解析，不允许日期溢出（例如2月30日）
-        birthday = "2024年" + birthday;
+        birthday = "2024-" + birthday;
         try
         {
             // 尝试解析日期
@@ -154,7 +157,7 @@ public class UserServiceImpl implements UserService
         catch (ParseException e)
         {
             // 解析失败，说明日期无效
-            e.printStackTrace();
+            //e.printStackTrace();
             return false;
         }
     }
@@ -162,22 +165,37 @@ public class UserServiceImpl implements UserService
     // 检查唯一性
     private boolean isUnique(String name, String qq, String wechat)
     {
-        String sql = "SELECT COUNT(*) FROM users WHERE name = ? OR qq = ? OR wechat = ?";
-
+        String sql;
+        if (qq == null && wechat == null)
+        {
+            sql = "SELECT COUNT(*) cnt FROM users WHERE name = '" + name + "'";
+        }
+        else if (qq != null && wechat == null)
+        {
+            sql = "SELECT COUNT(*) cnt FROM users WHERE name = '" + name + "' OR qq = '" + qq + "'";
+        }
+        else if (qq == null && wechat != null)
+        {
+            sql = "SELECT COUNT(*) cnt FROM users WHERE name = '" + name + "' OR wechat = '" + wechat + "'";
+        }
+        else
+        {
+            sql = "SELECT COUNT(*) cnt FROM users WHERE name = '" + name + "' OR qq = '" + qq + "' OR wechat = '" + wechat + "'";
+        }
+        System.out.println(sql);
         try (Connection conn = dataSource.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql))
         {
-            // 设置参数
-            stmt.setString(1, name);
-            stmt.setString(2, qq);
-            stmt.setString(3, wechat);
-
             // 执行查询
             ResultSet rs = stmt.executeQuery();
             if (rs.next())
             {
                 // 如果计数为0，则表示唯一
-                return rs.getInt(1) == 0;
+                if (rs.getInt("cnt") == 0)
+                {
+                    conn.close();
+                    return true;
+                }
             }
         }
         catch (SQLException e)
