@@ -341,7 +341,7 @@ public class VideoServiceImp implements VideoService
 
         try (Connection conn = dataSource.getConnection())
         {//检查存在/非作者/未审核
-            String check_video = "SELECT owner_mid,public_time, commit_time from videos where bv=?;";
+            String check_video = "SELECT owner_mid,public_time,commit_time from videos where bv=?;";
             try (PreparedStatement check_query = conn.prepareStatement(check_video))
             {
                 check_query.setString(1, bv);
