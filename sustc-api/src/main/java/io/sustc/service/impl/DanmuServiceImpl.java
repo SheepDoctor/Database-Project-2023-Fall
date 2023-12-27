@@ -153,6 +153,9 @@ class DanmuServiceImpl implements DanmuService
                     {
                         return -1; // 视频未发布
                     }
+                    if (danmuTime>videoResult.getInt("duration")){
+                        return -1;
+                    }
                 }
             }
 
