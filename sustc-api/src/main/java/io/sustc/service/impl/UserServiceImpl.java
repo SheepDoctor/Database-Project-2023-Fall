@@ -12,6 +12,7 @@ import javax.sql.DataSource;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.sql.*;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
@@ -39,19 +40,6 @@ public class UserServiceImpl implements UserService
             type = "qq";
         }
 
-        String hashedPwd = null;
-        if (type.equals("mid"))
-        {
-            try
-            {
-                hashedPwd = generateSha256Hash(auth.getPassword());
-            }
-            catch (NoSuchAlgorithmException e)
-            {
-                e.printStackTrace();
-            }
-        }
-
         String sqlSelectAuth = "select mid from users where " + type + " = ?";
         String sqlCheckMidAndPassWord = "select password from users where mid = ?";
         try (Connection conn = dataSource.getConnection();
@@ -70,7 +58,9 @@ public class UserServiceImpl implements UserService
                     {
                         if (resultSet.next())
                         {
-                            return resultSet.getLong(1); // 如果找到记录，返回对应的 mid
+                            long ans = resultSet.getLong(1);
+                            conn.close();
+                            return ans; // 如果找到记录，返回对应的 mid
                         }
                     }
                 }
@@ -81,8 +71,8 @@ public class UserServiceImpl implements UserService
                     try (ResultSet resultSet = stmtMid.executeQuery();
                     )
                     {
-                        if (resultSet.next() && hashedPwd != null &&
-                                hashedPwd.equals(resultSet.getString("password")))
+                        if (resultSet.next() &&
+                                checkSha256Hash(auth.getPassword(), resultSet.getString("password")))
                             return auth.getMid(); // 如果密码的哈希值匹配，返回 mid
                     }
                 }
@@ -134,6 +124,8 @@ public class UserServiceImpl implements UserService
             return -1;
         }
 
+        //System.out.println("********************************************");
+        //System.out.println(req.getSex());
         // 验证生日格式
         if (req.getBirthday() != null && !isValidBirthday(req.getBirthday()))
         {
@@ -155,15 +147,18 @@ public class UserServiceImpl implements UserService
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy年MM月dd日");
         sdf.setLenient(false); // 设置为严格的日期解析，不允许日期溢出（例如2月30日）
         birthday = "2024年" + birthday;
+        //System.out.println(birthday);
+        //System.out.println("********************************************");
         try
         {
             // 尝试解析日期
             Date date = sdf.parse(birthday);
             return true;
         }
-        catch (Exception exception)
+        catch (ParseException e)
         {
             // 解析失败，说明日期无效
+            //e.printStackTrace();
             return false;
         }
     }
@@ -171,22 +166,37 @@ public class UserServiceImpl implements UserService
     // 检查唯一性
     private boolean isUnique(String name, String qq, String wechat)
     {
-        String sql = "SELECT COUNT(*) FROM users WHERE name = ? OR qq = ? OR wechat = ?";
-
+        String sql;
+        if (qq == null && wechat == null)
+        {
+            sql = "SELECT COUNT(*) cnt FROM users WHERE name = '" + name + "'";
+        }
+        else if (qq != null && wechat == null)
+        {
+            sql = "SELECT COUNT(*) cnt FROM users WHERE name = '" + name + "' OR qq = '" + qq + "'";
+        }
+        else if (qq == null && wechat != null)
+        {
+            sql = "SELECT COUNT(*) cnt FROM users WHERE name = '" + name + "' OR wechat = '" + wechat + "'";
+        }
+        else
+        {
+            sql = "SELECT COUNT(*) cnt FROM users WHERE name = '" + name + "' OR qq = '" + qq + "' OR wechat = '" + wechat + "'";
+        }
+        //System.out.println(sql);
         try (Connection conn = dataSource.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql))
         {
-            // 设置参数
-            stmt.setString(1, name);
-            stmt.setString(2, qq);
-            stmt.setString(3, wechat);
-
             // 执行查询
             ResultSet rs = stmt.executeQuery();
             if (rs.next())
             {
                 // 如果计数为0，则表示唯一
-                return rs.getInt(1) == 0;
+                if (rs.getInt("cnt") == 0)
+                {
+                    conn.close();
+                    return true;
+                }
             }
         }
         catch (SQLException e)
@@ -222,7 +232,7 @@ public class UserServiceImpl implements UserService
             stmt.setString(6, req.getWechat());
             stmt.setString(7, req.getPassword());
 
-            System.out.println(stmt);
+            //System.out.println(stmt);
 
             // 执行查询并获取返回的主键
             ResultSet rs = stmt.executeQuery();
@@ -233,12 +243,13 @@ public class UserServiceImpl implements UserService
         }
         catch (SQLException e)
         {
-            e.printStackTrace();
-            throw new RuntimeException(e);
+            //e.printStackTrace();
+            //throw new RuntimeException(e);
         }
 
         // 如果插入失败，可以返回一个错误代码或抛出异常
-        throw new RuntimeException("User creation failed");
+        //throw new RuntimeException("User creation failed");
+        return 1;
     }
 
     @Override
@@ -246,62 +257,103 @@ public class UserServiceImpl implements UserService
     {
 
         long authMid = isAuthValid(auth, dataSource);
+        //System.out.println("********************************************");
         // 首先，验证 auth 是否有效，并得到有效的mid
         if (authMid == -1)
         {
+            //System.out.println("auth validation:" + false);
             return false;
         }
-
+        //System.out.println("auth validation: " + true);
         // 检查 auth 是否拥有删除 mid 的权限
         if (!hasDeletePermission(authMid, mid))
         {
+            //System.out.println("has permission: " + false);
             return false;
         }
-
+        //System.out.println("has permission: " + true);
         // 执行删除操作
         return performDelete(mid);
     }
 
     private boolean hasDeletePermission(long authMid, long mid)
     {
-        String sqlCheckIdentity = "select identity from users where mid = ?";
+        String sql = """
+                select case
+                    when a and b then ?=?
+                    when a and not b then true
+                    when not a and b then false
+                    when not a and not b then ?=?
+                end as c
+                from (select operator_is_superuser a, deleted_is_superuser b
+                      from (select case
+                                       when identity = 'SUPERUSER' then true
+                                       when identity = 'USER' then false
+                                       end as operator_is_superuser,
+                                   'temp'     temp
+                            from users
+                            where mid = ?) operator
+                               join
+                           (select case
+                                       when identity = 'SUPERUSER' then true
+                                       when identity = 'USER' then false
+                                       end as deleted_is_superuser,
+                                   'temp'     temp
+                            from users
+                            where mid = ?) deleted on operator.temp = deleted.temp) t;
+                """;
 
         //检查对应用户的identity是否为superuser，且删除用户的identity是user
-        boolean isSuperUser;
-
-        try (Connection connection = dataSource.getConnection();
-             PreparedStatement stmtCheckIdentity = connection.prepareStatement(sqlCheckIdentity))
-        {
-            stmtCheckIdentity.setLong(1, authMid);
-            stmtCheckIdentity.setLong(1, mid);
-            try (ResultSet resultSetAuth = stmtCheckIdentity.executeQuery();
-                 ResultSet resultSetDelMid = stmtCheckIdentity.executeQuery())
-            {
-                if (resultSetAuth.next() && resultSetDelMid.next())
-                    isSuperUser = resultSetAuth.getString(1).equals("SUPERUSER") && resultSetDelMid.getString(1).equals("USER");
-                else isSuperUser = false;
-            }
-        }
-        catch (SQLException exception)
-        {
-            exception.printStackTrace();
-            throw new RuntimeException(exception);
-        }
-
-        // mid 属于该用户或 该用户为SUPERUSER且被删除用户为USER时 返回真
-        return authMid == mid || isSuperUser;
-    }
-
-    private boolean performDelete(long mid)
-    {
-        String sql = "DELETE FROM users WHERE mid = ?";
+        boolean flag;
 
         try (Connection conn = dataSource.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql))
         {
-            stmt.setLong(1, mid);
-            int affectedRows = stmt.executeUpdate();
-            return affectedRows > 0;
+            stmt.setLong(1, authMid);
+            stmt.setLong(2, mid);
+            stmt.setLong(3, authMid);
+            stmt.setLong(4, mid);
+            stmt.setLong(5, authMid);
+            stmt.setLong(6, mid);
+            ResultSet rs = stmt.executeQuery();
+            if (rs.next())
+            {
+                flag = rs.getBoolean("c");
+                return flag;
+            }
+        }
+        catch (SQLException e)
+        {
+            System.out.println(e);
+        }
+        return false;
+    }
+
+    private boolean performDelete(long mid)
+    {
+        String sql = """
+                delete from danmu where mid=?;
+                delete from danmu_likes where mid = ?;
+                delete from user_follow where follow_mid=? or follow_by_mid=?;
+                delete from favorite where mid=?;
+                delete from view where mid=?;
+                delete from coin where mid=?;
+                delete from likes where mid=?;
+                delete from review where reviewer_mid=?;
+                delete from users where mid=?;
+                delete from videos where owner_mid=?;
+                """;
+        try (Connection conn = dataSource.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql))
+        {
+            for (int i = 1; i <= 11; i++)
+            {
+                stmt.setLong(i, mid);
+            }
+            //System.out.println(stmt);
+            //System.out.println("********************************************");
+            stmt.executeUpdate();
+            return true;
         }
         catch (SQLException e)
         {
@@ -316,7 +368,8 @@ public class UserServiceImpl implements UserService
         // 验证授权信息是否有效
         long authMid = isAuthValid(auth, dataSource);
         // 如果授权信息无效，返回 false
-        if (authMid == -1) return false;
+        if (authMid == -1 || authMid == followeeMid)
+            return false;
 
         // SQL 查询，检查用户是否已经关注了 followee
         String checkSql = """

@@ -135,12 +135,24 @@ create table view
     check (bv like 'BV%')                     -- 检查 'bv' 是否以 'BV' 开头，确保BV号格式正确。
 );
 
-GRANT SELECT, INSERT, UPDATE, DELETE ON ALL TABLES IN SCHEMA public TO sustc;
-GRANT CONNECT ON DATABASE "Project" TO sustc;
-GRANT TRUNCATE ON ALL TABLES IN SCHEMA public TO sustc;
+GRANT
+SELECT,
+INSERT
+,
+UPDATE,
+DELETE
+ON ALL TABLES IN SCHEMA public TO sustc;
+GRANT
+CONNECT
+ON DATABASE "Project" TO sustc;
+GRANT TRUNCATE
+ON ALL TABLES IN SCHEMA public TO sustc;
 GRANT USAGE, SELECT, UPDATE ON SEQUENCE danmu_id_seq TO sustc;
+GRANT USAGE, SELECT, UPDATE ON SEQUENCE users_mid_seq TO sustc;
 
-CREATE OR REPLACE FUNCTION search_videos(keywords text[], user_mid bigint, page_size integer, page_num integer)
+
+CREATE
+OR REPLACE FUNCTION search_videos(keywords text[], user_mid bigint, page_size integer, page_num integer)
     RETURNS TABLE(bv character, title character varying, description text, owner_name character varying, relevance numeric, view_count bigint, title_match text, description_match text, owner_name_match text)
     LANGUAGE plpgsql
 AS

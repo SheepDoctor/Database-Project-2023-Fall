@@ -206,7 +206,7 @@ public class DatabaseServiceImpl implements DatabaseService
             e.printStackTrace();
             throw new RuntimeException(e);
         }
-        log.info("{} users are imported.", count);
+        //log.info("{} users are imported.", count);
     }
 
     private void importVideo(List<VideoRecord> videoRecords, List<DanmuRecord> danmuRecords, List<UserRecord> userRecords)
