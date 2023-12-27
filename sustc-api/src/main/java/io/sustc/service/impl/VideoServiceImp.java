@@ -324,19 +324,23 @@ public class VideoServiceImp implements VideoService
             String check_video ="SELECT owner_mid,public_time from videos where bv=?;";
             try(PreparedStatement check_query=conn.prepareStatement(check_video))
             {
-                check_query.setString(1,bv);
-                ResultSet check_result=check_query.executeQuery();
-                if (!check_result.next()||check_result.getLong(1)==mid||check_result.getTime(2)!=null)
-                    return false;
+                check_query.setString(1, bv);
+                try (ResultSet check_result = check_query.executeQuery())
+                {
+                    if (!check_result.next() || check_result.getLong(1) == mid)
+                        return false;
+                }
             }
             //检查用户资格
             String check_user="SELECT identity from users where mid=?;";
             try(PreparedStatement check_query=conn.prepareStatement(check_user))
             {
-                check_query.setLong(1,mid);
-                ResultSet check_result=check_query.executeQuery();
-                if (!check_result.next()||!check_result.getString(1).equals("SUPERUSER"))
-                    return false;
+                check_query.setLong(1, mid);
+                try (ResultSet check_result_of_user = check_query.executeQuery())
+                {
+                    if (!check_result_of_user.next() || !check_result_of_user.getString(1).equals("SUPERUSER"))
+                        return false;
+                }
             }
             //更新
             Timestamp timestamp=new  Timestamp(System.currentTimeMillis());
@@ -370,7 +374,7 @@ public class VideoServiceImp implements VideoService
     @Override
     public boolean likeVideo(AuthInfo auth, String bv)
     {
-        return like_collect(auth, bv, "like");
+        return like_collect(auth, bv, "likes");
     }
 
     @Override
@@ -405,16 +409,37 @@ public class VideoServiceImp implements VideoService
                 check_statement.setString(2, bv);
                 ResultSet exist_query = check_statement.executeQuery();
                 if (!exist_query.next())
-
                 {
+                    if (op.equals("coin"))
+                    {
+                        String check_coin = "SELECT COIn from users where mid=?;";
+                        try (PreparedStatement check_coin_statement = conn.prepareStatement(check_coin))
+                        {
+                            check_coin_statement.setLong(1, mid);
+                            ResultSet coin_num = check_coin_statement.executeQuery();
+
+                            if (!coin_num.next() || coin_num.getInt(1) <= 0)
+                            {
+                                return false;
+                            }
+                            else
+                            {
+                                String coin_update = "update users set coin=coin-1 where mid=?;";
+                                try (PreparedStatement update_coin = conn.prepareStatement(coin_update))
+                                {
+                                    update_coin.setLong(1, mid);
+                                    update_coin.executeUpdate();
+                                }
+                            }
+                        }
+                    }
                     String update_op = "INSERT INTO " + op + " (bv, mid) values (?, ?) ;";
-                    try(PreparedStatement insert_statement = conn.prepareStatement(update_op);)
+                    try (PreparedStatement insert_statement = conn.prepareStatement(update_op))
                     {
                         insert_statement.setLong(2, mid);
                         insert_statement.setString(1, bv);
                         insert_statement.executeUpdate();
                     }
-
                     return true;
                 }
                 else
@@ -428,8 +453,6 @@ public class VideoServiceImp implements VideoService
                             insert_statement.setString(2, bv);
                             insert_statement.executeUpdate();
                         }
-
-
                     }
                     return false;
                 }

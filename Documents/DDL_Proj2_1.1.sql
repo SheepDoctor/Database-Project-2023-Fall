@@ -11,17 +11,17 @@ create type gender_type as enum ('男', '女', '保密');
 -- 创建一个表示用户的表 'users'
 create table users
 (
-    mid      bigserial primary key, -- 用户的唯一识别号
-    name     varchar,               -- 用户创建的名称
-    sex      gender_type,           -- 性别，类型为 'gender_type' 枚举
-    birthday varchar,               -- 用户的生日
-    level    int,                   -- 用户参与度的等级
-    sign     text,                  -- 用户创建的个人描述
-    identity identity_type,         -- 用户角色的值（'user', 'superuser'）
-    qq       varchar unique,        -- QQ号
-    wechat   varchar unique,        -- 微信号
-    password varchar,               -- 登录密码,使用sha-256存储
-    coin     int default (0)        -- 用户拥有的硬币数量
+    mid      bigserial primary key,        -- 用户的唯一识别号
+    name     varchar,                      -- 用户创建的名称
+    sex      gender_type,                  -- 性别，类型为 'gender_type' 枚举
+    birthday varchar,                      -- 用户的生日
+    level    int,                          -- 用户参与度的等级
+    sign     text,                         -- 用户创建的个人描述
+    identity identity_type default 'USER', -- 用户角色的值（'user', 'superuser'）
+    qq       varchar unique,               -- QQ号
+    wechat   varchar unique,               -- 微信号
+    password varchar,                      -- 登录密码,使用sha-256存储
+    coin     int           default (0)     -- 用户拥有的硬币数量
 );
 
 

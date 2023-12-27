@@ -201,9 +201,8 @@ public class UserServiceImpl implements UserService
         }
         catch (SQLException e)
         {
-            throw new RuntimeException(e);
+            System.out.println(e);
         }
-
         return false;
     }
 
@@ -231,25 +230,57 @@ public class UserServiceImpl implements UserService
             stmt.setString(5, req.getQq());
             stmt.setString(6, req.getWechat());
             stmt.setString(7, req.getPassword());
-
+            //System.out.println("******************************************");
             //System.out.println(stmt);
-
-            // 执行查询并获取返回的主键
-            ResultSet rs = stmt.executeQuery();
-            if (rs.next())
+            long mid = -1;
             {
-                return rs.getLong("mid"); // 返回生成的用户ID
+                while (mid == -1)
+                {    // 执行查询并获取返回的主键
+                    try (ResultSet rs = stmt.executeQuery())
+                    {
+                        if (rs.next())
+                        {
+                            mid = rs.getLong("mid");
+                            //System.out.println(mid);
+                            //System.out.println("******************************************");
+                            String check = "select count(*) cnt from users where mid=" + mid;
+                            try (PreparedStatement checkstmt = conn.prepareStatement(check);
+                                 ResultSet crs = checkstmt.executeQuery())
+                            {
+                                if (crs.next())
+                                {
+                                    int temp = crs.getInt("cnt");
+                                    //System.out.println(temp);
+                                    if (temp == 0)
+                                    {
+                                        mid = -1;
+                                        continue;
+                                    }
+                                    else
+                                    {
+                                        return mid;// 返回生成的用户ID
+                                    }
+                                }
+                                mid = -1;
+                            }
+                        }
+                    }
+                    catch (SQLException e)
+                    {
+                        //System.out.println(e);
+                        mid = -1;
+                    }
+                }
             }
         }
         catch (SQLException e)
         {
-            //e.printStackTrace();
-            //throw new RuntimeException(e);
+            System.out.println(e);
         }
 
         // 如果插入失败，可以返回一个错误代码或抛出异常
         //throw new RuntimeException("User creation failed");
-        return 1;
+        return -1;
     }
 
     @Override
@@ -257,21 +288,21 @@ public class UserServiceImpl implements UserService
     {
 
         long authMid = isAuthValid(auth, dataSource);
-        System.out.println("********************************************");
+        //System.out.println("********************************************");
         // 首先，验证 auth 是否有效，并得到有效的mid
         if (authMid == -1)
         {
-            System.out.println("auth validation:" + false);
+            //System.out.println("auth validation:" + false);
             return false;
         }
-        System.out.println("auth validation: " + true);
+        //System.out.println("auth validation: " + true);
         // 检查 auth 是否拥有删除 mid 的权限
         if (!hasDeletePermission(authMid, mid))
         {
-            System.out.println("has permission: " + false);
+            //System.out.println("has permission: " + false);
             return false;
         }
-        System.out.println("has permission: " + true);
+        //System.out.println("has permission: " + true);
         // 执行删除操作
         return performDelete(mid);
     }
@@ -315,7 +346,7 @@ public class UserServiceImpl implements UserService
             stmt.setLong(4, mid);
             stmt.setLong(5, authMid);
             stmt.setLong(6, mid);
-            System.out.println(stmt);
+            //System.out.println(stmt);
             ResultSet rs = stmt.executeQuery();
             if (rs.next())
             {
@@ -352,7 +383,7 @@ public class UserServiceImpl implements UserService
                 stmt.setLong(i, mid);
             }
             //System.out.println(stmt);
-            System.out.println("********************************************");
+            //System.out.println("********************************************");
             stmt.executeUpdate();
             return true;
         }

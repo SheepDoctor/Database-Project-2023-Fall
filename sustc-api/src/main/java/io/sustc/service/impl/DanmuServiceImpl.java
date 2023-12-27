@@ -261,17 +261,19 @@ class DanmuServiceImpl implements DanmuService
 
     @Override
     public boolean likeDanmu(AuthInfo auth, long danmuId)
+
     {
+        // 验证用户是否存在
+        long authMid = UserServiceImpl.isAuthValid(auth, dataSource);
+
+        // 检查auth信息是否非法
+        if (authMid == -1) return false;
+
         try (Connection connection = dataSource.getConnection())
         {
-            // 验证用户是否存在
-            long authMid = UserServiceImpl.isAuthValid(auth, dataSource);
-
-            // 检查auth信息是否非法
-            if (authMid == -1) return false;
-
             // 检查弹幕是否存在
-            String danmuQuerySql = "SELECT * FROM danmu WHERE id = ?;";
+            String danmuQuerySql = "SELECT bv FROM danmu WHERE id = ?;";
+            String videoBv;
             try (PreparedStatement danmuQuery = connection.prepareStatement(danmuQuerySql))
             {
                 danmuQuery.setLong(1, danmuId);
@@ -281,18 +283,44 @@ class DanmuServiceImpl implements DanmuService
                     {
                         return false; // 弹幕不存在
                     }
+                    else
+                    {
+                        videoBv = danmuResult.getString(1);
+                    }
                 }
             }
 
+            // 检查用户是否已观看过该视频
+            String viewerQuerySql = "SELECT mid FROM view WHERE mid = ? and bv= ? ;";
+            try (PreparedStatement viewerQuery = connection.prepareStatement(viewerQuerySql))
+            {
+                viewerQuery.setLong(1, authMid);
+                viewerQuery.setString(2, videoBv);
+                try (ResultSet viewerResult = viewerQuery.executeQuery())
+                {
+                    if (!viewerResult.next())
+                    {
+                        return false; // 用户未观看该视频
+                    }
+                }
+            }
+        }
+        catch (SQLException e)
+        {
+            e.printStackTrace();
+            throw new RuntimeException("Database error in likeDanmu: " + e.getMessage());
+        }
+        try (Connection connection = dataSource.getConnection())
+        {
             // 检查用户是否已经点赞
-            String likeCheckSql = "SELECT * FROM danmu_likes WHERE id = ? AND mid = ?;";
+            String likeCheckSql = "SELECT count(*) FROM danmu_likes WHERE id = ? AND mid = ?;";
             try (PreparedStatement likeCheckQuery = connection.prepareStatement(likeCheckSql))
             {
                 likeCheckQuery.setLong(1, danmuId);
                 likeCheckQuery.setLong(2, authMid);
                 try (ResultSet likeCheckResult = likeCheckQuery.executeQuery())
                 {
-                    if (!likeCheckResult.next())
+                    if (likeCheckResult.next() && likeCheckResult.getInt(1) == 0)
                     {
                         // 如果用户尚未点赞，添加点赞
                         String insertLikeSql = "INSERT INTO danmu_likes (id, mid) VALUES (?, ?);";

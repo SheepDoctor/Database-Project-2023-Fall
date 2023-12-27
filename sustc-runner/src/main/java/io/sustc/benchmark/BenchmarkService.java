@@ -18,7 +18,8 @@ import java.util.concurrent.atomic.AtomicLong;
 
 @Service
 @Slf4j
-public class BenchmarkService {
+public class BenchmarkService
+{
 
     @Autowired
     private BenchmarkConfig config;
@@ -48,8 +49,10 @@ public class BenchmarkService {
     private final Set<Long> registeredUser = new ConcurrentSkipListSet<>();
 
     @BenchmarkStep(order = 0, description = "Truncate tables")
-    public void truncate() {
-        if (!config.isStudentMode()) {
+    public void truncate()
+    {
+        if (!config.isStudentMode())
+        {
             return;
         }
         log.warn("Truncating tables");
@@ -57,7 +60,8 @@ public class BenchmarkService {
     }
 
     @BenchmarkStep(order = 1, timeout = 35, description = "Import data")
-    public BenchmarkResult importData() {
+    public BenchmarkResult importData()
+    {
         List<DanmuRecord> danmuRecords = deserialize(BenchmarkConstants.IMPORT_DATA, BenchmarkConstants.DANMU_RECORDS);
         List<UserRecord> userRecords = deserialize(BenchmarkConstants.IMPORT_DATA, BenchmarkConstants.USER_RECORDS);
         List<VideoRecord> videoRecords = deserialize(BenchmarkConstants.IMPORT_DATA, BenchmarkConstants.VIDEO_RECORDS);
@@ -408,6 +412,7 @@ public class BenchmarkService {
         return new BenchmarkResult(pass, endTime - startTime);
     }
 
+
     @BenchmarkStep(order = 12, description = "Test DanmuService#likeDanmu(AuthInfo, long)")
     public BenchmarkResult danmuLike()
     {
@@ -442,7 +447,6 @@ public class BenchmarkService {
 
         return new BenchmarkResult(pass, null);
     }
-
     @BenchmarkStep(order = 13, description = "Test VideoService#coinVideo(AuthInfo, String)")
     public BenchmarkResult videoCoin()
     {
@@ -633,21 +637,29 @@ public class BenchmarkService {
     }
 
     @BenchmarkStep(order = 18, description = "Test VideoService#updateVideoInfo(AuthInfo, String, PostVideoReq)")
-    public BenchmarkResult videoUpdate() {
+    public BenchmarkResult videoUpdate()
+    {
         List<Map.Entry<Object[], Boolean>> cases = deserialize(BenchmarkConstants.TEST_DATA, BenchmarkConstants.VIDEO_UPDATE);
         val pass = new AtomicLong();
 
         val startTime = System.currentTimeMillis();
-        cases.forEach(it -> {
-            try {
+        cases.forEach(it ->
+        {
+            try
+            {
                 val args = it.getKey();
                 val res = videoService.updateVideoInfo((AuthInfo) args[0], (String) args[1], (PostVideoReq) args[2]);
-                if (Objects.equals(it.getValue(), res)) {
+                if (Objects.equals(it.getValue(), res))
+                {
                     pass.incrementAndGet();
-                } else {
+                }
+                else
+                {
                     log.debug("Wrong answer for {}: expected {}, got {}", it.getKey(), it.getValue(), res);
                 }
-            } catch (Exception e) {
+            }
+            catch (Exception e)
+            {
                 log.error("Exception thrown for {}", it, e);
             }
         });
@@ -657,34 +669,49 @@ public class BenchmarkService {
     }
 
     @BenchmarkStep(order = 19, description = "Test VideoService#reviewVideo(AuthInfo, String)")
-    public BenchmarkResult videoReview() {
+    public BenchmarkResult videoReview()
+    {
         List<Map.Entry<Object[], Boolean>> cases = deserialize(BenchmarkConstants.TEST_DATA, BenchmarkConstants.VIDEO_REVIEW);
         AuthInfo superuser = deserialize(BenchmarkConstants.TEST_DATA, BenchmarkConstants.SUPER_USER_AUTH);
         val pass = new AtomicLong();
 
         val startTime = System.currentTimeMillis();
-        cases.forEach(it -> {
-            try {
+        cases.forEach(it ->
+        {
+            try
+            {
                 val args = it.getKey();
                 val res = videoService.reviewVideo((AuthInfo) args[0], (String) args[1]);
-                if (Objects.equals(it.getValue(), res)) {
+                if (Objects.equals(it.getValue(), res))
+                {
                     pass.incrementAndGet();
-                } else {
+                }
+                else
+                {
                     log.debug("Wrong answer for {}: expected {}, got {}", it.getKey(), it.getValue(), res);
                 }
-            } catch (Exception e) {
+            }
+            catch (Exception e)
+            {
                 log.error("Exception thrown for {}", it, e);
             }
         });
-        postedVideo.parallelStream().forEach(it -> {
-            try {
+        postedVideo.parallelStream().forEach(it ->
+        {
+            try
+            {
                 val res = videoService.reviewVideo(superuser, it);
-                if (res) {
+                if (res)
+                {
                     pass.incrementAndGet();
-                } else {
+                }
+                else
+                {
                     log.debug("Wrong answer for {}: expected true, got false", it);
                 }
-            } catch (Exception e) {
+            }
+            catch (Exception e)
+            {
                 log.error("Exception thrown for {}", it, e);
             }
         });
@@ -694,12 +721,14 @@ public class BenchmarkService {
     }
 
     @BenchmarkStep(order = 20, description = "Test side effect of step 17, 18")
-    public BenchmarkResult videoSearch2() {
+    public BenchmarkResult videoSearch2()
+    {
         List<Map.Entry<Object[], List<String>>> cases = deserialize(BenchmarkConstants.TEST_DATA, BenchmarkConstants.VIDEO_SEARCH_2);
         val pass = new AtomicLong();
 
         val startTime = System.currentTimeMillis();
-        cases.parallelStream().forEach(it -> {
+        cases.parallelStream().forEach(it ->
+        {
             try
             {
                 val args = it.getKey();
@@ -724,32 +753,45 @@ public class BenchmarkService {
     }
 
     @BenchmarkStep(order = 21, description = "Test VideoService#deleteVideo(AuthInfo, String)")
-    public BenchmarkResult videoDelete() {
+    public BenchmarkResult videoDelete()
+    {
         List<Map.Entry<Object[], Boolean>> cases = deserialize(BenchmarkConstants.TEST_DATA, BenchmarkConstants.VIDEO_DELETE);
         val pass = new AtomicLong();
 
         AuthInfo superuser = deserialize(BenchmarkConstants.TEST_DATA, BenchmarkConstants.SUPER_USER_AUTH);
 
         val startTime = System.currentTimeMillis();
-        postedVideo.parallelStream().forEach(it -> {
-            try {
+        postedVideo.parallelStream().forEach(it ->
+        {
+            try
+            {
                 val res = videoService.deleteVideo(superuser, it);
-                if (res) {
+                if (res)
+                {
                     pass.incrementAndGet();
-                } else {
+                }
+                else
+                {
                     log.debug("Wrong answer for {}: expected true, got false", it);
                 }
-            } catch (Exception e) {
+            }
+            catch (Exception e)
+            {
                 log.error("Exception thrown for {}", it, e);
             }
         });
-        cases.forEach(it -> {
-            try {
+        cases.forEach(it ->
+        {
+            try
+            {
                 val args = it.getKey();
                 val res = videoService.deleteVideo((AuthInfo) args[0], (String) args[1]);
-                if (Objects.equals(it.getValue(), res)) {
+                if (Objects.equals(it.getValue(), res))
+                {
                     pass.incrementAndGet();
-                } else {
+                }
+                else
+                {
                     log.debug("Wrong answer for {}: expected {}, got {}", it.getKey(), it.getValue(), res);
                 }
             }
@@ -791,16 +833,23 @@ public class BenchmarkService {
                 log.error("Exception thrown for {}", it, e);
             }
         });
-        cases.forEach(it -> {
-            try {
+        cases.forEach(it ->
+        {
+            try
+            {
                 val args = it.getKey();
                 val res = userService.deleteAccount((AuthInfo) args[0], (long) args[1]);
-                if (Objects.equals(it.getValue(), res)) {
+                if (Objects.equals(it.getValue(), res))
+                {
                     pass.incrementAndGet();
-                } else {
+                }
+                else
+                {
                     log.debug("Wrong answer for {}: expected {}, got {}", it.getKey(), it.getValue(), res);
                 }
-            } catch (Exception e) {
+            }
+            catch (Exception e)
+            {
                 log.error("Exception thrown for {}", it, e);
             }
         });
@@ -810,21 +859,29 @@ public class BenchmarkService {
     }
 
     @BenchmarkStep(order = 23, description = "Test UserService#follow(AuthInfo, long)")
-    public BenchmarkResult userFollow() {
+    public BenchmarkResult userFollow()
+    {
         List<Map.Entry<Object[], Boolean>> cases = deserialize(BenchmarkConstants.TEST_DATA, BenchmarkConstants.USER_FOLLOW);
         val pass = new AtomicLong();
 
         val startTime = System.currentTimeMillis();
-        cases.forEach(it -> {
-            try {
+        cases.forEach(it ->
+        {
+            try
+            {
                 val args = it.getKey();
                 val res = userService.follow((AuthInfo) args[0], (long) args[1]);
-                if (Objects.equals(it.getValue(), res)) {
+                if (Objects.equals(it.getValue(), res))
+                {
                     pass.incrementAndGet();
-                } else {
+                }
+                else
+                {
                     log.debug("Wrong answer for {}: expected {}, got {}", it.getKey(), it.getValue(), res);
                 }
-            } catch (Exception e) {
+            }
+            catch (Exception e)
+            {
                 log.error("Exception thrown for {}", it.getKey(), e);
             }
         });
@@ -835,40 +892,50 @@ public class BenchmarkService {
 
     @SneakyThrows
     @SuppressWarnings("unchecked")
-    private <T> T deserialize(String... path) {
+    private <T> T deserialize(String... path)
+    {
         val file = Paths.get(config.getDataPath(), path);
         return (T) fury.deserialize(Files.readAllBytes(file));
     }
 
-    private static boolean collectionEquals(Collection<?> expect, Collection<?> actual) {
+    private static boolean collectionEquals(Collection<?> expect, Collection<?> actual)
+    {
         return Objects.equals(expect, actual)
                 || expect.isEmpty() && Objects.isNull(actual);
     }
 
-    private static boolean longArrayAsSetEquals(long[] expect, long[] actual) {
-        if (expect.length != actual.length) {
+    private static boolean longArrayAsSetEquals(long[] expect, long[] actual)
+    {
+        if (expect.length != actual.length)
+        {
             return false;
         }
         val expectSet = new HashSet<Long>();
-        for (val i : expect) {
+        for (val i : expect)
+        {
             expectSet.add(i);
         }
-        for (val i : actual) {
-            if (!expectSet.remove(i)) {
+        for (val i : actual)
+        {
+            if (!expectSet.remove(i))
+            {
                 return false;
             }
         }
         return expectSet.isEmpty();
     }
 
-    private static <T> boolean arrayAsSetEquals(T[] expect, T[] actual) {
-        if (expect.length != actual.length) {
+    private static <T> boolean arrayAsSetEquals(T[] expect, T[] actual)
+    {
+        if (expect.length != actual.length)
+        {
             return false;
         }
         return Objects.equals(new HashSet<>(Arrays.asList(expect)), new HashSet<>(Arrays.asList(actual)));
     }
 
-    private static boolean userInfoEquals(UserInfoResp expect, UserInfoResp actual) {
+    private static boolean userInfoEquals(UserInfoResp expect, UserInfoResp actual)
+    {
         return expect.getMid() == actual.getMid()
                 && expect.getCoin() == actual.getCoin()
                 && longArrayAsSetEquals(expect.getFollowing(), actual.getFollowing())
