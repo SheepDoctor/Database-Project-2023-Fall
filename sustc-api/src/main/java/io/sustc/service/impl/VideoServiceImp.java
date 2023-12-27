@@ -394,21 +394,28 @@ public class VideoServiceImp implements VideoService
 
                 {
                     String update_op = "INSERT INTO " + op + " (bv, mid) values (?, ?) ;";
-                    PreparedStatement insert_statement = conn.prepareStatement(update_op);
-                    insert_statement.setLong(2, mid);
-                    insert_statement.setString(1, bv);
-                    insert_statement.executeUpdate();
+                    try(PreparedStatement insert_statement = conn.prepareStatement(update_op);)
+                    {
+                        insert_statement.setLong(2, mid);
+                        insert_statement.setString(1, bv);
+                        insert_statement.executeUpdate();
+                    }
+
                     return true;
                 }
                 else
                 {
                     if (!op.equals("coin"))
                     {
-                        String update_op="DELETE FROM "+op+" WHERE MID=? and BV=?;";
-                        PreparedStatement insert_statement = conn.prepareStatement(update_op);
-                        insert_statement.setLong(1, mid);
-                        insert_statement.setString(2, bv);
-                        insert_statement.executeUpdate();
+                        String update_op = "DELETE FROM " + op + " WHERE MID=? and BV=?;";
+                        try (PreparedStatement insert_statement = conn.prepareStatement(update_op))
+                        {
+                            insert_statement.setLong(1, mid);
+                            insert_statement.setString(2, bv);
+                            insert_statement.executeUpdate();
+                        }
+
+
                     }
                     return false;
                 }
