@@ -242,7 +242,6 @@ public class UserServiceImpl implements UserService
                         {
                             mid = rs.getLong("mid");
                             //System.out.println(mid);
-                            //System.out.println("******************************************");
                             String check = "select count(*) cnt from users where mid=" + mid;
                             try (PreparedStatement checkstmt = conn.prepareStatement(check);
                                  ResultSet crs = checkstmt.executeQuery())
@@ -250,7 +249,7 @@ public class UserServiceImpl implements UserService
                                 if (crs.next())
                                 {
                                     int temp = crs.getInt("cnt");
-                                    //System.out.println(temp);
+                                    System.out.println(temp);
                                     if (temp == 0)
                                     {
                                         mid = -1;
@@ -258,6 +257,8 @@ public class UserServiceImpl implements UserService
                                     }
                                     else
                                     {
+                                        //System.out.println(mid);
+                                        //System.out.println("******************************************");
                                         return mid;// 返回生成的用户ID
                                     }
                                 }
@@ -364,7 +365,6 @@ public class UserServiceImpl implements UserService
     private boolean performDelete(long mid)
     {
         String sql = """
-                delete from danmu where mid=?;
                 delete from danmu_likes where mid = ?;
                 delete from user_follow where follow_mid=? or follow_by_mid=?;
                 delete from favorite where mid=?;
@@ -372,6 +372,7 @@ public class UserServiceImpl implements UserService
                 delete from coin where mid=?;
                 delete from likes where mid=?;
                 delete from review where reviewer_mid=?;
+                delete from danmu where mid=?;
                 delete from users where mid=?;
                 delete from videos where owner_mid=?;
                 """;

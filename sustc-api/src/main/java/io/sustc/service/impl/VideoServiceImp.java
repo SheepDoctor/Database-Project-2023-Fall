@@ -137,18 +137,18 @@ public class VideoServiceImp implements VideoService
             // 判断是否是superuser
             if (user_info.next() && Objects.equals(user_info.getString("identity"), "superuser"))
             {
-                String sql = "delete from videos where bv =" + bv;
+                String sql = "delete from videos where bv ilike '" + bv + "'";
                 PreparedStatement stmt = conn.prepareStatement(sql);
                 return stmt.executeUpdate() != -1;
             }
 
             // 判断是否是视频的上传者
-            String select_video = "select owner_mid from videos where bv = " + bv;
+            String select_video = "select owner_mid from videos where bv ilike '" + bv + "'";
             PreparedStatement select_video_stmt = conn.prepareStatement(select_video);
             ResultSet video_info = select_video_stmt.executeQuery();
             if (video_info.next() && video_info.getLong("owner_id") == mid)
             {
-                String sql = "delete from videos where bv =" + bv;
+                String sql = "delete from videos where bv ilike'" + bv + "'";
                 PreparedStatement stmt = conn.prepareStatement(sql);
                 return stmt.executeUpdate() != -1;
             }
@@ -166,37 +166,53 @@ public class VideoServiceImp implements VideoService
     {
         long mid = UserServiceImpl.isAuthValid(auth, dataSource);
         if (mid == -1) return false;
-
         try (Connection conn = dataSource.getConnection())
         {
             // 获取此视频信息
             String select_video = "select * from videos where bv = ?";
-
-            try (PreparedStatement select_video_stmt = conn.prepareStatement(select_video))
+            String update_video = """
+                    update videos set public_time=null, commit_time=?, title=?, description=? where bv=?;
+                    """;
+            try (PreparedStatement select_video_stmt = conn.prepareStatement(select_video);
+                 PreparedStatement update_video_stmt = conn.prepareStatement(update_video))
             {
+                String title = "";
+                String description = "";
                 select_video_stmt.setString(1, bv);
+                //System.out.println("**********************************************");
+                //System.out.println(select_video_stmt);
                 try (ResultSet video_info = select_video_stmt.executeQuery())
                 {
                     if (video_info.next())
                     {
+                        title = video_info.getString("title");
+                        description = video_info.getString("description");
                         // 验证更改者信息
                         if (video_info.getLong("owner_mid") != mid)
                             return false;
                         // 验证视频时长有无修改
-                        if (video_info.getLong("duration") != req.getDuration())
+                        if (video_info.getFloat("duration") != req.getDuration())
                             return false;
-                        //todo
-                        return false;
+                        if (req.getPublicTime() == null)
+                            return false;
+                        update_video_stmt.setTimestamp(1, req.getPublicTime());
+                        update_video_stmt.setString(2, req.getTitle() == null ? title : req.getTitle());
+                        update_video_stmt.setString(3, req.getDescription() == null ? description : req.getDescription());
+                        update_video_stmt.setString(4, bv);
+                        //System.out.println(update_video_stmt);
+                        update_video_stmt.executeUpdate();
+                        return true;
                     }
+                    return false;
                 }
+
             }
         }
         catch (SQLException e)
         {
             e.printStackTrace();
-            throw new RuntimeException(e);
+            return false;
         }
-        return false;
     }
 
     @Override
@@ -234,7 +250,10 @@ public class VideoServiceImp implements VideoService
             stmtSearchVideo.setLong(2, authMid);
             stmtSearchVideo.setInt(3, pageSize);
             stmtSearchVideo.setInt(4, pageNum);
-            //log.info("search video sql {}", stmtSearchVideo);
+            //System.out.println("*************************************************");
+            //System.out.println(sqlKeywordsArray.toString());
+            //System.out.println(stmtSearchVideo);
+            //System.out.println("*************************************************");
 
             // 执行查询并处理结果集
             try (ResultSet resultSet = stmtSearchVideo.executeQuery())
@@ -322,19 +341,21 @@ public class VideoServiceImp implements VideoService
 
         try (Connection conn = dataSource.getConnection())
         {//检查存在/非作者/未审核
-            String check_video ="SELECT owner_mid,public_time from videos where bv=?;";
-            try(PreparedStatement check_query=conn.prepareStatement(check_video))
+            String check_video = "SELECT owner_mid,public_time, commit_time from videos where bv=?;";
+            try (PreparedStatement check_query = conn.prepareStatement(check_video))
             {
                 check_query.setString(1, bv);
                 try (ResultSet check_result = check_query.executeQuery())
                 {
                     if (!check_result.next() || check_result.getLong(1) == mid)
                         return false;
+                    if (check_result.getTimestamp("commit_time") == null)
+                        return false;
                 }
             }
             //检查用户资格
-            String check_user="SELECT identity from users where mid=?;";
-            try(PreparedStatement check_query=conn.prepareStatement(check_user))
+            String check_user = "SELECT identity from users where mid=?;";
+            try (PreparedStatement check_query = conn.prepareStatement(check_user))
             {
                 check_query.setLong(1, mid);
                 try (ResultSet check_result_of_user = check_query.executeQuery())
@@ -344,17 +365,17 @@ public class VideoServiceImp implements VideoService
                 }
             }
             //更新
-            Timestamp timestamp=new  Timestamp(System.currentTimeMillis());
-            String up_date_review="INSERT INTO REVIEW(bv,reviewer_mid,review_time) values(?,?,?);";
-            String up_date_video="update videos set public_time=? where bv= ?;";
-            try(PreparedStatement update_review=conn.prepareStatement(up_date_review);
-            PreparedStatement update_video=conn.prepareStatement(up_date_video))
+            Timestamp timestamp = new Timestamp(System.currentTimeMillis());
+            String up_date_review = "INSERT INTO REVIEW(bv,reviewer_mid,review_time) values(?,?,?);";
+            String up_date_video = "update videos set public_time=? where bv= ?;";
+            try (PreparedStatement update_review = conn.prepareStatement(up_date_review);
+                 PreparedStatement update_video = conn.prepareStatement(up_date_video))
             {
-                update_review.setString(1,bv);
-                update_review.setLong(2,mid);
-                update_review.setTimestamp(3,timestamp);
-                update_video.setTimestamp(1,timestamp);
-                update_video.setString(2,bv);
+                update_review.setString(1, bv);
+                update_review.setLong(2, mid);
+                update_review.setTimestamp(3, timestamp);
+                update_video.setTimestamp(1, timestamp);
+                update_video.setString(2, bv);
                 update_review.executeUpdate();
                 update_video.executeUpdate();
                 return true;
@@ -400,11 +421,11 @@ public class VideoServiceImp implements VideoService
                 stmtVideo.setString(1, bv);
                 try (ResultSet resultSet4 = stmtVideo.executeQuery())
                 {
-                    if (!resultSet4.next() || resultSet4.getLong(1) == mid||resultSet4.getTime(2)==null)
+                    if (!resultSet4.next() || resultSet4.getLong(1) == mid || resultSet4.getTime(2) == null)
                         return false;
                 }
             }
-            try(PreparedStatement check_statement = conn.prepareStatement(check_done_before))
+            try (PreparedStatement check_statement = conn.prepareStatement(check_done_before))
             {//检查之前有没有
                 check_statement.setLong(1, mid);
                 check_statement.setString(2, bv);
