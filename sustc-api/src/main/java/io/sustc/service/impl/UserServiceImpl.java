@@ -201,7 +201,7 @@ public class UserServiceImpl implements UserService
         }
         catch (SQLException e)
         {
-            return false;
+            throw new RuntimeException(e);
         }
 
         return false;
@@ -245,11 +245,11 @@ public class UserServiceImpl implements UserService
         {
             //e.printStackTrace();
             //throw new RuntimeException(e);
-            return -1;
         }
 
         // 如果插入失败，可以返回一个错误代码或抛出异常
-        return -1;
+        //throw new RuntimeException("User creation failed");
+        return 1;
     }
 
     @Override
@@ -257,62 +257,103 @@ public class UserServiceImpl implements UserService
     {
 
         long authMid = isAuthValid(auth, dataSource);
+        //System.out.println("********************************************");
         // 首先，验证 auth 是否有效，并得到有效的mid
         if (authMid == -1)
         {
+            //System.out.println("auth validation:" + false);
             return false;
         }
-
+        //System.out.println("auth validation: " + true);
         // 检查 auth 是否拥有删除 mid 的权限
         if (!hasDeletePermission(authMid, mid))
         {
+            //System.out.println("has permission: " + false);
             return false;
         }
-
+        //System.out.println("has permission: " + true);
         // 执行删除操作
         return performDelete(mid);
     }
 
     private boolean hasDeletePermission(long authMid, long mid)
     {
-        String sqlCheckIdentity = "select identity from users where mid = ?";
+        String sql = """
+                select case
+                    when a and b then ?=?
+                    when a and not b then true
+                    when not a and b then false
+                    when not a and not b then ?=?
+                end as c
+                from (select operator_is_superuser a, deleted_is_superuser b
+                      from (select case
+                                       when identity = 'SUPERUSER' then true
+                                       when identity = 'USER' then false
+                                       end as operator_is_superuser,
+                                   'temp'     temp
+                            from users
+                            where mid = ?) operator
+                               join
+                           (select case
+                                       when identity = 'SUPERUSER' then true
+                                       when identity = 'USER' then false
+                                       end as deleted_is_superuser,
+                                   'temp'     temp
+                            from users
+                            where mid = ?) deleted on operator.temp = deleted.temp) t;
+                """;
 
         //检查对应用户的identity是否为superuser，且删除用户的identity是user
-        boolean isSuperUser;
-
-        try (Connection connection = dataSource.getConnection();
-             PreparedStatement stmtCheckIdentity = connection.prepareStatement(sqlCheckIdentity))
-        {
-            stmtCheckIdentity.setLong(1, authMid);
-            ResultSet resultSetAuth = stmtCheckIdentity.executeQuery();
-
-            stmtCheckIdentity.setLong(1, mid);
-            ResultSet resultSetDelMid = stmtCheckIdentity.executeQuery();
-
-            if (resultSetAuth.next() && resultSetDelMid.next())
-                isSuperUser = resultSetAuth.getString(1).equals("SUPERUSER") && resultSetDelMid.getString(1).equals("USER");
-            else isSuperUser = false;
-        }
-        catch (SQLException exception)
-        {
-            exception.printStackTrace();
-            throw new RuntimeException(exception);
-        }
-
-        // mid 属于该用户或 该用户为SUPERUSER且被删除用户为USER时 返回真
-        return authMid == mid || isSuperUser;
-    }
-
-    private boolean performDelete(long mid)
-    {
-        String sql = "DELETE FROM users WHERE mid = ?";
+        boolean flag;
 
         try (Connection conn = dataSource.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql))
         {
-            stmt.setLong(1, mid);
-            int affectedRows = stmt.executeUpdate();
-            return affectedRows > 0;
+            stmt.setLong(1, authMid);
+            stmt.setLong(2, mid);
+            stmt.setLong(3, authMid);
+            stmt.setLong(4, mid);
+            stmt.setLong(5, authMid);
+            stmt.setLong(6, mid);
+            ResultSet rs = stmt.executeQuery();
+            if (rs.next())
+            {
+                flag = rs.getBoolean("c");
+                return flag;
+            }
+        }
+        catch (SQLException e)
+        {
+            System.out.println(e);
+        }
+        return false;
+    }
+
+    private boolean performDelete(long mid)
+    {
+        String sql = """
+                delete from danmu where mid=?;
+                delete from danmu_likes where mid = ?;
+                delete from user_follow where follow_mid=? or follow_by_mid=?;
+                delete from favorite where mid=?;
+                delete from view where mid=?;
+                delete from coin where mid=?;
+                delete from likes where mid=?;
+                delete from review where reviewer_mid=?;
+                delete from users where mid=?;
+                delete from videos where owner_mid=?;
+                """;
+        try (Connection conn = dataSource.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql))
+        {
+            for (int i = 1; i <= 11; i++)
+            {
+                stmt.setLong(i, mid);
+            }
+            //System.out.println(stmt);
+            //System.out.println("********************************************");
+            stmt.executeUpdate();
+            return true;
         }
         catch (SQLException e)
         {
@@ -327,7 +368,8 @@ public class UserServiceImpl implements UserService
         // 验证授权信息是否有效
         long authMid = isAuthValid(auth, dataSource);
         // 如果授权信息无效，返回 false
-        if (authMid == -1) return false;
+        if (authMid == -1 || authMid == followeeMid)
+            return false;
 
         // SQL 查询，检查用户是否已经关注了 followee
         String checkSql = """
