@@ -253,8 +253,6 @@ public class VideoServiceImp implements VideoService
                       from (select sum(time) as total, count(*) as num from view where bv = ?) tmp
                                join videos on videos.bv=?
                       where tmp is not null;""";
-            //String query = """
-            //        select duration from videos""";
             PreparedStatement preparedStatement = conn.prepareStatement(query);
             preparedStatement.setString(1, bv);
             preparedStatement.setString(2, bv);
@@ -308,43 +306,40 @@ public class VideoServiceImp implements VideoService
         if (mid == -1) return false;
 
         try (Connection conn = dataSource.getConnection())
-        {
-            String query4 = "SELECT * FROM videos WHERE BV=?;";
-            PreparedStatement preparedStatement4 = conn.prepareStatement(query4);
-            preparedStatement4.setString(1, bv);
-            ResultSet resultSet4 = preparedStatement4.executeQuery();
-            if (!resultSet4.next() || resultSet4.getLong(1) == mid)
+        {//检查存在/非作者/未审核
+            String check_video ="SELECT owner_mid,public_time from videos where bv=?;";
+            try(PreparedStatement check_query=conn.prepareStatement(check_video))
             {
-                return false;
+                check_query.setString(1,bv);
+                ResultSet check_result=check_query.executeQuery();
+                if (!check_result.next()||check_result.getLong(1)==mid||check_result.getTime(2)!=null)
+                    return false;
             }
-            String query6 = "SELECT identity FROM USERS where mid= ?";
-            PreparedStatement preparedStatement = conn.prepareStatement(query6);
-            preparedStatement.setLong(1, mid);
-            ResultSet resultSet = preparedStatement.executeQuery();
-            if (!resultSet.next())
+            //检查用户资格
+            String check_user="SELECT identity from users where mid=?;";
+            try(PreparedStatement check_query=conn.prepareStatement(check_user))
             {
-                return false;
+                check_query.setLong(1,mid);
+                ResultSet check_result=check_query.executeQuery();
+                if (!check_result.next()||!check_result.getString(1).equals("SUPERUSER"))
+                    return false;
             }
-            String query3 = "SELECT * FROM review WHERE BV=?;";
-            PreparedStatement preparedStatement3 = conn.prepareStatement(query3);
-            preparedStatement3.setLong(1, mid);
-            ResultSet resultSet3 = preparedStatement3.executeQuery();
-            if (!resultSet3.next())
+            //更新
+            Timestamp timestamp=new  Timestamp(System.currentTimeMillis());
+            String up_date_review="INSERT INTO REVIEW(bv,reviewer_mid,review_time) values(?,?,?);";
+            String up_date_video="update videos set public_time=? where bv= ?;";
+            try(PreparedStatement update_review=conn.prepareStatement(up_date_review);
+            PreparedStatement update_video=conn.prepareStatement(up_date_video))
             {
-                String query5 = "INSERT INTO review(bv,reviewer_mid,review_time) values (?,?,?);";
-                PreparedStatement preparedStatement5 = conn.prepareStatement(query5);
-                preparedStatement5.setLong(2, mid);
-                preparedStatement5.setString(1, bv);
-                preparedStatement5.setTime(3, new Time(System.currentTimeMillis()));
-                preparedStatement5.executeUpdate();
-                ;
+                update_review.setString(1,bv);
+                update_review.setLong(2,mid);
+                update_review.setTimestamp(3,timestamp);
+                update_video.setTimestamp(1,timestamp);
+                update_video.setString(2,bv);
+                update_review.executeUpdate();
+                update_video.executeUpdate();
                 return true;
             }
-            else
-            {
-                return false;
-            }
-
         }
         catch (SQLException e)
         {
@@ -379,47 +374,47 @@ public class VideoServiceImp implements VideoService
         try (Connection conn = dataSource.getConnection())
         {
 
-            String query4 = "SELECT * FROM videos WHERE BV= ? ; ";
-            String check_done_before = "SELECT * FROM " + op + " WHERE MID = ? ;";
-            String update_op = "INSERT INTO " + op + " (bv, mid) values (?, ?) ;";
-
-            try (PreparedStatement stmtVideo = conn.prepareStatement(query4))
-            {
+            String query_video = "SELECT owner_mid,public_time FROM videos WHERE BV= ? ; ";
+            String check_done_before = "SELECT * FROM " + op + " WHERE MID = ? and bv=? ;";
+            try (PreparedStatement stmtVideo = conn.prepareStatement(query_video))
+            {//检查视频发布/存在，不能被作者操作
                 stmtVideo.setString(1, bv);
                 try (ResultSet resultSet4 = stmtVideo.executeQuery())
                 {
-                    if (!resultSet4.next() || resultSet4.getLong(1) == mid)
+                    if (!resultSet4.next() || resultSet4.getLong(1) == mid||resultSet4.getTime(2)==null)
                         return false;
                 }
             }
-            List<String> res = searchVideo(auth, bv, 1, 1);
-            if (res == null)
-                return false;
+            try(PreparedStatement check_statement = conn.prepareStatement(check_done_before))
+            {//检查之前有没有
+                check_statement.setLong(1, mid);
+                check_statement.setString(2, bv);
+                ResultSet exist_query = check_statement.executeQuery();
+                if (!exist_query.next())
 
-
-            PreparedStatement check_statement = conn.prepareStatement(check_done_before);
-            check_statement.setLong(1, mid);
-            ResultSet resultSet3 = check_statement.executeQuery();
-            if (!resultSet3.next())
-
-            {
-                PreparedStatement insert_statement = conn.prepareStatement(update_op);
-                insert_statement.setLong(2, mid);
-                insert_statement.setString(1, bv);
-                insert_statement.executeUpdate();
-                return true;
-            }
-            else
-            {
-                if (!op.equals("coin"))
                 {
+                    String update_op = "INSERT INTO " + op + " (bv, mid) values (?, ?) ;";
                     PreparedStatement insert_statement = conn.prepareStatement(update_op);
-                    insert_statement.setLong(1, mid);
-                    insert_statement.setString(2, bv);
+                    insert_statement.setLong(2, mid);
+                    insert_statement.setString(1, bv);
                     insert_statement.executeUpdate();
+                    return true;
                 }
-                return false;
+                else
+                {
+                    if (!op.equals("coin"))
+                    {
+                        String update_op="DELETE FROM "+op+" WHERE MID=? and BV=?;";
+                        PreparedStatement insert_statement = conn.prepareStatement(update_op);
+                        insert_statement.setLong(1, mid);
+                        insert_statement.setString(2, bv);
+                        insert_statement.executeUpdate();
+                    }
+                    return false;
+                }
             }
+
+
         }
         catch (SQLException e)
         {
