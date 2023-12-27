@@ -38,8 +38,8 @@ public class DatabaseServiceImpl implements DatabaseService
     {
         bigSource = new DruidDataSource();
         bigSource.setDriverClassName("org.postgresql.Driver");
-        bigSource.setUsername("postgres");
-        bigSource.setPassword("123abc");
+        bigSource.setUsername("sustc");
+        bigSource.setPassword("123456");
         bigSource.setUrl("jdbc:postgresql://localhost:5432/sustc?useUnicode=true&characterEncoding=UTF-8");
         bigSource.setInitialSize(1);
         bigSource.setMaxActive(200);
@@ -75,7 +75,7 @@ public class DatabaseServiceImpl implements DatabaseService
     )
     {
         importUsersInParallel(userRecords);
-        System.out.println("************* import video... begin**************");
+        //System.out.println("************* import video... begin**************");
         importVideo(videoRecords, danmuRecords, userRecords);
         bigSource.close();
     }
@@ -125,8 +125,8 @@ public class DatabaseServiceImpl implements DatabaseService
             log.error("Error during importing danmu {}", e.toString());
             throw new RuntimeException(e);
         }
-        log.info("{} danmu are imported.", count2);
-        log.info("{} danmu_like are imported.", count);
+        //log.info("{} danmu are imported.", count2);
+        //log.info("{} danmu_like are imported.", count);
     }
 
     private void importUsersInParallel(List<UserRecord> userRecords)
@@ -160,7 +160,7 @@ public class DatabaseServiceImpl implements DatabaseService
             Thread.currentThread().interrupt();
         }
 
-        log.info("{} users are imported.", totalRecords);
+        //log.info("{} users are imported.", totalRecords);
     }
 
     private void importUser(List<UserRecord> userRecords)
@@ -246,7 +246,7 @@ public class DatabaseServiceImpl implements DatabaseService
             }
             statementVideo.executeBatch();
             statementVideo.clearBatch();
-            log.info("{} videos are imported.", count);
+            //log.info("{} videos are imported.", count);
 
             int n = 7;
             Thread[] thread = new Thread[n];
@@ -315,7 +315,7 @@ public class DatabaseServiceImpl implements DatabaseService
                 int totalViews = videoRecords.stream()
                         .mapToInt(vr -> vr.getViewerMids().length)
                         .sum();
-                log.info("{} views are imported.", totalViews);
+                //log.info("{} views are imported.", totalViews);
             });
 
 
@@ -353,7 +353,7 @@ public class DatabaseServiceImpl implements DatabaseService
             int totalFollows = userRecords.stream()
                     .mapToInt(record -> record.getFollowing().length)
                     .sum();
-            log.info("{} follows are prepared.", totalFollows);
+            //log.info("{} follows are prepared.", totalFollows);
             //catch (InterruptedException e) {
             //    throw new RuntimeException(e);
             //}
@@ -448,7 +448,7 @@ public class DatabaseServiceImpl implements DatabaseService
             Thread.currentThread().interrupt();
         }
 
-        log.info("{} are imported", type); // 记录日志
+        //log.info("{} are imported", type); // 记录日志
     }
 
     // 辅助方法：导入单个视频记录（喜欢、投币、收藏）
@@ -508,7 +508,7 @@ public class DatabaseServiceImpl implements DatabaseService
             }
             statementReview.executeBatch(); // 处理剩余记录
             statementReview.clearBatch();
-            log.info("{} reviews are imported.", count);
+            //log.info("{} reviews are imported.", count);
         }
         catch (SQLException e)
         {

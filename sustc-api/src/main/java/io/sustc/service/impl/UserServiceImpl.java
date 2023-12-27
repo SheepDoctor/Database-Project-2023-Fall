@@ -257,21 +257,21 @@ public class UserServiceImpl implements UserService
     {
 
         long authMid = isAuthValid(auth, dataSource);
-        //System.out.println("********************************************");
+        System.out.println("********************************************");
         // 首先，验证 auth 是否有效，并得到有效的mid
         if (authMid == -1)
         {
-            //System.out.println("auth validation:" + false);
+            System.out.println("auth validation:" + false);
             return false;
         }
-        //System.out.println("auth validation: " + true);
+        System.out.println("auth validation: " + true);
         // 检查 auth 是否拥有删除 mid 的权限
         if (!hasDeletePermission(authMid, mid))
         {
-            //System.out.println("has permission: " + false);
+            System.out.println("has permission: " + false);
             return false;
         }
-        //System.out.println("has permission: " + true);
+        System.out.println("has permission: " + true);
         // 执行删除操作
         return performDelete(mid);
     }
@@ -315,6 +315,7 @@ public class UserServiceImpl implements UserService
             stmt.setLong(4, mid);
             stmt.setLong(5, authMid);
             stmt.setLong(6, mid);
+            System.out.println(stmt);
             ResultSet rs = stmt.executeQuery();
             if (rs.next())
             {
@@ -351,7 +352,7 @@ public class UserServiceImpl implements UserService
                 stmt.setLong(i, mid);
             }
             //System.out.println(stmt);
-            //System.out.println("********************************************");
+            System.out.println("********************************************");
             stmt.executeUpdate();
             return true;
         }

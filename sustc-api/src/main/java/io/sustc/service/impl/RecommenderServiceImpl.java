@@ -32,7 +32,7 @@ public class RecommenderServiceImpl implements RecommenderService
                     from (select bv, mid from view where bv = ?) t1
                              inner join (select * from view where bv != ?) v2 on t1.mid = v2.mid
                     group by v2.bv
-                    order by count(v2.mid) desc
+                    order by count(v2.mid) desc, bv
                     limit 5;""";
             PreparedStatement stmt = conn.prepareStatement(sql);
             stmt.setString(1, bv);

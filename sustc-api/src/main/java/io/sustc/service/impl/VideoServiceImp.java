@@ -46,14 +46,17 @@ public class VideoServiceImp implements VideoService
     {
         // 验证授权信息是否有效
         long authenticatedUserId = isAuthValid(auth, dataSource);
-        if (authenticatedUserId == -1) return null; // 如果授权无效，返回 null
+        if (authenticatedUserId == -1)
+            return null; // 如果授权无效，返回 null
 
         // 检查视频请求的有效性
         if (req == null || req.getTitle() == null || req.getTitle().trim().isEmpty()
-                || req.getDuration() < 10 || req.getPublicTime().before(Timestamp.valueOf(LocalDateTime.now())))
+                || req.getDuration() < 10 || req.getPublicTime() == null || req.getPublicTime().before(Timestamp.valueOf(LocalDateTime.now())))
         {
             return null; // 请求无效，返回 null
         }
+        // 测试有无同名的
+        String check = "select count(*) cnt from videos where title=? and owner_mid=?;";
 
         // 生成视频 BV 号
         String bv = generateBvNumber();
@@ -62,7 +65,8 @@ public class VideoServiceImp implements VideoService
         String insertVideoSql = "INSERT INTO videos(bv, title, owner_mid, commit_time, public_time, duration, description)" +
                 " VALUES(?, ?, ?, ?, ?, ?, ?)";
         try (Connection conn = dataSource.getConnection();
-             PreparedStatement videoInsertStmt = conn.prepareStatement(insertVideoSql))
+             PreparedStatement videoInsertStmt = conn.prepareStatement(insertVideoSql);
+             PreparedStatement checkStmt = conn.prepareStatement(check))
         {
             videoInsertStmt.setString(1, bv);
             videoInsertStmt.setString(2, req.getTitle());
@@ -71,7 +75,17 @@ public class VideoServiceImp implements VideoService
             videoInsertStmt.setTimestamp(5, req.getPublicTime());
             videoInsertStmt.setLong(6, (long) req.getDuration());
             videoInsertStmt.setString(7, req.getDescription());
-
+            checkStmt.setString(1, req.getTitle());
+            checkStmt.setLong(2, authenticatedUserId);
+            ResultSet rs = checkStmt.executeQuery();
+            if (rs.next())
+            {
+                if (rs.getInt("cnt") != 0)
+                {
+                    conn.close();
+                    return null;
+                }
+            }
             videoInsertStmt.executeUpdate();
         }
         catch (SQLException e)
