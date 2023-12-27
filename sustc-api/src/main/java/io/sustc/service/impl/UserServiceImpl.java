@@ -124,6 +124,8 @@ public class UserServiceImpl implements UserService
             return -1;
         }
 
+        //System.out.println("********************************************");
+        //System.out.println(req.getSex());
         // 验证生日格式
         if (req.getBirthday() != null && !isValidBirthday(req.getBirthday()))
         {
@@ -142,12 +144,11 @@ public class UserServiceImpl implements UserService
     // 验证生日格式
     private boolean isValidBirthday(String birthday)
     {
-        System.out.println(birthday);
-        birthday = birthday.replace('月', '-');
-        birthday = birthday.replace("日", "");
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy年MM月dd日");
         sdf.setLenient(false); // 设置为严格的日期解析，不允许日期溢出（例如2月30日）
-        birthday = "2024-" + birthday;
+        birthday = "2024年" + birthday;
+        //System.out.println(birthday);
+        //System.out.println("********************************************");
         try
         {
             // 尝试解析日期
@@ -182,7 +183,7 @@ public class UserServiceImpl implements UserService
         {
             sql = "SELECT COUNT(*) cnt FROM users WHERE name = '" + name + "' OR qq = '" + qq + "' OR wechat = '" + wechat + "'";
         }
-        System.out.println(sql);
+        //System.out.println(sql);
         try (Connection conn = dataSource.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql))
         {
@@ -200,7 +201,7 @@ public class UserServiceImpl implements UserService
         }
         catch (SQLException e)
         {
-            throw new RuntimeException(e);
+            return false;
         }
 
         return false;
@@ -231,7 +232,7 @@ public class UserServiceImpl implements UserService
             stmt.setString(6, req.getWechat());
             stmt.setString(7, req.getPassword());
 
-            System.out.println(stmt);
+            //System.out.println(stmt);
 
             // 执行查询并获取返回的主键
             ResultSet rs = stmt.executeQuery();
@@ -242,12 +243,13 @@ public class UserServiceImpl implements UserService
         }
         catch (SQLException e)
         {
-            e.printStackTrace();
-            throw new RuntimeException(e);
+            //e.printStackTrace();
+            //throw new RuntimeException(e);
+            return -1;
         }
 
         // 如果插入失败，可以返回一个错误代码或抛出异常
-        throw new RuntimeException("User creation failed");
+        return -1;
     }
 
     @Override
