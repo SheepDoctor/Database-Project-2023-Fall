@@ -79,7 +79,7 @@ public class BenchmarkService
 
         return new BenchmarkResult(endTime - startTime);
     }
-/*
+
     @BenchmarkStep(order = 2, description = "Test VideoService#searchVideo(AuthInfo, String, int, int)")
     public BenchmarkResult videoSearch1()
     {
@@ -447,6 +447,7 @@ public class BenchmarkService
 
         return new BenchmarkResult(pass, null);
     }
+
     @BenchmarkStep(order = 13, description = "Test VideoService#coinVideo(AuthInfo, String)")
     public BenchmarkResult videoCoin()
     {
@@ -541,7 +542,7 @@ public class BenchmarkService
 
         return new BenchmarkResult(pass, endTime - startTime);
     }
-*/
+
     @BenchmarkStep(order = 16, description = "Test VideoService#postVideo(AuthInfo, PostVideoReq)")
     public BenchmarkResult videoPost()
     {
@@ -588,6 +589,7 @@ public class BenchmarkService
 
         return new BenchmarkResult(pass, endTime - startTime);
     }
+
     @BenchmarkStep(order = 17, description = "Test UserService#register(RegisterUserReq)")
     public BenchmarkResult userRegister()
     {
@@ -752,145 +754,145 @@ public class BenchmarkService
         return new BenchmarkResult(pass, endTime - startTime);
     }
 
-    /*
-        @BenchmarkStep(order = 21, description = "Test VideoService#deleteVideo(AuthInfo, String)")
-        public BenchmarkResult videoDelete()
+
+    @BenchmarkStep(order = 21, description = "Test VideoService#deleteVideo(AuthInfo, String)")
+    public BenchmarkResult videoDelete()
+    {
+        List<Map.Entry<Object[], Boolean>> cases = deserialize(BenchmarkConstants.TEST_DATA, BenchmarkConstants.VIDEO_DELETE);
+        val pass = new AtomicLong();
+
+        AuthInfo superuser = deserialize(BenchmarkConstants.TEST_DATA, BenchmarkConstants.SUPER_USER_AUTH);
+
+        val startTime = System.currentTimeMillis();
+        postedVideo.parallelStream().forEach(it ->
         {
-            List<Map.Entry<Object[], Boolean>> cases = deserialize(BenchmarkConstants.TEST_DATA, BenchmarkConstants.VIDEO_DELETE);
-            val pass = new AtomicLong();
-
-            AuthInfo superuser = deserialize(BenchmarkConstants.TEST_DATA, BenchmarkConstants.SUPER_USER_AUTH);
-
-            val startTime = System.currentTimeMillis();
-            postedVideo.parallelStream().forEach(it ->
+            try
             {
-                try
+                val res = videoService.deleteVideo(superuser, it);
+                if (res)
                 {
-                    val res = videoService.deleteVideo(superuser, it);
-                    if (res)
-                    {
-                        pass.incrementAndGet();
-                    }
-                    else
-                    {
-                        log.debug("Wrong answer for {}: expected true, got false", it);
-                    }
+                    pass.incrementAndGet();
                 }
-                catch (Exception e)
+                else
                 {
-                    log.error("Exception thrown for {}", it, e);
+                    log.debug("Wrong answer for {}: expected true, got false", it);
                 }
-            });
-            cases.forEach(it ->
+            }
+            catch (Exception e)
             {
-                try
-                {
-                    val args = it.getKey();
-                    val res = videoService.deleteVideo((AuthInfo) args[0], (String) args[1]);
-                    if (Objects.equals(it.getValue(), res))
-                    {
-                        pass.incrementAndGet();
-                    }
-                    else
-                    {
-                        log.debug("Wrong answer for {}: expected {}, got {}", it.getKey(), it.getValue(), res);
-                    }
-                }
-                catch (Exception e)
-                {
-                    log.error("Exception thrown for {}", it, e);
-                }
-            });
-            val endTime = System.currentTimeMillis();
-
-            return new BenchmarkResult(pass, endTime - startTime);
-        }
-
-        @BenchmarkStep(order = 22, description = "Test UserService#deleteAccount(AuthInfo, long)")
-        public BenchmarkResult userDelete()
+                log.error("Exception thrown for {}", it, e);
+            }
+        });
+        cases.forEach(it ->
         {
-            List<Map.Entry<Object[], Boolean>> cases = deserialize(BenchmarkConstants.TEST_DATA, BenchmarkConstants.USER_DELETE);
-            val pass = new AtomicLong();
-
-            AuthInfo superuser = deserialize(BenchmarkConstants.TEST_DATA, BenchmarkConstants.SUPER_USER_AUTH);
-
-            val startTime = System.currentTimeMillis();
-            registeredUser.parallelStream().forEach(it ->
+            try
             {
-                try
+                val args = it.getKey();
+                val res = videoService.deleteVideo((AuthInfo) args[0], (String) args[1]);
+                if (Objects.equals(it.getValue(), res))
                 {
-                    val res = userService.deleteAccount(superuser, it);
-                    if (res)
-                    {
-                        pass.incrementAndGet();
-                    }
-                    else
-                    {
-                        log.debug("Wrong answer for {}: expected true, got false", it);
-                    }
+                    pass.incrementAndGet();
                 }
-                catch (Exception e)
+                else
                 {
-                    log.error("Exception thrown for {}", it, e);
+                    log.debug("Wrong answer for {}: expected {}, got {}", it.getKey(), it.getValue(), res);
                 }
-            });
-            cases.forEach(it ->
+            }
+            catch (Exception e)
             {
-                try
-                {
-                    val args = it.getKey();
-                    val res = userService.deleteAccount((AuthInfo) args[0], (long) args[1]);
-                    if (Objects.equals(it.getValue(), res))
-                    {
-                        pass.incrementAndGet();
-                    }
-                    else
-                    {
-                        log.debug("Wrong answer for {}: expected {}, got {}", it.getKey(), it.getValue(), res);
-                    }
-                }
-                catch (Exception e)
-                {
-                    log.error("Exception thrown for {}", it, e);
-                }
-            });
-            val endTime = System.currentTimeMillis();
+                log.error("Exception thrown for {}", it, e);
+            }
+        });
+        val endTime = System.currentTimeMillis();
 
-            return new BenchmarkResult(pass, endTime - startTime);
-        }
+        return new BenchmarkResult(pass, endTime - startTime);
+    }
 
-        @BenchmarkStep(order = 23, description = "Test UserService#follow(AuthInfo, long)")
-        public BenchmarkResult userFollow()
+    @BenchmarkStep(order = 22, description = "Test UserService#deleteAccount(AuthInfo, long)")
+    public BenchmarkResult userDelete()
+    {
+        List<Map.Entry<Object[], Boolean>> cases = deserialize(BenchmarkConstants.TEST_DATA, BenchmarkConstants.USER_DELETE);
+        val pass = new AtomicLong();
+
+        AuthInfo superuser = deserialize(BenchmarkConstants.TEST_DATA, BenchmarkConstants.SUPER_USER_AUTH);
+
+        val startTime = System.currentTimeMillis();
+        registeredUser.parallelStream().forEach(it ->
         {
-            List<Map.Entry<Object[], Boolean>> cases = deserialize(BenchmarkConstants.TEST_DATA, BenchmarkConstants.USER_FOLLOW);
-            val pass = new AtomicLong();
-
-            val startTime = System.currentTimeMillis();
-            cases.forEach(it ->
+            try
             {
-                try
+                val res = userService.deleteAccount(superuser, it);
+                if (res)
                 {
-                    val args = it.getKey();
-                    val res = userService.follow((AuthInfo) args[0], (long) args[1]);
-                    if (Objects.equals(it.getValue(), res))
-                    {
-                        pass.incrementAndGet();
-                    }
-                    else
-                    {
-                        log.debug("Wrong answer for {}: expected {}, got {}", it.getKey(), it.getValue(), res);
-                    }
+                    pass.incrementAndGet();
                 }
-                catch (Exception e)
+                else
                 {
-                    log.error("Exception thrown for {}", it.getKey(), e);
+                    log.debug("Wrong answer for {}: expected true, got false", it);
                 }
-            });
-            val endTime = System.currentTimeMillis();
+            }
+            catch (Exception e)
+            {
+                log.error("Exception thrown for {}", it, e);
+            }
+        });
+        cases.forEach(it ->
+        {
+            try
+            {
+                val args = it.getKey();
+                val res = userService.deleteAccount((AuthInfo) args[0], (long) args[1]);
+                if (Objects.equals(it.getValue(), res))
+                {
+                    pass.incrementAndGet();
+                }
+                else
+                {
+                    log.debug("Wrong answer for {}: expected {}, got {}", it.getKey(), it.getValue(), res);
+                }
+            }
+            catch (Exception e)
+            {
+                log.error("Exception thrown for {}", it, e);
+            }
+        });
+        val endTime = System.currentTimeMillis();
 
-            return new BenchmarkResult(pass, endTime - startTime);
-        }
-    */
+        return new BenchmarkResult(pass, endTime - startTime);
+    }
+
+    @BenchmarkStep(order = 23, description = "Test UserService#follow(AuthInfo, long)")
+    public BenchmarkResult userFollow()
+    {
+        List<Map.Entry<Object[], Boolean>> cases = deserialize(BenchmarkConstants.TEST_DATA, BenchmarkConstants.USER_FOLLOW);
+        val pass = new AtomicLong();
+
+        val startTime = System.currentTimeMillis();
+        cases.forEach(it ->
+        {
+            try
+            {
+                val args = it.getKey();
+                val res = userService.follow((AuthInfo) args[0], (long) args[1]);
+                if (Objects.equals(it.getValue(), res))
+                {
+                    pass.incrementAndGet();
+                }
+                else
+                {
+                    log.debug("Wrong answer for {}: expected {}, got {}", it.getKey(), it.getValue(), res);
+                }
+            }
+            catch (Exception e)
+            {
+                log.error("Exception thrown for {}", it.getKey(), e);
+            }
+        });
+        val endTime = System.currentTimeMillis();
+
+        return new BenchmarkResult(pass, endTime - startTime);
+    }
+
     @SneakyThrows
     @SuppressWarnings("unchecked")
     private <T> T deserialize(String... path)

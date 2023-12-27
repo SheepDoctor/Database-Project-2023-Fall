@@ -249,7 +249,7 @@ public class UserServiceImpl implements UserService
                                 if (crs.next())
                                 {
                                     int temp = crs.getInt("cnt");
-                                    System.out.println(temp);
+                                    //System.out.println(temp);
                                     if (temp == 0)
                                     {
                                         mid = -1;
