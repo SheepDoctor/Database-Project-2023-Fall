@@ -4,6 +4,7 @@ import io.sustc.dto.AuthInfo;
 
 import io.sustc.service.DanmuService;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -15,113 +16,12 @@ import java.util.List;
 import java.util.Set;
 
 @Service
+@Slf4j
 class DanmuServiceImpl implements DanmuService
 {
     @Autowired
     private DataSource dataSource;
 
-    /*public long sendDanmu(AuthInfo auth, String bv, String content, float time)
-    {
-        if (content.length() == 0)
-            return -1;
-
-        try (Connection connection = dataSource.getConnection())
-        {
-            // 执行数据库操作，使用connection对象
-            String query1 = "SELECT * FROM videos WHERE bv = ?;";
-            PreparedStatement query = connection.prepareStatement(query1);
-            query.setString(1, bv);
-            ResultSet videoRecord = query.executeQuery();
-            if (videoRecord == null)
-                return -1;
-            if (content.equals(" ") || content == null)
-                return -1;
-            if (videoRecord.getTime("public_time") == null)
-                return -1;
-            String query2 = "SELECT * FROM view WHERE bv = ?;";
-            PreparedStatement query2_ = connection.prepareStatement(query2);
-            query2_.setString(1, bv);
-            ResultSet viewerRecord = query2_.executeQuery();
-            if (viewerRecord == null)
-                return -1;
-            String query3 = "INSERT INTO danmu(BV, MID, TIME, CONTENT, POST_TIME,ID) VALUES (?, ?, ?, ?, ?, ?);";
-            String query4 = "SELECT COUNT(*) FROM danmu;";
-            PreparedStatement query4_ = connection.prepareStatement(query4);
-            PreparedStatement query3_ = connection.prepareStatement(query3);
-            ResultSet q4 = query4_.executeQuery();
-            query4_.execute();
-            query3_.setString(1, bv);
-            query3_.setLong(2, auth.getMid());
-            query3_.setTime(3, new Time((long) time));
-            query3_.setString(4, content);
-            query3_.setTime(5, new Time(System.currentTimeMillis()));
-            query3_.setBigDecimal(6, BigDecimal.valueOf(q4.getInt(1)));
-            query3_.executeUpdate();
-        }
-        catch (SQLException e)
-        {
-            e.printStackTrace(); // 实际开发中请处理异常逻辑
-        }
-        return auth.getMid();
-    }
-
-        public List<Long> displayDanmu(String bv, float timeStart, float timeEnd, boolean filter)
-    {
-        List<Long> res = new ArrayList<>();
-        if (timeEnd <= timeEnd | timeEnd < 0 | timeStart < 0)
-            return null;
-        try (Connection connection = dataSource.getConnection())
-        {
-            String query1 = "SELECT * FROM videos WHERE bv = ?;";
-            PreparedStatement query = connection.prepareStatement(query1);
-            query.setString(1, bv);
-            ResultSet videoRecord = query.executeQuery();
-            if (videoRecord == null)
-                return null;
-            if (videoRecord.getTime("commit_time") == null)
-                return null;
-            if (timeEnd > videoRecord.getInt("duration"))
-                return null;
-            String query2 = "SELECT * FROM danmu WHERE bv = ? and time between ? and ?;";
-            PreparedStatement query2_ = connection.prepareStatement(query2);
-            query2_.setString(1, bv);
-            query2_.setTime(2, new Time((long) timeStart));
-            query2_.setTime(3, new Time((long) timeEnd));
-            ResultSet danmuRecord = query2_.executeQuery();
-            danmuRecord.last();
-            int rows = danmuRecord.getRow();
-            danmuRecord.first();
-            for (int i = 0; i < rows; i++)
-            {
-                boolean flag = true;
-                if (filter)
-                {
-                    String cur_content = danmuRecord.getString("content");
-                    danmuRecord.first();
-                    for (int j = 0; j <= i; j++)
-                    {
-                        if (j != i)
-                        {
-                            if (danmuRecord.getString("content").equals(cur_content))
-                            {
-                                flag = false;
-                                break;
-                            }
-                        }
-                        danmuRecord.next();
-                    }
-                }
-                if (flag)
-                    res.add(danmuRecord.getTime("time").getTime());
-                danmuRecord.next();
-            }
-        }
-        catch (SQLException e)
-        {
-            throw new RuntimeException(e);
-        }
-        return res;
-    }*/
 
     public long sendDanmu(AuthInfo auth, String videoBv, String danmuContent, float danmuTime)
     {
@@ -146,21 +46,21 @@ class DanmuServiceImpl implements DanmuService
                 try (ResultSet videoResult = videoQuery.executeQuery())
                 {
                     if (!videoResult.next())
-                    {
                         return -1; // 视频不存在
-                    }
                     if (videoResult.getTime("public_time") == null)
-                    {
+
                         return -1; // 视频未发布
-                    }
+                    if (danmuTime > videoResult.getFloat("duration") || danmuTime < 0)
+                        return -1; // 弹幕时间不合法
                 }
             }
 
             // 检查用户是否已观看过该视频
-            String viewerQuerySql = "SELECT * FROM view WHERE bv = ?;";
+            String viewerQuerySql = "SELECT * FROM view WHERE bv = ? and mid = ? ;";
             try (PreparedStatement viewerQuery = connection.prepareStatement(viewerQuerySql))
             {
                 viewerQuery.setString(1, videoBv);
+                viewerQuery.setLong(2, authMid);
                 try (ResultSet viewerResult = viewerQuery.executeQuery())
                 {
                     if (!viewerResult.next())
@@ -258,28 +158,49 @@ class DanmuServiceImpl implements DanmuService
     @Override
     public boolean likeDanmu(AuthInfo auth, long danmuId)
     {
+        // 验证用户是否存在
+        long authMid = UserServiceImpl.isAuthValid(auth, dataSource);
+
+        // 检查auth信息是否非法
+        if (authMid == -1) return false;
+
         try (Connection connection = dataSource.getConnection())
         {
-            // 验证用户是否存在
-            long authMid = UserServiceImpl.isAuthValid(auth, dataSource);
-
-            // 检查auth信息是否非法
-            if (authMid == -1) return false;
-
             // 检查弹幕是否存在
-            String danmuQuerySql = "SELECT * FROM danmu WHERE id = ?;";
+            String bv;
+            String danmuQuerySql = "SELECT bv FROM danmu WHERE id = ?;";
             try (PreparedStatement danmuQuery = connection.prepareStatement(danmuQuerySql))
             {
                 danmuQuery.setLong(1, danmuId);
                 try (ResultSet danmuResult = danmuQuery.executeQuery())
                 {
-                    if (!danmuResult.next())
-                    {
-                        return false; // 弹幕不存在
-                    }
+                    if (!danmuResult.next()) return false; // 弹幕不存在
+                    else bv = danmuResult.getString("bv");
                 }
             }
 
+            // 检查用户是否看过视频
+            String watchedQuerySql = "SELECT count(*) FROM view WHERE mid = ? and bv = ? ;";
+            try (PreparedStatement danmuQuery = connection.prepareStatement(watchedQuerySql))
+            {
+                danmuQuery.setLong(1, authMid);
+                danmuQuery.setString(2, bv);
+                try (ResultSet danmuResult = danmuQuery.executeQuery())
+                {
+                    if (danmuResult.next() && danmuResult.getInt(1) == 0)
+                    {
+                        return false; // 用户未看过视频
+                    }
+                }
+            }
+        }
+        catch (SQLException e)
+        {
+            e.printStackTrace();
+            throw new RuntimeException("Database error in likeDanmu: " + e.getMessage());
+        }
+        try (Connection connection = dataSource.getConnection())
+        {
             // 检查用户是否已经点赞
             String likeCheckSql = "SELECT * FROM danmu_likes WHERE id = ? AND mid = ?;";
             try (PreparedStatement likeCheckQuery = connection.prepareStatement(likeCheckSql))
@@ -296,6 +217,7 @@ class DanmuServiceImpl implements DanmuService
                         {
                             insertLikeStmt.setLong(1, danmuId);
                             insertLikeStmt.setLong(2, authMid);
+                            //log.info("insert danmu: {}", insertLikeStmt);
                             insertLikeStmt.executeUpdate();
                             return true; // 点赞成功
                         }
@@ -308,6 +230,7 @@ class DanmuServiceImpl implements DanmuService
                         {
                             deleteLikeStmt.setLong(1, danmuId);
                             deleteLikeStmt.setLong(2, authMid);
+                            //log.info("delete danmu: {}", deleteLikeStmt);
                             deleteLikeStmt.executeUpdate();
                             return false; // 取消点赞成功
                         }
@@ -322,52 +245,5 @@ class DanmuServiceImpl implements DanmuService
         }
     }
 
-    /*public boolean likeDanmu(AuthInfo auth, long id)
-    {
-        try (Connection connection = dataSource.getConnection())
-        {
-            String query1 = "SELECT * FROM users WHERE bv = ?";
-            PreparedStatement query = connection.prepareStatement(query1);
-            query.setLong(1, auth.getMid());
-            ResultSet userService = query.executeQuery();
-            if (userService == null)
-                return false;
-
-            String query2 = "SELECT * FROM danmu WHERE id = ? ";
-            PreparedStatement query2_ = connection.prepareStatement(query2);
-            query2_.setLong(1, id);
-            ResultSet danmuRecord = query2_.executeQuery();
-            if (danmuRecord == null)
-                return false;
-
-            String q3 = "SELECT * FROM danmu_likes where id = ? and mid = ?";
-            PreparedStatement q3_ = connection.prepareStatement(q3);
-            q3_.setLong(1, id);
-            q3_.setLong(2, auth.getMid());
-            ResultSet resultSet3 = q3_.executeQuery();
-            if (resultSet3 == null)
-            {
-                String up = "INSERT INTO danmu_likes(id,mid) values(?,?);";
-                PreparedStatement preparedStatement4 = connection.prepareStatement(up);
-                preparedStatement4.setLong(1, id);
-                preparedStatement4.setLong(2, auth.getMid());
-                preparedStatement4.executeUpdate();
-                return true;
-            }
-            else
-            {
-                String up = "DELETE FROM danmu_likes where id= ? and mid = ? ;";
-                PreparedStatement preparedStatement4 = connection.prepareStatement(up);
-                preparedStatement4.setLong(1, id);
-                preparedStatement4.setLong(2, auth.getMid());
-                preparedStatement4.executeUpdate();
-                return false;
-            }
-        }
-        catch (SQLException e)
-        {
-            throw new RuntimeException(e);
-        }
-    }*/
 
 }

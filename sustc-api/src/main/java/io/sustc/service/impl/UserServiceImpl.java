@@ -12,7 +12,6 @@ import javax.sql.DataSource;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.sql.*;
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
@@ -40,6 +39,19 @@ public class UserServiceImpl implements UserService
             type = "qq";
         }
 
+        String hashedPwd = null;
+        if (type.equals("mid"))
+        {
+            try
+            {
+                hashedPwd = generateSha256Hash(auth.getPassword());
+            }
+            catch (NoSuchAlgorithmException e)
+            {
+                e.printStackTrace();
+            }
+        }
+
         String sqlSelectAuth = "select mid from users where " + type + " = ?";
         String sqlCheckMidAndPassWord = "select password from users where mid = ?";
         try (Connection conn = dataSource.getConnection();
@@ -58,9 +70,7 @@ public class UserServiceImpl implements UserService
                     {
                         if (resultSet.next())
                         {
-                            long ans = resultSet.getLong(1);
-                            conn.close();
-                            return ans; // 如果找到记录，返回对应的 mid
+                            return resultSet.getLong(1); // 如果找到记录，返回对应的 mid
                         }
                     }
                 }
@@ -71,8 +81,8 @@ public class UserServiceImpl implements UserService
                     try (ResultSet resultSet = stmtMid.executeQuery();
                     )
                     {
-                        if (resultSet.next() &&
-                                checkSha256Hash(auth.getPassword(), resultSet.getString("password")))
+                        if (resultSet.next() && hashedPwd != null &&
+                                hashedPwd.equals(resultSet.getString("password")))
                             return auth.getMid(); // 如果密码的哈希值匹配，返回 mid
                     }
                 }
@@ -151,10 +161,9 @@ public class UserServiceImpl implements UserService
             Date date = sdf.parse(birthday);
             return true;
         }
-        catch (ParseException e)
+        catch (Exception exception)
         {
             // 解析失败，说明日期无效
-            e.printStackTrace();
             return false;
         }
     }
@@ -264,14 +273,14 @@ public class UserServiceImpl implements UserService
              PreparedStatement stmtCheckIdentity = connection.prepareStatement(sqlCheckIdentity))
         {
             stmtCheckIdentity.setLong(1, authMid);
-            ResultSet resultSetAuth = stmtCheckIdentity.executeQuery();
-
             stmtCheckIdentity.setLong(1, mid);
-            ResultSet resultSetDelMid = stmtCheckIdentity.executeQuery();
-
-            if (resultSetAuth.next() && resultSetDelMid.next())
-                isSuperUser = resultSetAuth.getString(1).equals("SUPERUSER") && resultSetDelMid.getString(1).equals("USER");
-            else isSuperUser = false;
+            try (ResultSet resultSetAuth = stmtCheckIdentity.executeQuery();
+                 ResultSet resultSetDelMid = stmtCheckIdentity.executeQuery())
+            {
+                if (resultSetAuth.next() && resultSetDelMid.next())
+                    isSuperUser = resultSetAuth.getString(1).equals("SUPERUSER") && resultSetDelMid.getString(1).equals("USER");
+                else isSuperUser = false;
+            }
         }
         catch (SQLException exception)
         {
