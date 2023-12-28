@@ -14,6 +14,7 @@ import java.util.*;
 
 import static io.sustc.service.impl.UserServiceImpl.isAuthValid;
 
+
 @Service
 @Slf4j
 public class VideoServiceImp implements VideoService
@@ -75,6 +76,9 @@ public class VideoServiceImp implements VideoService
             videoInsertStmt.setTimestamp(5, req.getPublicTime());
             videoInsertStmt.setLong(6, (long) req.getDuration());
             videoInsertStmt.setString(7, req.getDescription());
+            //System.out.println("******************************************");
+            //System.out.println(videoInsertStmt);
+            //System.out.println("******************************************");
             checkStmt.setString(1, req.getTitle());
             checkStmt.setLong(2, authenticatedUserId);
             ResultSet rs = checkStmt.executeQuery();
@@ -135,22 +139,24 @@ public class VideoServiceImp implements VideoService
             ResultSet user_info = select_user_info_stmt.executeQuery();
 
             // 判断是否是superuser
-            if (user_info.next() && Objects.equals(user_info.getString("identity"), "superuser"))
+            if (user_info.next() && Objects.equals(user_info.getString("identity"), "SUPERUSER"))
             {
-                String sql = "delete from videos where bv ilike '" + bv + "'";
+                String sql = "delete from videos where bv ='BV" + bv.substring(2) + "'";
                 PreparedStatement stmt = conn.prepareStatement(sql);
-                return stmt.executeUpdate() != -1;
+                stmt.executeUpdate();
+                return true;
             }
 
             // 判断是否是视频的上传者
-            String select_video = "select owner_mid from videos where bv ilike '" + bv + "'";
+            String select_video = "select owner_mid from videos where bv = 'BV" + bv + "'";
             PreparedStatement select_video_stmt = conn.prepareStatement(select_video);
             ResultSet video_info = select_video_stmt.executeQuery();
             if (video_info.next() && video_info.getLong("owner_id") == mid)
             {
-                String sql = "delete from videos where bv ilike'" + bv + "'";
+                String sql = "delete from videos where bv = 'BV" + bv.substring(2) + "'";
                 PreparedStatement stmt = conn.prepareStatement(sql);
-                return stmt.executeUpdate() != -1;
+                stmt.executeUpdate();
+                return true;
             }
             return false;
         }
@@ -171,7 +177,7 @@ public class VideoServiceImp implements VideoService
             // 获取此视频信息
             String select_video = "select * from videos where bv = ?";
             String update_video = """
-                    update videos set public_time=null, commit_time=?, title=?, description=? where bv=?;
+                    update videos set public_time=?, commit_time=?, title=?, description=? where bv=?;
                     """;
             try (PreparedStatement select_video_stmt = conn.prepareStatement(select_video);
                  PreparedStatement update_video_stmt = conn.prepareStatement(update_video))
@@ -195,7 +201,9 @@ public class VideoServiceImp implements VideoService
                             return false;
                         if (req.getPublicTime() == null)
                             return false;
+
                         update_video_stmt.setTimestamp(1, req.getPublicTime());
+                        update_video_stmt.setTimestamp(2, Timestamp.valueOf(LocalDateTime.now()));
                         update_video_stmt.setString(2, req.getTitle() == null ? title : req.getTitle());
                         update_video_stmt.setString(3, req.getDescription() == null ? description : req.getDescription());
                         update_video_stmt.setString(4, bv);
@@ -250,6 +258,7 @@ public class VideoServiceImp implements VideoService
             stmtSearchVideo.setLong(2, authMid);
             stmtSearchVideo.setInt(3, pageSize);
             stmtSearchVideo.setInt(4, pageNum);
+            //log.info("search sql {} ", stmtSearchVideo);
             //System.out.println("*************************************************");
             //System.out.println(sqlKeywordsArray.toString());
             //System.out.println(stmtSearchVideo);
@@ -351,6 +360,8 @@ public class VideoServiceImp implements VideoService
                         return false;
                     if (check_result.getTimestamp("commit_time") == null)
                         return false;
+                    if (check_result.getTimestamp("public_time") == null)
+                        return false;
                 }
             }
             //检查用户资格
@@ -367,17 +378,16 @@ public class VideoServiceImp implements VideoService
             //更新
             Timestamp timestamp = new Timestamp(System.currentTimeMillis());
             String up_date_review = "INSERT INTO REVIEW(bv,reviewer_mid,review_time) values(?,?,?);";
-            String up_date_video = "update videos set public_time=? where bv= ?;";
-            try (PreparedStatement update_review = conn.prepareStatement(up_date_review);
-                 PreparedStatement update_video = conn.prepareStatement(up_date_video))
+            try (PreparedStatement update_review = conn.prepareStatement(up_date_review))
             {
                 update_review.setString(1, bv);
                 update_review.setLong(2, mid);
                 update_review.setTimestamp(3, timestamp);
-                update_video.setTimestamp(1, timestamp);
-                update_video.setString(2, bv);
+                //System.out.println("***********************************");
+                //System.out.println(update_review);
+                //System.out.println(update_video);
+                //System.out.println("***********************************");
                 update_review.executeUpdate();
-                update_video.executeUpdate();
                 return true;
             }
         }
