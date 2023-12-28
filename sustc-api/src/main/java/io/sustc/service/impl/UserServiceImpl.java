@@ -218,8 +218,8 @@ public class UserServiceImpl implements UserService
         {
             String sex = switch (req.getSex().name())
                     {
-                        case "MAN" -> "男";
-                        case "WOMAN" -> "女";
+                        case "MALE" -> "男";
+                        case "FEMALE" -> "女";
                         default -> "保密";
                     };
             // 设置 PreparedStatement 参数
@@ -365,7 +365,7 @@ public class UserServiceImpl implements UserService
     private boolean performDelete(long mid)
     {
         String sql = """
-                delete from danmu_likes where mid = ?;
+                delete from danmu_likes where mid = ? or danmu_likes.id in (select id from danmu where mid=?);
                 delete from user_follow where follow_mid=? or follow_by_mid=?;
                 delete from favorite where mid=?;
                 delete from view where mid=?;
@@ -375,11 +375,11 @@ public class UserServiceImpl implements UserService
                 delete from danmu where mid=?;
                 delete from users where mid=?;
                 delete from videos where owner_mid=?;
-                """;
+                """;//todo
         try (Connection conn = dataSource.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql))
         {
-            for (int i = 1; i <= 11; i++)
+            for (int i = 1; i <= 12; i++)
             {
                 stmt.setLong(i, mid);
             }

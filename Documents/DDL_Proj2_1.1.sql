@@ -135,6 +135,7 @@ create table view
     check (bv like 'BV%')                     -- 检查 'bv' 是否以 'BV' 开头，确保BV号格式正确。
 );
 
+
 GRANT
 SELECT,
 INSERT

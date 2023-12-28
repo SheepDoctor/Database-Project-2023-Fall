@@ -14,6 +14,7 @@ import java.util.*;
 
 import static io.sustc.service.impl.UserServiceImpl.isAuthValid;
 
+
 @Service
 @Slf4j
 public class VideoServiceImp implements VideoService
