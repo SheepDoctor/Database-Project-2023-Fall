@@ -258,7 +258,7 @@ public class VideoServiceImp implements VideoService
             stmtSearchVideo.setLong(2, authMid);
             stmtSearchVideo.setInt(3, pageSize);
             stmtSearchVideo.setInt(4, pageNum);
-            log.info("search sql {} ", stmtSearchVideo);
+            //log.info("search sql {} ", stmtSearchVideo);
             //System.out.println("*************************************************");
             //System.out.println(sqlKeywordsArray.toString());
             //System.out.println(stmtSearchVideo);
@@ -360,6 +360,8 @@ public class VideoServiceImp implements VideoService
                         return false;
                     if (check_result.getTimestamp("commit_time") == null)
                         return false;
+                    if (check_result.getTimestamp("public_time") == null)
+                        return false;
                 }
             }
             //检查用户资格
@@ -376,21 +378,16 @@ public class VideoServiceImp implements VideoService
             //更新
             Timestamp timestamp = new Timestamp(System.currentTimeMillis());
             String up_date_review = "INSERT INTO REVIEW(bv,reviewer_mid,review_time) values(?,?,?);";
-            String up_date_video = "update videos set public_time=? where bv= ?;";
-            try (PreparedStatement update_review = conn.prepareStatement(up_date_review);
-                 PreparedStatement update_video = conn.prepareStatement(up_date_video))
+            try (PreparedStatement update_review = conn.prepareStatement(up_date_review))
             {
                 update_review.setString(1, bv);
                 update_review.setLong(2, mid);
                 update_review.setTimestamp(3, timestamp);
-                update_video.setTimestamp(1, timestamp);
-                update_video.setString(2, bv);
                 //System.out.println("***********************************");
                 //System.out.println(update_review);
                 //System.out.println(update_video);
                 //System.out.println("***********************************");
                 update_review.executeUpdate();
-                update_video.executeUpdate();
                 return true;
             }
         }

@@ -754,7 +754,6 @@ public class BenchmarkService
         return new BenchmarkResult(pass, endTime - startTime);
     }
 
-
     @BenchmarkStep(order = 21, description = "Test VideoService#deleteVideo(AuthInfo, String)")
     public BenchmarkResult videoDelete()
     {
@@ -892,6 +891,7 @@ public class BenchmarkService
 
         return new BenchmarkResult(pass, endTime - startTime);
     }
+
     @SneakyThrows
     @SuppressWarnings("unchecked")
     private <T> T deserialize(String... path)
